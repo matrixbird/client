@@ -1,4 +1,6 @@
 <script>
+import { onMount, tick } from 'svelte';
+import * as EmailValidator from 'email-validator';
 import { 
     expand, 
     collapse, 
@@ -7,8 +9,11 @@ import {
     close 
 } from '$lib/assets/icons.js'
 
+import { createStore } from '$lib/store/store.svelte.js'
+const store = createStore()
+
 import { createEditorStore } from '$lib/store/editor.svelte.js'
-const store = createEditorStore()
+const editorStore = createEditorStore()
 
 let { item, index } = $props();
 
@@ -16,12 +21,12 @@ let expanded = $state(false)
 let minimized = $state(false)
 
 let maximized_exists = $derived.by(() => {
-    return store.maximized !== null
+    return editorStore.maximized !== null
 })
 
 $effect(() => {
     if(maximized_exists) {
-        if(store.maximized != item.id) {
+        if(editorStore.maximized != item.id) {
             minimizeWindow()
         }
     }
@@ -33,20 +38,23 @@ function expandWindow() {
         return
     }
     expanded = !expanded
+    if(expanded) {
+        focusBody()
+    }
 }
 
 $effect(() => {
     if(expanded) {
         console.log('expanded', item.id)
-        store.maximizeEditor(item.id)
+        editorStore.maximizeEditor(item.id)
     }
 })
 
 function minimizeWindow() {
     minimized = true
     expanded = false
-    if(store.maximized === item.id) {
-        store.maximizeEditor(null)
+    if(editorStore.maximized === item.id) {
+        editorStore.maximizeEditor(null)
     }
 }
 
@@ -55,11 +63,59 @@ function toggleMinimize() {
     if(expanded) {
         expanded = false
     }
+    if(!minimized) {
+        focusTo()
+    }
 }
 
 function closeWindow() {
-    store.killEditor(item.id)
+    editorStore.killEditor(item.id)
 }
+
+
+let to = $state('');
+let to_input;
+let subject = $state('');
+let subject_input;
+let body = $state('');
+let body_input;
+
+onMount(() => {
+    focusTo()
+})
+
+async function focusTo() {
+    await tick()
+    to_input.focus()
+}
+
+async function focusSubject() {
+    await tick()
+    subject_input.focus()
+}
+
+async function focusBody() {
+    await tick()
+    body_input.focus()
+}
+
+async function process() {
+    /*
+    let email_valid = EmailValidator.validate(to);
+    console.log('email_valid', email_valid)
+
+    if(!email_valid) {
+        to_input.focus();
+        return;
+    }
+    */
+
+
+    const resp = await store.matrixClient.getProfileInfo("@bee:localhost:8480")
+    console.log('resp', resp)
+
+}
+
 </script>
 
 <div class="box editor grid grid-rows-[auto_1fr] 
@@ -102,10 +158,36 @@ class:expand={expanded}>
     </div>
 
     {#if !minimized}
-    <div class="content">
-            {index}
-        editor
-            {item.id}
+    <div class="content text-sm p-1 grid grid-rows-[auto_auto_1fr_auto]">
+
+            <div class="border-b border-border">
+                <input type="email" class="px-2 py-3" 
+                    bind:this={to_input}
+                    bind:value={to}
+                    placeholder="To" 
+                />
+            </div>
+
+            <div class="border-b border-border">
+                <input type="text" class="px-2 py-3" 
+                    bind:this={subject_input}
+                    bind:value={subject}
+                    placeholder="Subject"
+                />
+            </div>
+
+            <div class="">
+                <textarea class="p-2"
+                    bind:this={body_input}
+                    bind:value={body}
+                >
+                </textarea>
+            </div>
+            <div class="">
+                <button class="p-2" onclick={process}>
+                    Send
+                </button>
+            </div>
     </div>
     {/if}
 </div>
@@ -143,5 +225,13 @@ class:expand={expanded}>
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.4);
+}
+
+input, textarea {
+    border:none;
+    resize: none;
+    height: 100%;
+    width: 100%;
+    outline: none;
 }
 </style>
