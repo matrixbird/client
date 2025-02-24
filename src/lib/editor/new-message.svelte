@@ -1,7 +1,7 @@
 <script>
 import { plus } from '$lib/assets/icons.js'
-import { createStore } from '$lib/store/store.svelte.js'
-const store = createStore()
+import { createEditorStore } from '$lib/store/editor.svelte.js'
+const store = createEditorStore()
 
 function newMessage() {
     store.newEditor()

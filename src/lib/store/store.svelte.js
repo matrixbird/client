@@ -127,6 +127,11 @@ export function createStore() {
   }
 
   function newEditor(){
+
+    if(editor.items.length == 4) {
+      return
+    }
+
     let id = uuidv4();
     editor.items.unshift({
       id: id,

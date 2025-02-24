@@ -7,13 +7,25 @@ import {
     close 
 } from '$lib/assets/icons.js'
 
-import { createStore } from '$lib/store/store.svelte.js'
-const store = createStore()
+import { createEditorStore } from '$lib/store/editor.svelte.js'
+const store = createEditorStore()
 
 let { item, index } = $props();
 
 let expanded = $state(false)
 let minimized = $state(false)
+
+let maximized_exists = $derived.by(() => {
+    return store.maximized !== null
+})
+
+$effect(() => {
+    if(maximized_exists) {
+        if(store.maximized != item.id) {
+            minimizeWindow()
+        }
+    }
+})
 
 function expandWindow() {
     if(minimized) {
@@ -23,14 +35,26 @@ function expandWindow() {
     expanded = !expanded
 }
 
+$effect(() => {
+    if(expanded) {
+        console.log('expanded', item.id)
+        store.maximizeEditor(item.id)
+    }
+})
+
 function minimizeWindow() {
     minimized = true
     expanded = false
+    if(store.maximized === item.id) {
+        store.maximizeEditor(null)
+    }
 }
 
-function toggleCollapse() {
-    minimized = true
-    expanded = false
+function toggleMinimize() {
+    minimized = !minimized
+    if(expanded) {
+        expanded = false
+    }
 }
 
 function closeWindow() {
@@ -48,13 +72,13 @@ class:expand={expanded}>
     >
 
         <div class="flex p-2 flex-1 place-items-center cursor-pointer text-sm ml-1 tracking-wide"
-            onclick={toggleCollapse}>
+            onclick={toggleMinimize}>
             New Message
         </div>
 
 
         <div class="cursor-pointer flex place-items-center mr-1"
-        onclick={minimizeWindow}>
+        onclick={toggleMinimize}>
                 {#if minimized}
                     {@html maximize}
                 {:else}

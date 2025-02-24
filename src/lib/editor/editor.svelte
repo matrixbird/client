@@ -1,8 +1,8 @@
 <script>
 import { page } from '$app/stores';
 import EditorItem from './editor-item.svelte';
-import { createStore } from '$lib/store/store.svelte.js'
-const store = createStore()
+import { createEditorStore } from '$lib/store/editor.svelte.js'
+const store = createEditorStore()
 
 let items = $derived.by(() => {
     return store.editor?.items
@@ -18,7 +18,7 @@ let active = $derived.by(() => {
 
 
 {#if items && active}
-<div class="editors flex gap-2">
+<div class="editors flex gap-2 items-end">
     {#each items as item, i (item.id)}
         <EditorItem {item} index={i} />
     {/each}
