@@ -1,4 +1,5 @@
 import { createUIStore } from './ui.svelte.js';
+import { v4 as uuidv4 } from 'uuid';
 
 import { 
   PUBLIC_HOMESERVER,
@@ -20,7 +21,7 @@ let members = $state([]);
 let events = $state([]);
 
 let editor = $state({
-  active: false,
+  items: [],
 });
 
 export function createStore() {
@@ -125,6 +126,19 @@ export function createStore() {
     msg = data
   }
 
+  function newEditor(){
+    let id = uuidv4();
+    editor.items.unshift({
+      id: id,
+      state: null
+    });
+  }
+
+  function killEditor(id){
+    let index = editor.items.findIndex((i) => i.id === id);
+    editor.items.splice(index, 1)
+  }
+
   return {
 
     get synced() {
@@ -171,7 +185,9 @@ export function createStore() {
     updateSession,
     createMatrixClient,
     setMsg,
-    getUser
+    getUser,
+    newEditor,
+    killEditor,
 
   };
 }

@@ -4,7 +4,7 @@ import { createStore } from '$lib/store/store.svelte.js'
 const store = createStore()
 
 function newMessage() {
-    store.editor.active = true
+    store.newEditor()
 }
 
 </script>
