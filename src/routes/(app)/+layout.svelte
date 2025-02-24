@@ -1,0 +1,125 @@
+<script>
+import { PUBLIC_HOMESERVER } from '$env/static/public';
+import { onMount } from 'svelte';
+import { browser } from '$app/environment';
+import '../../app.css';
+import logo from '../../logo.png'
+import Switcher from '$lib/switcher/switcher.svelte'
+import Header from '$lib/header/header.svelte'
+import User from '$lib/user/user.svelte'
+
+import Logout from '$lib/auth/logout.svelte'
+import ThemeToggle from '$lib/theme/toggle.svelte'
+
+import { expand } from '$lib/assets/icons.js'
+
+import { createStore } from '$lib/store/store.svelte.js'
+const store = createStore()
+
+const session = $derived(store?.session)
+
+let { data, children } = $props();
+
+let ready = $derived(store?.ready)
+
+$effect(() => {
+    console.log(data)
+    if(data?.access_token && data?.device_id && data?.user_id) {
+        store.updateSession(data)
+    }
+    if(browser && session) {
+        store.createMatrixClient()
+    }
+})
+
+
+onMount(() => {
+    setTimeout(() => {
+    }, 100);
+})
+
+let expanded = $state(false);
+
+function expandWindow() {
+    expanded = !expanded
+}
+
+</script>
+
+
+{#if !ready}
+    <div class="loading grid h-screen w-screen overflow-hidden">
+        <div class="flex flex-col justify-self-center self-center">
+            <div class="spinner"></div>
+        </div>
+    </div>
+{/if}
+
+<User />
+
+<div class="grid h-screen w-screen overflow-hidden">
+
+    <div class="grid grid-rows-[auto_1fr] overflow-hidden bg-white
+            sm:max-w-[1200px] mx-10 justify-self-center self-center 
+            w-full h-full max-h-full select-none
+            lg:h-8/10 lg:max-h-[760px]"
+    class:box={!expanded}
+    class:expanded={expanded}>
+
+        <div class="flex bg-neutral-900 p-1 text-white font-medium">
+
+            <div class="flex place-items-center silk cursor-pointer text ml-2 tracking-wide
+">
+                matrixbird
+            </div>
+
+            <div class="flex-1 flex place-items-center ml-3">
+            </div>
+            <div class="cursor-pointer flex place-items-center mr-2"
+            onclick={expandWindow}>
+                {@html expand}
+            </div>
+        </div>
+
+
+        <div class="overflow-hidden 
+            grid grid-cols-[3rem_1fr] ">
+
+            <Switcher />
+
+
+            <div class="page overflow-hidden">
+                {@render children()}
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+
+<Logout />
+
+<ThemeToggle />
+
+<style>
+.loading {
+    background: var(--background);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+}
+.expanded {
+    height: 100vh;
+    width: 100vw;
+    max-height: 100vh;
+    max-width: 100vw;
+    margin: 0;
+}
+</style>

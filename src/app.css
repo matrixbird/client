@@ -1,0 +1,293 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+
+@font-face {
+    font-family: 'Inter';
+    src: url('/fonts/Inter-VariableFont_opsz,wght.ttf');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Overpass Mono';
+    src: url('/fonts/OverpassMono-VariableFont_wght.ttf');
+    font-display: swap;
+}
+
+
+@font-face {
+    font-family: 'Silkscreen';
+    src: url('/fonts/silkscreen.woff2');
+}
+
+
+:root {
+    --background: hsla(0, 0%, 97%, 1);
+    --text: hsla(0, 0%, 10%, 1);
+    --link: hsla(0, 99%, 33%, 1);
+    --border: hsla(0, 0%, 60%, 1);
+    --primary: hsla(0, 99%, 33%, 1);
+    --light: hsla(0, 0%, 25%, 1);
+    --logo-background: hsla(0, 0%, 10%, 1);
+    --logo-fill: hsla(0, 99%, 44%, 1);
+    --logo-fill-inactive: hsla(0, 100%, 41.6%, 1);
+    --icon: hsla(0, 0%, 25%, 1);
+    --icon-hover: hsla(0, 0%, 45%, 1);
+
+    --spinner: hsla(0, 0%, 0%, 1);
+
+    --button-background: white;
+    --button-text: hsla(0, 0%, 0%, 1);
+    --button-hover: theme('colors.neutral.100');
+    --button-focus: white;
+    --button-active: theme('colors.neutral.200');
+    --button-border: theme('colors.neutral.400');
+    --button-box-shadow: theme('colors.neutral.100');
+
+    --button-primary-background: theme('colors.neutral.900');
+    --button-primary-text: hsla(0, 0%, 100%, 1);
+    --button-primary-hover: theme('colors.neutral.800');
+    --button-primary-focus: theme('colors.neutral.900');
+    --button-primary-active: theme('colors.neutral.950');
+    --button-primary-border: transparent;
+    --button-primary-box-shadow: theme('colors.neutral.800');
+
+    --input-background: hsla(0, 0%, 100%, 1);
+    --input-border: hsla(0, 0%, 20%, 1);
+    --input-focus: hsla(0, 0%, 20%, 1);
+    --input-text: hsla(0, 0%, 0%, 1);
+    --input-placeholder: hsla(0, 0%, 40%, 1);
+
+    --alert: hsla(0, 100%, 50%, 1);
+
+    --scrollbar-thumb: theme('colors.neutral.700');
+    --scrollbar-track: theme('colors.neutral.100');
+}
+
+:root.black {
+    --background: black;
+    --text: white;
+    --link: hsla(0, 99%, 33%, 1);
+    --border: hsla(0, 0%, 90%, 1);
+    --primary: hsla(0, 99%, 33%, 1);
+    --light: hsla(0, 0%, 25%, 1);
+    --logo-background: hsla(0, 0%, 10%, 1);
+    --logo-fill: hsla(0, 99%, 44%, 1);
+    --logo-fill-inactive: hsla(0, 100%, 41.6%, 1);
+    --icon: hsla(0, 0%, 25%, 1);
+    --icon-hover: hsla(0, 0%, 45%, 1);
+
+    --spinner: hsla(0, 0%, 0%, 1);
+
+    --button-background: hsla(0, 0%, 15%, 1);
+    --button-text: hsla(0, 0%, 100%, 1);
+    --button-hover: hsla(0, 0%, 20%, 1);
+    --button-focus: hsla(0, 0%, 20%, 1);
+    --button-active: hsla(0, 0%, 5%, 1);
+    --button-border: transparent;
+
+    --button-primary-background: hsla(0, 0%, 92%, 1);
+    --button-primary-text: hsla(0, 0%, 7%, 1);
+    --button-primary-hover: hsla(0, 0%, 90%, 1);
+    --button-primary-focus: hsla(0, 0%, 90%, 1);
+    --button-primary-active: hsla(0, 0%, 88%, 1);
+    --button-primary-border: transparent;
+
+    --input-background: hsla(0, 0%, 100%, 1);
+    --input-border: hsla(0, 0%, 20%, 1);
+    --input-focus: hsla(0, 0%, 20%, 1);
+    --input-text: hsla(0, 0%, 0%, 1);
+    --input-placeholder: hsla(0, 0%, 40%, 1);
+
+    --alert: hsla(0, 100%, 50%, 1);
+
+    --scrollbar-thumb: hsla(0, 0%, 71%, 1);
+    --scrollbar-track: hsla(0, 0%, 90%, 1);
+}
+
+::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: none;
+}
+::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+}
+::-webkit-scrollbar-corner {
+    background: var(--scrollbar-track);
+}
+
+
+html {
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: none;
+    font-size: var(--base-font-size);
+    height: -webkit-fill-available;
+    width: 100%;
+    background-color: var(--background);
+    background-image: url("data:image/svg+xml,<svg id='patternId' width='100%' height='100%' xmlns='http://www.w3.org/2000/svg'><defs><pattern id='a' patternUnits='userSpaceOnUse' width='20' height='20' patternTransform='scale(1) rotate(0)'><rect x='0' y='0' width='100%' height='100%' fill='transparent'/><path d='M 10,-2.55e-7 V 20 Z M -1.1677362e-8,10 H 20 Z'  stroke-width='0.5' stroke='%23f0f0f0' fill='none'/></pattern></defs><rect width='800%' height='800%' transform='translate(0,0)' fill='url(%23a)'/></svg>");
+}
+
+body {
+    font-family: "Inter", "Twemoji", "Apple Color Emoji", "Segoe UI Emoji", "Arial", "Helvetica", sans-serif, "STIXGeneral", "Noto Color Emoji";
+    font-weight: normal;
+    font-size: 1rem;
+    line-height: 1;
+    margin: 0;
+    padding: 0;
+    color: var(--text);
+    background-image: linear-gradient(white 0%, transparent 30vh);
+    width: 100%;
+}
+
+.mono {
+    font-family: "Overpass Mono", monospace;
+    font-optical-sizing: auto;
+    font-style: normal;
+    line-height: 1;
+}
+
+button {
+    font-optical-sizing: auto;
+    font-style: normal;
+    box-shadow: inset 0px -3px 0 var(--button-box-shadow);
+    border: 1px solid var(--button-border);
+    border-radius: 3px;
+    background-color: var(--button-background);
+    color: var(--button-text);
+    transition: background-color 0.1s;
+}
+
+button.primary {
+    font-optical-sizing: auto;
+    font-style: normal;
+    box-shadow: inset 0px -3px 0 var(--button-primary-box-shadow);
+    border: 1px solid var(--button-primary-border);
+    border-radius: 2px;
+    background-color: var(--button-primary-background);
+    color: var(--button-primary-text);
+    transition: background-color 0.1s;
+}
+
+button:focus {
+    background-color: var(--button-focus);
+}
+
+button:hover {
+    background-color: var(--button-hover);
+}
+
+button:active {
+    background-color: var(--button-active);
+}
+
+button.primary:focus {
+    background-color: var(--button-primary-focus);
+}
+
+button.primary:hover {
+    background-color: var(--button-primary-hover);
+}
+
+button.primary:active{
+    background-color: var(--button-primary-active);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+button:disabled:hover {
+    background-color: var(--button-background);
+}
+
+button.primary:disabled:hover {
+    background-color: var(--button-primary-background);
+}
+
+input {
+    width: 100%;
+    border: 1px solid var(--input-border);
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active  {
+    transition: background-color 5000s;
+    -webkit-text-fill-color: var(--input-text) !important;
+}
+
+input:disabled {
+    cursor: not-allowed;
+}
+
+input:focus {
+    outline-offset: 0;
+    border-radius: 0;
+}
+
+input::placeholder {
+    color: var(--input-placeholder);
+}
+
+.spinner {
+    width: 22px;
+    height: 22px;
+    cursor: not-allowed;
+    border-width: 2px;
+    border-color: var(--spinner);
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: spin 0.5s linear infinite;
+}
+
+.spinner-sm {
+    width: 12px;
+    height: 12px;
+    cursor: not-allowed;
+    border-width: 2px;
+    border-color: var(--spinner);
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: spin 0.5s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.box {
+    background: white;
+    border: 1px solid var(--border);
+    box-shadow: 6px 6px 0 #a7a7a729;
+    transform: translate(0, 0);
+    border-radius: 1px;
+}
+
+.box:hover {
+}
+
+.silk {
+  font-family: "Silkscreen", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+

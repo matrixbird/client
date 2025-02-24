@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>Matrixbird- %sveltekit.error.message%</title>
+        <meta name="description" content="Modern, secure and private email built on top of the matrix protocol.">
+		<link rel="icon" href="/favicon.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="preload" href="/fonts/Inter-VariableFont_opsz,wght.ttf" as="font" type="font/ttf" crossorigin="">
+        <link rel="preload" href="/fonts/OverpassMono-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin="">
+        <meta property="og:type" content="website" />
+    <script>
+        window.global = window;
+        document.documentElement.classList.toggle(
+  "dark",
+  localStorage.theme === "dark" ||
+    (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches),
+);
+    </script>
+    <style>
+html {
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: none;
+    font-size: var(--base-font-size);
+    height: -webkit-fill-available;
+    width: 100%;
+    background-color: var(--background);
+    background-image: url("data:image/svg+xml,<svg id='patternId' width='100%' height='100%' xmlns='http://www.w3.org/2000/svg'><defs><pattern id='a' patternUnits='userSpaceOnUse' width='20' height='20' patternTransform='scale(1) rotate(0)'><rect x='0' y='0' width='100%' height='100%' fill='transparent'/><path d='M 10,-2.55e-7 V 20 Z M -1.1677362e-8,10 H 20 Z'  stroke-width='0.5' stroke='%23f0f0f0' fill='none'/></pattern></defs><rect width='800%' height='800%' transform='translate(0,0)' fill='url(%23a)'/></svg>");
+}
+
+body {
+    font-family: "Inter", "Twemoji", "Apple Color Emoji", "Segoe UI Emoji", "Arial", "Helvetica", sans-serif, "STIXGeneral", "Noto Color Emoji";
+    font-weight: normal;
+    font-size: 1rem;
+    line-height: 1;
+    margin: 0;
+    padding: 0;
+    color: var(--text);
+    background-image: linear-gradient(white 0%, transparent 50vh);
+    width: 100%;
+}
+
+.root {
+    display: grid;
+    place-items: center;
+    height: 100vh;
+    width: 100%;
+    font-weight: 500;
+}
+
+.flex {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+    </style>
+	</head>
+	<body>
+        <div class="root">
+            <div class="flex">
+                <div class="">
+                    <img src="/logo.png" height="40" width="40"/>
+                </div>
+                <div class="">
+                    <p>%sveltekit.error.message%</p>
+                </div>
+            </div>
+        </div>
+	</body>
+</html>
