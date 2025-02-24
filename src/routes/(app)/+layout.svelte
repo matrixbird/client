@@ -38,10 +38,26 @@ onMount(() => {
     }, 100);
 })
 
+function getFromLS() {
+    if(localStorage.getItem('expanded')) {
+        return true
+    }
+    return false
+}
+
 let expanded = $state(false);
+
+if(browser) {
+    expanded = getFromLS()
+}
 
 function expandWindow() {
     expanded = !expanded
+    if(expanded) {
+        localStorage.setItem('expanded', 'true')
+    } else {
+        localStorage.removeItem('expanded')
+    }
 }
 
 </script>
