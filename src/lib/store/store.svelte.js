@@ -5,7 +5,11 @@ import {
 } from '$env/static/public';
 
 let ready = $state(false);
+let synced = $state(false);
 let session = $state(null);
+let msg = $state(null);
+
+let user = $state(null);
 
 let matrixClient = $state(null);
 let sdk;
@@ -14,6 +18,10 @@ let loaded = $state(false);
 let rooms = $state({});
 let members = $state([]);
 let events = $state([]);
+
+let editor = $state({
+  active: false,
+});
 
 export function createStore() {
 
@@ -36,7 +44,7 @@ export function createStore() {
 
     try {
       const whoami = await matrixClient.whoami()
-      console.log(whoami);
+      //console.log(whoami);
     } catch(e) {
       if(e.errcode === "M_UNKNOWN_TOKEN") {
         console.log("logging out")
@@ -76,6 +84,12 @@ export function createStore() {
     matrixClient.on("sync", (state, prevState, data) => {
       if(state === "PREPARED") {
 
+        synced = true
+
+        let logged_in_user = matrixClient.store.getUser(matrixClient.getUserId());
+        user = logged_in_user;
+        console.log("saving user", user)
+
 
         const items = matrixClient.getRooms();
         items.forEach((room) => {
@@ -107,10 +121,26 @@ export function createStore() {
     return matrixClient.store.getUser(user_id)
   }
 
+  function setMsg(data){
+    msg = data
+  }
+
   return {
+
+    get synced() {
+      return synced;
+    },
+
+    get matrixClient() {
+      return matrixClient;
+    },
 
     get ready() {
       return ready;
+    },
+
+    get msg() {
+      return msg;
     },
 
     get session() {
@@ -129,8 +159,18 @@ export function createStore() {
 			return createUIStore();
 		},
 
+		get user() {
+			return user;
+		},
+
+		get editor() {
+			return editor;
+		},
+
+
     updateSession,
     createMatrixClient,
+    setMsg,
     getUser
 
   };

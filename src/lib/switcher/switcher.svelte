@@ -1,6 +1,7 @@
 <script>
 import { page } from '$app/stores';
 import { goto } from '$app/navigation';
+import User from '$lib/user/user.svelte'
 import { 
     settings
 } from '$lib/assets/icons'
@@ -13,6 +14,7 @@ import Calendar from './calendar.svelte'
 
 <div class="flex flex-col border-r border-border pt-2 gap-2">
 
+    <User />
 
     <Inbox />
 
@@ -28,6 +30,8 @@ import Calendar from './calendar.svelte'
             {@html settings}
         </div>
     </div>
+
+
 </div>
 
 <style>

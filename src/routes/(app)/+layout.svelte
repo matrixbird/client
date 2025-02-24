@@ -5,13 +5,12 @@ import { browser } from '$app/environment';
 import '../../app.css';
 import logo from '../../logo.png'
 import Switcher from '$lib/switcher/switcher.svelte'
-import Header from '$lib/header/header.svelte'
-import User from '$lib/user/user.svelte'
+import Editor from '$lib/editor/editor.svelte'
 
 import Logout from '$lib/auth/logout.svelte'
 import ThemeToggle from '$lib/theme/toggle.svelte'
 
-import { expand } from '$lib/assets/icons.js'
+import { expand, collapse } from '$lib/assets/icons.js'
 
 import { createStore } from '$lib/store/store.svelte.js'
 const store = createStore()
@@ -33,10 +32,8 @@ $effect(() => {
 })
 
 
-onMount(() => {
-    setTimeout(() => {
-    }, 100);
-})
+let msg = $derived(store?.msg)
+
 
 function getFromLS() {
     if(localStorage.getItem('expanded')) {
@@ -71,29 +68,33 @@ function expandWindow() {
     </div>
 {/if}
 
-<User />
+<Editor />
 
 <div class="grid h-screen w-screen overflow-hidden">
 
     <div class="grid grid-rows-[auto_1fr] overflow-hidden bg-white
-            sm:max-w-[1200px] mx-10 justify-self-center self-center 
+            sm:max-w-[1600px] mx-10 justify-self-center self-center 
             w-full h-full max-h-full select-none
-            lg:h-8/10 lg:max-h-[760px]"
+            lg:h-8/10 lg:max-h-[960px]"
     class:box={!expanded}
     class:expanded={expanded}>
 
-        <div class="flex bg-neutral-900 p-1 text-white font-medium">
+        <div class="flex bg-neutral-900 p-2 text-white font-medium">
 
-            <div class="flex place-items-center silk cursor-pointer text ml-2 tracking-wide
+            <div class="flex place-items-center silk cursor-pointer text ml-1 tracking-wide
 ">
-                matrixbird
+                matrixbird {msg}
             </div>
 
             <div class="flex-1 flex place-items-center ml-3">
             </div>
-            <div class="cursor-pointer flex place-items-center mr-2"
+            <div class="cursor-pointer flex place-items-center mr-1"
             onclick={expandWindow}>
-                {@html expand}
+                {#if expanded}
+                    {@html collapse}
+                {:else}
+                    {@html expand}
+                {/if}
             </div>
         </div>
 

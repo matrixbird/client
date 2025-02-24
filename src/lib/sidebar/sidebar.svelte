@@ -1,5 +1,6 @@
 <script>
 import MailboxList from './mailbox-list.svelte'
+import NewMessage from '$lib/editor/new-message.svelte'
 import { plus } from '$lib/assets/icons.js'
 
 </script>
@@ -8,14 +9,7 @@ import { plus } from '$lib/assets/icons.js'
 
 
     <div class="flex place-items-center">
-        <button class="flex place-items-center py-2 px-3 w-full">
-            <div class="ml-5">
-                {@html plus}
-            </div>
-            <div class="ml-2">
-                New message
-            </div>
-        </button>
+        <NewMessage />
     </div>
 
     <MailboxList />

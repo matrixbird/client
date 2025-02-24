@@ -11,6 +11,8 @@ import {
     login as appservice_login,
 } from '$lib/appservice/api.js';
 
+import { createStore } from '$lib/store/store.svelte.js'
+const store = createStore()
 
 onMount(() => {
     usernameInput.focus();
@@ -91,6 +93,8 @@ async function login() {
             const json = await res.json();
 
             console.log("found it", json)
+
+            store.setMsg("lol")
 
             goto('/mail/inbox')
         }
