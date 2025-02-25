@@ -240,12 +240,21 @@ function removeEmail(i) {
     {#if !minimized}
         <div class="content text-sm p-1 grid grid-rows-[auto_auto_1fr_auto]">
 
-            <div class="border-b border-border flex flex-wrap">
+            <div class="border-b border-border flex flex-wrap cursor-text"
+            onclick={() => focusTo()}>
 
                 {#each emails as email, i}
-                    <div class="flex place-items-center p-1"
-                    onclick={() => removeEmail(i)}>
-                        {email}
+                    <div class="flex place-items-center my-2 px-2
+                        hover:bg-neutral-200 duration-100
+                        bg-neutral-100 rounded cursor-pointer"
+                            onclick={() => removeEmail(i)}>
+                        <div class="">
+                            {email}
+                        </div>
+                        <div class="cursor-pointer font-semibold ml-2"
+                            onclick={() => removeEmail(i)}>
+                            x
+                        </div>
                     </div>
                 {/each}
 
