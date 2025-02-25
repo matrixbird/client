@@ -169,6 +169,31 @@ async function focusComposer() {
     composer.focus()
 }
 
+let emails = $state([]);
+
+function processInput(event) {
+    if(event.code == 'Backspace' && to.length == 0) {
+        emails.pop()
+    }
+
+    if(event.code == 'Comma' || event.code == 'Space' || event.code == 'Enter') {
+        let email_valid = validate(to);
+        if(email_valid) {
+            emails.push(to)
+            to = ''
+            event.preventDefault()
+        }
+    }
+
+    if(event.key === 'Enter') {
+    }
+
+}
+
+function removeEmail(i) {
+    emails.splice(i, 1)
+    focusTo()
+}
 
 </script>
 
@@ -215,12 +240,23 @@ async function focusComposer() {
     {#if !minimized}
         <div class="content text-sm p-1 grid grid-rows-[auto_auto_1fr_auto]">
 
-            <div class="border-b border-border">
+            <div class="border-b border-border flex flex-wrap">
+
+                {#each emails as email, i}
+                    <div class="flex place-items-center p-1"
+                    onclick={() => removeEmail(i)}>
+                        {email}
+                    </div>
+                {/each}
+
+                <div class="">
                 <input type="email" class="px-2 py-3" 
                     bind:this={to_input}
                     bind:value={to}
-                    placeholder="To" 
+                    onkeydown={processInput}
+                    placeholder={emails?.length == 0 ? `To` : ''}
                 />
+                </div>
             </div>
 
             <div class="border-b border-border">
@@ -256,6 +292,7 @@ async function focusComposer() {
 
 .content {
     min-height: 48dvh;
+    max-width: 34rem;
 }
 
 .base {
@@ -283,7 +320,6 @@ input, textarea {
     border:none;
     resize: none;
     height: 100%;
-    width: 100%;
     outline: none;
 }
 </style>
