@@ -94,8 +94,6 @@ async function login() {
 
             console.log("found it", json)
 
-            store.setMsg("lol")
-
             goto('/mail/inbox')
         }
 

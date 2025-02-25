@@ -5,7 +5,8 @@ import { v4 as uuidv4 } from 'uuid';
 import Composer from './composer.svelte'
 
 import {
-    email_to_mxid
+    email_to_mxid,
+    mxid_to_email
 } from '$lib/utils/matrix.js'
 
 import {
@@ -108,6 +109,7 @@ async function focusSubject() {
 }
 
 async function process() {
+
     let email_valid = validate(to);
 
     if(!email_valid) {
@@ -129,18 +131,22 @@ async function process() {
     try {
         //const resp = await store.testRooms()
         //console.log("dm rooms", resp)
-        let room_id = await store.findOrCreateDMRoom(mxid)
+        let room_id = await store.emailRoom([mxid])
         console.log("room id", room_id)
 
         const msg = await store.client.sendEvent(
             room_id,
             "matrixbird.email.native",
             {
+                from: {
+                    name: store.user?.displayName,
+                    address: mxid_to_email(store.user?.userId)
+                },
+                subject: subject,
                 body: {
                     text: body.text,
                     html: body.html
-                },
-                subject: subject
+                }
             },
             uuidv4()
         );
