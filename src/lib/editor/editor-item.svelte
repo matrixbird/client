@@ -146,6 +146,8 @@ async function process() {
         );
         console.log('msg', msg)
 
+        closeWindow()
+
     } catch(e) {
         console.log('error', e)
     }

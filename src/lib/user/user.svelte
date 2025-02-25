@@ -1,7 +1,7 @@
 <script>
-import { createStore } from '$lib/store/store.svelte.js'
+import { createMatrixStore } from '$lib/store/matrix.svelte.js'
 
-const store = createStore()
+const store = createMatrixStore()
 
 let user = $derived.by(() => {
     if(!store?.synced) return null
@@ -41,7 +41,7 @@ let initials = $derived.by(() => {
     <div class="user rounded-[50%] w-9 h-9 cursor-pointer
         hover:bg-neutral-800 grid place-items-center 
         bg-neutral-900" >
-        <div class="font-semibold text-white ">
+        <div class="font-semibold text-white uppercase">
             {initials} 
         </div>
     </div>
