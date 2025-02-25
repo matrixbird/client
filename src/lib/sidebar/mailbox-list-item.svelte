@@ -2,9 +2,9 @@
 import { page } from '$app/stores';
 import { goto } from '$app/navigation';
 
-import { createStore } from '$lib/store/store.svelte.js'
+import { createMatrixStore } from '$lib/store/matrix.svelte.js'
 
-const store = createStore()
+const store = createMatrixStore()
 const events = $derived(store?.events)
 
 let count = $derived.by(() => {

@@ -2,6 +2,8 @@
 import { onMount, tick } from 'svelte';
 import * as EmailValidator from 'email-validator';
 
+import Composer from './composer.svelte'
+
 import {
     email_to_mxid
 } from '$lib/utils/matrix.js'
@@ -44,7 +46,10 @@ function expandWindow() {
     }
     expanded = !expanded
     if(expanded) {
-        focusBody()
+        focusComposer()
+    }
+    if(!expanded) {
+        editorStore.maximizeEditor(null)
     }
 }
 
@@ -99,11 +104,6 @@ async function focusSubject() {
     subject_input.focus()
 }
 
-async function focusBody() {
-    await tick()
-    body_input.focus()
-}
-
 async function process() {
     /*
     let email_valid = EmailValidator.validate(to);
@@ -120,32 +120,51 @@ async function process() {
 
 
     /*
-    const resp = await store.matrixClient.getProfileInfo(mxid)
+    const resp = await store.client.getProfileInfo(mxid)
     console.log('resp', resp)
     */
 
 
     try {
-        //const resp = await store.matrixClient.getRooms()
+        const resp = await store.DMUserExists(mxid)
+        console.log("dm user exists", resp)
+
+        //const resp = await store.client.getRooms()
         //console.log('resp', resp)
         /*
-        const items = await store.matrixClient.getRooms();
+        const items = await store.client.getRooms();
         items.forEach((room) => {
             let members = room.getJoinedMembers();
             console.log(members);
         });
         */
+        /*
+        const items = await store.client.getRooms();
+        items.forEach((room) => {
+            console.log(room.roomId);
+        });
+        */
+        //await store.syncOnce()
 
         /*
-        const room = await store.matrixClient.createRoom({
+        const room = await store.client.createRoom({
             is_direct: true,
-            invite: ["@pigpig:localhost:8480"],
+            initial_state: [
+                {
+                    type: "matrixbird.room.type",
+                    content: {
+                        type: "email"
+                    }
+                }
+            ],
+            invite: ["@guest1234:localhost:8480"],
             preset: "trusted_private_chat",
             visibility: "private"
         });
-        */
-        const msg = await store.matrixClient.sendEvent(
-            "!teZxEwWVIpQTLKZaPc:localhost:8480",
+        let room_id = room.room_id;
+        console.log('room id ', room_id)
+        const msg = await store.client.sendEvent(
+            room_id,
             "matrixbird.email.native",
             {
                 body: {
@@ -156,12 +175,25 @@ async function process() {
             "lol"
         );
         console.log('msg', msg)
+        */
     } catch(e) {
         console.log('error', e)
     }
 }
 
+function updateComposer(e) {
+    //console.log(e)
+}
+
+let composer;
+async function focusComposer() {
+    await tick()
+    composer.focus()
+}
+
+
 </script>
+
 
 <div class="box editor grid grid-rows-[auto_1fr] 
     min-w-[34rem]
@@ -222,14 +254,11 @@ async function process() {
             </div>
 
             <div class="">
-                <textarea class="p-2"
-                    bind:this={body_input}
-                    bind:value={body}
-                >
-                </textarea>
+                <Composer bind:this={composer} {updateComposer} />
             </div>
-            <div class="">
-                <button class="p-2" onclick={process}>
+
+            <div class="p-2">
+                <button class="primary px-4 py-2 rounded-[50%]" onclick={process}>
                     Send
                 </button>
             </div>

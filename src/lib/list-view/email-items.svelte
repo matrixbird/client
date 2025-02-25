@@ -1,9 +1,9 @@
 <script>
-import { createStore } from '$lib/store/store.svelte.js'
+import { createMatrixStore } from '$lib/store/matrix.svelte.js'
 import EmailItem from './email-item.svelte'
 
 
-const store = createStore()
+const store = createMatrixStore()
 const events = $derived(store?.events)
 
 let processed = $state(null);

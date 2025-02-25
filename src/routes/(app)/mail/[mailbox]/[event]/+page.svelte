@@ -5,8 +5,8 @@ import { page } from '$app/stores';
 import { mxid_to_email } from '$lib/utils/matrix.js'
 
 
-import { createStore } from '$lib/store/store.svelte.js'
-const store = createStore()
+import { createMatrixStore } from '$lib/store/matrix.svelte.js'
+const store = createMatrixStore()
 
 const events = $derived(store?.events)
 

@@ -15,8 +15,8 @@ import {
     check_small
 } from '$lib/assets/icons.js'
 
-import { createStore } from '$lib/store/store.svelte.js'
-const store = createStore()
+import { createMatrixStore } from '$lib/store/matrix.svelte.js'
+const store = createMatrixStore()
 
 let { email } = $props();
 

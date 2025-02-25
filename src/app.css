@@ -291,3 +291,8 @@ input::placeholder {
   font-style: normal;
 }
 
+.ProseMirror {
+}
+.ProseMirror-focused {
+    outline: none;
+}

@@ -37,6 +37,9 @@
 	},
 	"dependencies": {
 		"@matrix-org/matrix-sdk-crypto-wasm": "^14.0.0",
+		"@tiptap/core": "^2.11.5",
+		"@tiptap/pm": "^2.11.5",
+		"@tiptap/starter-kit": "^2.11.5",
 		"dayjs": "^1.11.13",
 		"dompurify": "^3.2.4",
 		"email-validator": "^2.0.4",

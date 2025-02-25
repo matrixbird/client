@@ -15,19 +15,22 @@ import { expand, collapse } from '$lib/assets/icons.js'
 import { createStore } from '$lib/store/store.svelte.js'
 const store = createStore()
 
-const session = $derived(store?.session)
+import { createMatrixStore } from '$lib/store/matrix.svelte.js'
+const matrixStore = createMatrixStore()
+
+const session = $derived(matrixStore?.session)
 
 let { data, children } = $props();
 
-let ready = $derived(store?.ready)
+let ready = $derived(matrixStore?.ready)
 
 $effect(() => {
     console.log(data)
     if(data?.access_token && data?.device_id && data?.user_id) {
-        store.updateSession(data)
+        matrixStore.updateSession(data)
     }
     if(browser && session) {
-        store.createMatrixClient()
+        matrixStore.createMatrixClient()
     }
 })
 

@@ -5,7 +5,7 @@ const store = createStore()
 
 let user = $derived.by(() => {
     if(!store?.synced) return null
-    let user = store.matrixClient.store.getUser(store.matrixClient.getUserId())
+    let user = store.client.store.getUser(store.client.getUserId())
     if(user) {
         return user
     }
@@ -13,7 +13,7 @@ let user = $derived.by(() => {
 
 let local_part = $derived.by(() => {
     if(!store?.synced) return null
-    let localPart = store.matrixClient.getUserIdLocalpart()
+    let localPart = store.client.getUserIdLocalpart()
     if(localPart) {
         return localPart
     }
