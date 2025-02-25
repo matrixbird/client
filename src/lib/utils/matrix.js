@@ -1,5 +1,15 @@
 import { PUBLIC_HOMESERVER_NAME } from '$env/static/public';
 
+export function email_to_mxid(email) {
+  if (!email || typeof email !== 'string' || !email.includes('@')) {
+    return 'Invalid email format';
+  }
+  
+  const [username, domain] = email.split('@');
+  
+  return `@${username}:${domain}`;
+}
+
 export function mxid_to_email(matrixId) {
   if (!matrixId) return null;
   const match = matrixId.match(/^@([^:]+):(.+)$/);

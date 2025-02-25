@@ -1,6 +1,11 @@
 <script>
 import { onMount, tick } from 'svelte';
 import * as EmailValidator from 'email-validator';
+
+import {
+    email_to_mxid
+} from '$lib/utils/matrix.js'
+
 import { 
     expand, 
     collapse, 
@@ -110,10 +115,50 @@ async function process() {
     }
     */
 
+    let mxid = email_to_mxid(to)
+    console.log('mxid', mxid)
 
-    const resp = await store.matrixClient.getProfileInfo("@bee:localhost:8480")
+
+    /*
+    const resp = await store.matrixClient.getProfileInfo(mxid)
     console.log('resp', resp)
+    */
 
+
+    try {
+        //const resp = await store.matrixClient.getRooms()
+        //console.log('resp', resp)
+        /*
+        const items = await store.matrixClient.getRooms();
+        items.forEach((room) => {
+            let members = room.getJoinedMembers();
+            console.log(members);
+        });
+        */
+
+        /*
+        const room = await store.matrixClient.createRoom({
+            is_direct: true,
+            invite: ["@pigpig:localhost:8480"],
+            preset: "trusted_private_chat",
+            visibility: "private"
+        });
+        */
+        const msg = await store.matrixClient.sendEvent(
+            "!teZxEwWVIpQTLKZaPc:localhost:8480",
+            "matrixbird.email.native",
+            {
+                body: {
+                    text: "just a test"
+                },
+                subject: "hello there"
+            },
+            "lol"
+        );
+        console.log('msg', msg)
+    } catch(e) {
+        console.log('error', e)
+    }
 }
 
 </script>
@@ -121,8 +166,8 @@ async function process() {
 <div class="box editor grid grid-rows-[auto_1fr] 
     min-w-[34rem]
     select-none"
-class:base={!expanded}
-class:expand={expanded}>
+    class:base={!expanded}
+    class:expand={expanded}>
 
     <div class="flex bg-neutral-900 text-white font-medium"
     >
@@ -134,16 +179,16 @@ class:expand={expanded}>
 
 
         <div class="cursor-pointer flex place-items-center mr-1"
-        onclick={toggleMinimize}>
-                {#if minimized}
-                    {@html maximize}
-                {:else}
-                    {@html minimize}
-                {/if}
+            onclick={toggleMinimize}>
+            {#if minimized}
+                {@html maximize}
+            {:else}
+                {@html minimize}
+            {/if}
         </div>
 
         <div class="cursor-pointer flex place-items-center mr-1"
-        onclick={expandWindow}>
+            onclick={expandWindow}>
             {#if expanded}
                 {@html collapse}
             {:else}
@@ -152,13 +197,13 @@ class:expand={expanded}>
         </div>
 
         <div class="cursor-pointer flex place-items-center mr-1"
-        onclick={closeWindow}>
-                {@html close}
+            onclick={closeWindow}>
+            {@html close}
         </div>
     </div>
 
     {#if !minimized}
-    <div class="content text-sm p-1 grid grid-rows-[auto_auto_1fr_auto]">
+        <div class="content text-sm p-1 grid grid-rows-[auto_auto_1fr_auto]">
 
             <div class="border-b border-border">
                 <input type="email" class="px-2 py-3" 
@@ -188,7 +233,7 @@ class:expand={expanded}>
                     Send
                 </button>
             </div>
-    </div>
+        </div>
     {/if}
 </div>
 

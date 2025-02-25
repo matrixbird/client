@@ -62,11 +62,6 @@ export function createStore() {
 
 });
 
-    await matrixClient.startClient({
-      initialSyncLimit: 1000,
-    });
-
-
 
     matrixClient.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
       if(event?.event) {
@@ -86,6 +81,7 @@ export function createStore() {
       if(state === "PREPARED") {
 
         synced = true
+        console.log(matrixClient.store)
 
         let logged_in_user = matrixClient.store.getUser(matrixClient.getUserId());
         user = logged_in_user;
@@ -116,6 +112,12 @@ export function createStore() {
         ready = true
       }
     });
+
+    await matrixClient.startClient({
+      initialSyncLimit: 1000,
+    });
+
+
   }
 
   function getUser(user_id){
