@@ -4,6 +4,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 import Composer from './composer.svelte'
 
+import { close_small } from '$lib/assets/icons'
+
 import {
     email_to_mxid,
     mxid_to_email
@@ -110,14 +112,11 @@ async function focusSubject() {
 
 async function process() {
 
-    let email_valid = validate(to);
 
-    if(!email_valid) {
-        to_input.focus();
-        return;
-    }
+    let mxids = emails.map(e => email_to_mxid(e))
 
-    let mxid = email_to_mxid(to)
+    console.log(mxids)
+    return
 
     /*
     const resp = await store.client.getProfileInfo(mxid)
@@ -131,7 +130,7 @@ async function process() {
     try {
         //const resp = await store.testRooms()
         //console.log("dm rooms", resp)
-        let room_id = await store.emailRoom([mxid])
+        let room_id = await store.emailRoom([mxids])
         console.log("room id", room_id)
 
         const msg = await store.client.sendEvent(
@@ -178,7 +177,10 @@ function processInput(event) {
 
     if(event.code == 'Comma' || event.code == 'Space' || event.code == 'Enter') {
         let email_valid = validate(to);
-        if(email_valid) {
+
+        let exists = emails.find(e => e == to)
+
+        if(email_valid && !exists) {
             emails.push(to)
             to = ''
             event.preventDefault()
@@ -193,6 +195,19 @@ function processInput(event) {
 function removeEmail(i) {
     emails.splice(i, 1)
     focusTo()
+}
+
+function processBlur(event) {
+    if(to.length == 0) return;
+
+    let exists = emails.find(e => e == to)
+
+    let email_valid = validate(to);
+    if(email_valid && !exists) {
+        emails.push(to)
+        to = ''
+        event.preventDefault()
+    }
 }
 
 </script>
@@ -251,9 +266,9 @@ function removeEmail(i) {
                         <div class="">
                             {email}
                         </div>
-                        <div class="cursor-pointer font-semibold ml-2"
+                        <div class="cursor-pointer font-semibold ml-1"
                             onclick={() => removeEmail(i)}>
-                            x
+                            {@html close_small}
                         </div>
                     </div>
                 {/each}
@@ -263,6 +278,7 @@ function removeEmail(i) {
                     bind:this={to_input}
                     bind:value={to}
                     onkeydown={processInput}
+                    onblur={processBlur}
                     placeholder={emails?.length == 0 ? `To` : ''}
                 />
                 </div>
