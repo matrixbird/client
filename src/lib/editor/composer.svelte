@@ -18,7 +18,7 @@ onMount(() => {
             editor = editor;
             let data = {
                 html: editor.getHTML(),
-                json: editor.getJSON(),
+                //json: editor.getJSON(),
                 text: editor.getText(),
             }
             updateComposer(data);

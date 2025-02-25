@@ -1,12 +1,16 @@
 <script>
 import { onMount, tick } from 'svelte';
-import * as EmailValidator from 'email-validator';
+import { v4 as uuidv4 } from 'uuid';
 
 import Composer from './composer.svelte'
 
 import {
     email_to_mxid
 } from '$lib/utils/matrix.js'
+
+import {
+    validate
+} from '$lib/utils/email.js'
 
 import { 
     expand, 
@@ -16,8 +20,8 @@ import {
     close 
 } from '$lib/assets/icons.js'
 
-import { createStore } from '$lib/store/store.svelte.js'
-const store = createStore()
+import { createMatrixStore } from '$lib/store/matrix.svelte.js'
+const store = createMatrixStore()
 
 import { createEditorStore } from '$lib/store/editor.svelte.js'
 const editorStore = createEditorStore()
@@ -88,7 +92,6 @@ let to_input;
 let subject = $state('');
 let subject_input;
 let body = $state('');
-let body_input;
 
 onMount(() => {
     focusTo()
@@ -105,84 +108,51 @@ async function focusSubject() {
 }
 
 async function process() {
-    /*
-    let email_valid = EmailValidator.validate(to);
-    console.log('email_valid', email_valid)
+    let email_valid = validate(to);
 
     if(!email_valid) {
         to_input.focus();
         return;
     }
-    */
 
     let mxid = email_to_mxid(to)
-    console.log('mxid', mxid)
-
 
     /*
     const resp = await store.client.getProfileInfo(mxid)
     console.log('resp', resp)
     */
 
+    if(!subject) {
+    }
+
 
     try {
-        const resp = await store.DMUserExists(mxid)
-        console.log("dm user exists", resp)
+        //const resp = await store.testRooms()
+        //console.log("dm rooms", resp)
+        let room_id = await store.findOrCreateDMRoom(mxid)
+        console.log("room id", room_id)
 
-        //const resp = await store.client.getRooms()
-        //console.log('resp', resp)
-        /*
-        const items = await store.client.getRooms();
-        items.forEach((room) => {
-            let members = room.getJoinedMembers();
-            console.log(members);
-        });
-        */
-        /*
-        const items = await store.client.getRooms();
-        items.forEach((room) => {
-            console.log(room.roomId);
-        });
-        */
-        //await store.syncOnce()
-
-        /*
-        const room = await store.client.createRoom({
-            is_direct: true,
-            initial_state: [
-                {
-                    type: "matrixbird.room.type",
-                    content: {
-                        type: "email"
-                    }
-                }
-            ],
-            invite: ["@guest1234:localhost:8480"],
-            preset: "trusted_private_chat",
-            visibility: "private"
-        });
-        let room_id = room.room_id;
-        console.log('room id ', room_id)
         const msg = await store.client.sendEvent(
             room_id,
             "matrixbird.email.native",
             {
                 body: {
-                    text: "just a test"
+                    text: body.text,
+                    html: body.html
                 },
-                subject: "hello there"
+                subject: subject
             },
-            "lol"
+            uuidv4()
         );
         console.log('msg', msg)
-        */
+
     } catch(e) {
         console.log('error', e)
     }
 }
 
-function updateComposer(e) {
-    //console.log(e)
+function updateComposer(data) {
+    body = data
 }
 
 let composer;

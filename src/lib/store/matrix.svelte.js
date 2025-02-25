@@ -18,6 +18,8 @@ let rooms = $state({});
 let members = $state([]);
 let events = $state([]);
 
+let created_rooms = $state({});
+
 
 export function createMatrixStore() {
 
@@ -35,6 +37,8 @@ export function createMatrixStore() {
       accessToken: session?.access_token,
       userId: session.user_id,
       deviceId: session.device_id,
+      supportsCallTransfer: false,
+      useE2eForGroupCall: false
     });
 
     try {
@@ -170,6 +174,317 @@ export function createMatrixStore() {
     return dmUsers.includes(user);
   }
 
+  // Assuming you already have an authenticated client
+  const getDMRooms = async () => {
+    // Wait for initial sync to complete
+    if (client.isInitialSyncComplete()) {
+      return getDMUsers();
+    } else {
+      return new Promise((resolve) => {
+        client.once('sync', (state) => {
+          if (state === 'PREPARED') {
+            resolve(getDMUsers());
+          }
+        });
+      });
+    }
+
+    function getDMUsers() {
+      // Method 1: Using m.direct account data (official way)
+      const directData = client.getAccountData('m.direct');
+      const directRoomsMap = directData ? directData.getContent() : {};
+
+      // Convert from {userId: [roomId1, roomId2]} to a more usable format
+      const directRooms = {};
+      Object.entries(directRoomsMap).forEach(([userId, roomIds]) => {
+        directRooms[userId] = {
+          userId,
+          roomIds: Array.isArray(roomIds) ? roomIds : [roomIds],
+          source: 'accountData'
+        };
+      });
+
+      console.log("DM users from account data:", Object.keys(directRooms));
+
+      // Method 2: Find rooms with exactly two members
+      const rooms = client.getRooms();
+      const twoMemberRooms = rooms.filter(room => {
+        const members = room.getJoinedMembers();
+        return members.length === 2 && 
+          members.some(member => member.userId === client.getUserId());
+      });
+
+      // Build map of user IDs to room IDs
+      const twoMemberDMs = {};
+      twoMemberRooms.forEach(room => {
+        const members = room.getJoinedMembers();
+        const otherMember = members.find(member => 
+          member.userId !== client.getUserId()
+        );
+
+        if (otherMember) {
+          const userId = otherMember.userId;
+          if (!twoMemberDMs[userId]) {
+            twoMemberDMs[userId] = {
+              userId,
+              roomIds: [],
+              source: 'twoMemberRoom'
+            };
+          }
+          twoMemberDMs[userId].roomIds.push(room.roomId);
+        }
+      });
+
+      console.log("DM users from two-member rooms:", Object.keys(twoMemberDMs));
+
+      // Combine both methods
+      const allDMUsers = {};
+
+      // Add all users from both methods
+      [...Object.keys(directRooms), ...Object.keys(twoMemberDMs)].forEach(userId => {
+        if (!allDMUsers[userId]) {
+          allDMUsers[userId] = {
+            userId,
+            roomIds: [],
+            source: []
+          };
+        }
+
+        // Add room IDs from method 1 if available
+        if (directRooms[userId]) {
+          allDMUsers[userId].roomIds.push(...directRooms[userId].roomIds);
+          allDMUsers[userId].source.push('accountData');
+        }
+
+        // Add room IDs from method 2 if available
+        if (twoMemberDMs[userId]) {
+          allDMUsers[userId].roomIds.push(...twoMemberDMs[userId].roomIds);
+          allDMUsers[userId].source.push('twoMemberRoom');
+        }
+
+        // Remove duplicate room IDs
+        allDMUsers[userId].roomIds = [...new Set(allDMUsers[userId].roomIds)];
+      });
+
+      return allDMUsers;
+    }
+  };
+
+
+
+  const testRooms = async () => {
+    let stateEventType = "matrixbird.room.type";
+    let stateKey = undefined;
+    // Wait for initial sync to complete
+    if (!client.isInitialSyncComplete()) {
+      await new Promise((resolve) => {
+        client.once('sync', (state) => {
+          if (state === 'PREPARED') resolve();
+        });
+      });
+    }
+
+    // Function to check if a room has the required state event
+    const roomHasStateEvent = (room) => {
+      if (!stateEventType) return true; // No filtering if no state event type provided
+
+      if (stateKey !== undefined) {
+        // Check for specific state key
+        const event = room.currentState.getStateEvent(stateEventType, stateKey);
+        return !!event;
+      } else {
+        // Check for any state event of the given type
+        const events = room.currentState.getStateEvents(stateEventType);
+        return events && events.length > 0;
+      }
+    };
+
+    // Method 1: Using m.direct account data
+    const directData = client.getAccountData('m.direct');
+    const directRoomsMap = directData ? directData.getContent() : {};
+
+    // Convert from {userId: [roomId1, roomId2]} to a more usable format
+    // and filter by state event
+    const directRooms = {};
+    Object.entries(directRoomsMap).forEach(([userId, roomIds]) => {
+      const filteredRoomIds = (Array.isArray(roomIds) ? roomIds : [roomIds])
+      .filter(roomId => {
+        const room = client.getRoom(roomId);
+        return room && roomHasStateEvent(room);
+      });
+
+      if (filteredRoomIds.length > 0) {
+        directRooms[userId] = {
+          userId,
+          roomIds: filteredRoomIds,
+          source: 'accountData'
+        };
+      }
+    });
+
+    // Method 2: Find rooms with exactly two members
+    const rooms = client.getRooms();
+    const twoMemberRooms = rooms.filter(room => {
+      const members = room.getJoinedMembers();
+      return members.length === 2 && 
+        members.some(member => member.userId === client.getUserId()) &&
+        roomHasStateEvent(room);
+    });
+
+    // Build map of user IDs to room IDs
+    const twoMemberDMs = {};
+    twoMemberRooms.forEach(room => {
+      const members = room.getJoinedMembers();
+      const otherMember = members.find(member => 
+        member.userId !== client.getUserId()
+      );
+
+      if (otherMember) {
+        const userId = otherMember.userId;
+        if (!twoMemberDMs[userId]) {
+          twoMemberDMs[userId] = {
+            userId,
+            roomIds: [],
+            source: 'twoMemberRoom'
+          };
+        }
+        twoMemberDMs[userId].roomIds.push(room.roomId);
+      }
+    });
+
+    // Combine both methods
+    const allDMUsers = {};
+
+    // Add all users from both methods
+    [...Object.keys(directRooms), ...Object.keys(twoMemberDMs)].forEach(userId => {
+      if (!allDMUsers[userId]) {
+        allDMUsers[userId] = {
+          userId,
+          roomIds: [],
+          source: []
+        };
+      }
+
+      // Add room IDs from method 1 if available
+      if (directRooms[userId]) {
+        allDMUsers[userId].roomIds.push(...directRooms[userId].roomIds);
+        allDMUsers[userId].source.push('accountData');
+      }
+
+      // Add room IDs from method 2 if available
+      if (twoMemberDMs[userId]) {
+        allDMUsers[userId].roomIds.push(...twoMemberDMs[userId].roomIds);
+        allDMUsers[userId].source.push('twoMemberRoom');
+      }
+
+      // Remove duplicate room IDs
+      allDMUsers[userId].roomIds = [...new Set(allDMUsers[userId].roomIds)];
+    });
+
+    return allDMUsers;
+  };
+
+  const findDMRoomWithUser = async (userId) => {
+
+    if (created_rooms[userId]) {
+      return created_rooms[userId];
+    }
+
+    try {
+      // Get all DM users and their rooms
+      const dmUsers = await testRooms();
+
+      // Check if the specified user has a DM room
+      if (dmUsers[userId] && dmUsers[userId].roomIds.length > 0) {
+        // Return the first room ID (since your app enforces max one DM room per user)
+        return dmUsers[userId].roomIds[0];
+      }
+
+      // No DM room found with this user
+      return null;
+    } catch (error) {
+      console.error(`Error finding DM room with user ${userId}:`, error);
+      return null;
+    }
+  };
+
+  const findOrCreateDMRoom = async (userId) => {
+    // First check if a DM room already exists
+    const existingRoomId = await findDMRoomWithUser(userId);
+
+    if (existingRoomId) {
+      console.log(`Found existing DM room with ${userId}: ${existingRoomId}`);
+      return existingRoomId;
+    }
+
+    console.log(`No existing DM room found with ${userId}, creating one...`);
+
+    // Create a new DM room
+    const createRoomResult = await client.createRoom({
+      preset: 'trusted_private_chat',
+      invite: [userId],
+      is_direct: true,  
+      visibility: 'private',
+      initial_state: [
+        {
+          type: 'matrixbird.room.type',
+          state_key: '',
+          content: {
+            type: 'email'
+          }
+        }
+      ]
+    });
+
+    const newRoomId = createRoomResult.room_id;
+
+    // Important: Update m.direct account data to register this as a DM
+    const directData = client.getAccountData('m.direct') || { content: {} };
+    const directContent = directData.getContent() || {};
+
+    // Add the new room to the user's DM list
+    if (!directContent[userId]) {
+      directContent[userId] = [];
+    }
+
+    if (!directContent[userId].includes(newRoomId)) {
+      directContent[userId].push(newRoomId);
+    }
+
+    // Save the updated m.direct account data
+    //await client.setAccountData('m.direct', directContent);
+    client.setAccountData('m.direct', directContent).catch(err => 
+      console.warn("Failed to update m.direct account data", err)
+    );
+
+    // Option 1: Wait for a specific sync for this room to complete
+    /*
+    await new Promise((resolve) => {
+      const onSync = (state, prevState) => {
+        // Check if room is in the client's room list after sync
+        if (state === 'PREPARED' && client.getRoom(newRoomId)) {
+          client.removeListener('sync', onSync);
+          resolve();
+        }
+      };
+
+      client.on('sync', onSync);
+
+      // Timeout to prevent infinite waiting
+      setTimeout(() => {
+        client.removeListener('sync', onSync);
+        resolve();
+      }, 10000);
+    });
+    */
+
+    created_rooms[userId] = newRoomId;
+
+    console.log(`Created new DM room with ${userId}: ${newRoomId}`);
+
+    return newRoomId;
+  };
+
 
   function getUser(user_id){
     return client.store.getUser(user_id)
@@ -212,5 +527,9 @@ export function createMatrixStore() {
     syncOnce,
     findDMUsers,
     DMUserExists,
+    getDMRooms,
+    testRooms,
+    findDMRoomWithUser,
+    findOrCreateDMRoom
   };
 }
