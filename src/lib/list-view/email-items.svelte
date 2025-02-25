@@ -6,12 +6,18 @@ import EmailItem from './email-item.svelte'
 const store = createMatrixStore()
 const events = $derived(store?.events)
 
+let user = $derived(store?.user)
+
 let processed = $state(null);
 
 $effect(() => {
     if(events) {
-        processed = events.sort((a, b) => {
+        let reversed = events.sort((a, b) => {
             return b.origin_server_ts - a.origin_server_ts
+        })
+
+        processed = reversed.filter((event) => {
+            return event.sender != user?.userId
         })
     }
 })

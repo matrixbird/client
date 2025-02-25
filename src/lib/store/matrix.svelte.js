@@ -1,7 +1,7 @@
 import { 
   PUBLIC_HOMESERVER,
 } from '$env/static/public';
-//import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 
 let ready = $state(false);
 let synced = $state(false);
@@ -52,11 +52,40 @@ export function createMatrixStore() {
 
     client.on(sdk.RoomEvent.MyMembership, function (room, membership, prevMembership) {
       if (membership === sdk.KnownMembership.Invite) {
-        client.joinRoom(room.roomId).then(function () {
-          console.log("Auto-joined %s", room.roomId);
-        });
+        join_room(room);
       }
     });
+
+    async function join_room(room) {
+      try {
+        // Get all currently joined rooms
+        const joinedRooms = client.getRooms().filter(r => 
+          r.getMyMembership() === "join"
+        ).map(r => r.roomId);
+
+        console.log(joinedRooms)
+        // Check if we're already in this room
+        if (joinedRooms.includes(room.roomId)) {
+          console.log("Already joined room:", room.roomId);
+          return;
+        }
+
+        // Join the room since we're not already in it
+        console.log("Joining room:", room.roomId);
+        await client.joinRoom(room.roomId);
+
+        // Force an initial sync to get the room state
+        console.log("Syncing room:", room.roomId);
+        await client.roomInitialSync(room.roomId);
+
+
+        console.log("Room join and sync complete for:", room.roomId);
+
+
+      } catch (error) {
+        console.error("Error joining room:", room.roomId, error);
+      }
+    }
 
 
     client.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
@@ -276,7 +305,6 @@ export function createMatrixStore() {
       preset: 'trusted_private_chat',
       invite: [userId],
       is_direct: true,  
-      visibility: 'private',
       initial_state: [
         {
           type: 'matrixbird.room.type',
