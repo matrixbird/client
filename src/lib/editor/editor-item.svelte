@@ -253,7 +253,8 @@ function processBlur(event) {
     </div>
 
     {#if !minimized}
-        <div class="content text-sm p-1 grid grid-rows-[auto_auto_1fr_auto]">
+        <div class="content text-sm p-1 grid grid-rows-[auto_auto_1fr_auto]"
+        class:max={expanded}>
 
             <div class="border-b border-border flex flex-wrap cursor-text"
             onclick={() => focusTo()}>
@@ -320,7 +321,8 @@ function processBlur(event) {
     max-width: 34rem;
 }
 
-.base {
+.max {
+    max-width: 100%;
 }
 
 .expand {
