@@ -1,7 +1,12 @@
 <script>
 import { createMatrixStore } from '$lib/store/matrix.svelte.js'
 
+import Popup from '$lib/components/popup/popup.svelte'
+
 const store = createMatrixStore()
+
+import { ui_state } from '$lib/store/store.svelte.js'
+let expanded = $derived(ui_state?.expanded)
 
 let user = $derived.by(() => {
     if(!store?.synced) return null
@@ -35,17 +40,39 @@ let initials = $derived.by(() => {
 })
 
 
+let popup;
+
+function kill() {
+    popup.kill()
+}
+
 </script>
 
-<div class="grid place-items-center w-full mb-2">
-    <div class="user rounded-[50%] w-9 h-9 cursor-pointer
+<Popup bind:this={popup} {trigger} {content}>
+
+</Popup>
+
+{#snippet content()}
+    <button onclick={kill}>
+        test
+    </button>
+{/snippet}
+
+{#snippet trigger()}
+<div class="grid place-items-center w-full mb-2 select-none">
+    <div class="user rounded-[50%] cursor-pointer
         hover:bg-neutral-800 grid place-items-center 
-        bg-neutral-900" >
+        bg-neutral-900" 
+    class:w-12={!expanded}
+    class:h-12={!expanded}
+    class:w-9={expanded}
+    class:h-9={expanded}>
         <div class="font-semibold text-white uppercase">
             {initials} 
         </div>
     </div>
 </div>
+{/snippet}
 
 <style>
 .user {

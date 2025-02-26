@@ -1,6 +1,7 @@
 <script>
 import { createMatrixStore } from '$lib/store/matrix.svelte.js'
 import EmailItem from './email-item.svelte'
+import { goto } from '$app/navigation';
 
 
 const store = createMatrixStore()
@@ -19,6 +20,11 @@ $effect(() => {
         processed = reversed.filter((event) => {
             return event.sender != user?.userId
         })
+
+    }
+    if(events.length == 2) {
+        let event_id = events[0].event_id
+        console.log(event_id)
     }
 })
 

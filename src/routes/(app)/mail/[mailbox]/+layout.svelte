@@ -8,23 +8,23 @@ let event_open = $derived.by(() => {
     return $page.params.event !== undefined
 })
 
-let width = $state(550);
-
 </script>
 
-<div class="view grid  w-full h-full overflow-hidden" 
-style="--width:{width}px;">
+<div class="grid grid-cols-[1fr] w-full h-full overflow-hidden" 
+class:open={event_open}>
 
     <ListView />
 
+    {#if event_open}
         <div class="overflow-hidden border-l border-border">
             {@render children()}
         </div>
+    {/if}
 </div>
 
 <style>
-.view {
-    grid-template-columns: 50% 50%;
+.open {
+    grid-template-columns: 45% 55%;
 }
 </style>
 

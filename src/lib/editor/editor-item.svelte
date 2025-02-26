@@ -246,7 +246,7 @@ function processPaste(event) {
 
         <div class="flex p-2 flex-1 place-items-center cursor-pointer text-sm ml-1 tracking-wide"
             onclick={toggleMinimize}>
-            New Message
+            {subject ? subject : `New Message`}
         </div>
 
 

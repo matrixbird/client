@@ -75,8 +75,13 @@ let user = $derived.by(() =>{
 <div class="h-full overflow-x-auto overflow-y-auto select-text">
 
     <div class="meta p-3 flex flex-col">
-        <div class="text-xl font-medium leading-1 mb-3">
-            {subject}
+        <div class="flex place-items-center mb-3">
+            <div class="flex-1 text-xl font-medium leading-1">
+                {subject}
+            </div>
+            <div class="flex ml-3">
+                <button>reply</button>
+            </div>
         </div>
 
         {#if native && user}
@@ -110,5 +115,6 @@ let user = $derived.by(() =>{
         {/if}
 
 </div>
+
 {/if}
 

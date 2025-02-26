@@ -1,6 +1,9 @@
 <script>
 import { PUBLIC_HOMESERVER } from '$env/static/public';
 import { onMount } from 'svelte';
+import {
+	goto,
+} from '$app/navigation';
 import { browser } from '$app/environment';
 import '../../app.css';
 import logo from '../../logo.png'
@@ -10,8 +13,11 @@ import Editor from '$lib/editor/editor.svelte'
 import Logout from '$lib/auth/logout.svelte'
 import ThemeToggle from '$lib/theme/toggle.svelte'
 
+import Profile from '$lib/profile/profile.svelte'
+
 import { expand, collapse } from '$lib/assets/icons.js'
 
+import { userState, ui_state } from '$lib/store/store.svelte.js'
 import { createStore } from '$lib/store/store.svelte.js'
 const store = createStore()
 
@@ -35,24 +41,35 @@ $effect(() => {
 })
 
 
-let msg = $derived(store?.msg)
 
-
-function getFromLS() {
-    if(localStorage.getItem('expanded')) {
-        return true
+const events = $derived(matrixStore?.events)
+const first_event = $derived.by(() => {
+    if(events) {
+        return events[0]
     }
-    return false
-}
+})
+let new_user = $derived(userState?.new_user)
 
-let expanded = $state(false);
+$effect(() => {
+    if(new_user){
+    }
+    if(new_user && first_event) {
+        userState.new_user = false
+        goto(`/mail/inbox/${first_event.event_id}`)
+    }
+})
 
-if(browser) {
-    expanded = getFromLS()
-}
+
+
+let expanded = $derived(ui_state?.expanded)
 
 function expandWindow() {
-    expanded = !expanded
+    if(expanded) {
+        ui_state.expanded = false
+    } else {
+        ui_state.expanded = true
+    }
+
     if(expanded) {
         localStorage.setItem('expanded', 'true')
     } else {
@@ -73,8 +90,16 @@ function expandWindow() {
 
 <Editor />
 
-<div class="grid h-screen w-screen overflow-hidden">
+{#if new_user}
+{/if}
 
+{#if !expanded}
+    <div class="profile">
+        <Profile />
+    </div>
+{/if}
+
+<div class="grid h-screen w-screen overflow-hidden">
     <div class="grid grid-rows-[auto_1fr] overflow-hidden bg-white
             sm:max-w-[1600px] mx-10 justify-self-center self-center 
             w-full h-full max-h-full select-none
@@ -86,7 +111,7 @@ function expandWindow() {
 
             <div class="flex place-items-center silk cursor-pointer text ml-1 tracking-wide
 ">
-                matrixbird {msg}
+                matrixbird
             </div>
 
             <div class="flex-1 flex place-items-center ml-3">
@@ -141,5 +166,10 @@ function expandWindow() {
     max-height: 100vh;
     max-width: 100vw;
     margin: 0;
+}
+.profile {
+    position: fixed;
+    top: 2rem;
+    left: 2rem;
 }
 </style>

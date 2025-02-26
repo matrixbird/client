@@ -14,6 +14,8 @@ import {
 
 import { page } from '$app/state';
 
+import { userState } from '$lib/store/store.svelte.js'
+
 import { 
     debounce
 } from '$lib/utils/utils.js';
@@ -152,6 +154,7 @@ async function process() {
                     device_id: response.device_id,
                 }),
             });
+            userState.new_user = true
             goto('/mail/inbox')
         }
 
