@@ -210,6 +210,30 @@ function processBlur(event) {
     }
 }
 
+function processPaste(event) {
+    let clipboardData, pastedData;
+
+    // Stop data actually being pasted into div
+    event.stopPropagation();
+    event.preventDefault();
+
+    // Get pasted data via clipboard API
+    clipboardData = event.clipboardData || window.clipboardData;
+    pastedData = clipboardData.getData('Text');
+
+
+    let pasted = pastedData.split(/[\s,]+/)
+
+    pasted.forEach(email => {
+        let email_valid = validate(email);
+        let exists = emails.find(e => e == email)
+        console.log(exists)
+        if(email_valid && !exists) {
+            emails.push(email)
+        }
+    })
+}
+
 </script>
 
 
@@ -280,6 +304,7 @@ function processBlur(event) {
                     bind:value={to}
                     onkeydown={processInput}
                     onblur={processBlur}
+                    onpaste={processPaste}
                     placeholder={emails?.length == 0 ? `To` : ''}
                 />
                 </div>
