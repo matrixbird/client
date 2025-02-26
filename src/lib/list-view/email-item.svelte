@@ -90,7 +90,7 @@ const has_attachments = $derived.by(() => {
 </script>
 
 
-<div class="flex flex-col cursor-pointer hover:bg-neutral-50 border-b
+<div class="email-item flex flex-col cursor-pointer hover:bg-neutral-50 border-b
     border-neutral-300 overflow-x-hidden"
     oncontextmenu={log}
     class:active={active}
@@ -178,6 +178,9 @@ const has_attachments = $derived.by(() => {
 
 <style lang="postcss">
 @reference "tailwindcss/theme";
+.email-item {
+    min-height: 72px;
+}
 .active {
     border-left: 3px solid theme('colors.neutral.700');
 }

@@ -116,7 +116,7 @@ async function process() {
     let mxids = emails.map(e => email_to_mxid(e))
 
     console.log(mxids)
-    return
+    //return
 
     /*
     const resp = await store.client.getProfileInfo(mxid)
@@ -130,7 +130,7 @@ async function process() {
     try {
         //const resp = await store.testRooms()
         //console.log("dm rooms", resp)
-        let room_id = await store.emailRoom([mxids])
+        let room_id = await store.emailRoom(mxids)
         console.log("room id", room_id)
 
         const msg = await store.client.sendEvent(
@@ -171,8 +171,10 @@ async function focusComposer() {
 let emails = $state([]);
 
 function processInput(event) {
+
     if(event.code == 'Backspace' && to.length == 0) {
         emails.pop()
+        return
     }
 
     if(event.code == 'Comma' || event.code == 'Space' || event.code == 'Enter') {
@@ -213,21 +215,17 @@ function processBlur(event) {
 function processPaste(event) {
     let clipboardData, pastedData;
 
-    // Stop data actually being pasted into div
     event.stopPropagation();
     event.preventDefault();
 
-    // Get pasted data via clipboard API
     clipboardData = event.clipboardData || window.clipboardData;
     pastedData = clipboardData.getData('Text');
-
 
     let pasted = pastedData.split(/[\s,]+/)
 
     pasted.forEach(email => {
         let email_valid = validate(email);
         let exists = emails.find(e => e == email)
-        console.log(exists)
         if(email_valid && !exists) {
             emails.push(email)
         }
@@ -285,8 +283,9 @@ function processPaste(event) {
 
                 {#each emails as email, i}
                     <div class="flex place-items-center my-2 px-2
-                        hover:bg-neutral-200 duration-100
-                        bg-neutral-100 rounded cursor-pointer"
+                        hover:border-neutral-500 duration-100
+                        border border-neutral-400
+                        bg-neutral-50 rounded cursor-pointer"
                             onclick={() => removeEmail(i)}>
                         <div class="">
                             {email}

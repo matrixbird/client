@@ -52,6 +52,7 @@ export function createMatrixStore() {
 
     client.on(sdk.RoomEvent.MyMembership, function (room, membership, prevMembership) {
       if (membership === sdk.KnownMembership.Invite) {
+        console.log(room)
         join_room(room);
       }
     });
@@ -63,7 +64,7 @@ export function createMatrixStore() {
           r.getMyMembership() === "join"
         ).map(r => r.roomId);
 
-        console.log(joinedRooms)
+        //console.log(joinedRooms)
         // Check if we're already in this room
         if (joinedRooms.includes(room.roomId)) {
           console.log("Already joined room:", room.roomId);
@@ -72,14 +73,47 @@ export function createMatrixStore() {
 
         // Join the room since we're not already in it
         console.log("Joining room:", room.roomId);
-        await client.joinRoom(room.roomId);
+        let joined = await client.joinRoom(room.roomId);
+        console.log("joined", joined)
 
-        // Force an initial sync to get the room state
-        console.log("Syncing room:", room.roomId);
-        await client.roomInitialSync(room.roomId);
+        let storedRoom = await client.getRoom(room.roomId);
+        console.log("room from store is", storedRoom)
+        rooms[room.roomId] = storedRoom;
+
+        /*
+        setTimeout(async () => {
+
+
+
+        await client.scrollback(storedRoom, 50).then((x) => {
+          console.log("Fetched previous messages", x);
+        });
+
+
+        const events = storedRoom.getLiveTimeline().getEvents();
+        console.log(events)
+        if (events.length > 0) {
+          const latestEvent = events[events.length - 1];
+          const read = await client.sendReceipt(latestEvent, "m.read", {thread: "main"});
+          console.log("read", read)
+        }
+
+
+        await client.roomInitialSync(room.roomId, 25).then(() => {
+          console.log("Room initial sync complete");
+        });
+
+
+        const messagesResult = await client.createMessagesRequest(room.roomId, null, 100, 'b', null);
+        const messages = messagesResult.chunk;
+        console.log(`Fetched ${messages.length} messages using createMessagesRequest`);
 
 
         console.log("Room join and sync complete for:", room.roomId);
+        }, 3000)
+
+        */
+
 
 
       } catch (error) {
@@ -102,17 +136,27 @@ export function createMatrixStore() {
       }
     });
 
+    client.on(sdk.RoomMemberEvent.Membership, function (event, room, toStartOfTimeline) {
+      if(event?.event?.content?.membership == "join") {
+        console.log(event.event)
+      }
+    });
+
+
     client.on("sync", (state, prevState, data) => {
       if(state === "PREPARED") {
 
+        console.log(data)
+
         synced = true
-        console.log(client.store)
+        //console.log(client.store)
 
         let logged_in_user = client.store.getUser(client.getUserId());
         user = logged_in_user;
-        console.log("saving user", user)
+        //console.log("saving user", user)
 
 
+        /*
         const items = client.getRooms();
         items.forEach((room) => {
           const timeline = room.getLiveTimeline();
@@ -128,12 +172,13 @@ export function createMatrixStore() {
           });
         });
 
+        //console.log(client);
+        */
         Object.keys(client.store.rooms).forEach((roomId) => {
           const room = client.getRoom(roomId);
           rooms[roomId] = room;
         });
         console.log(rooms);
-        //console.log(client);
         ready = true
       }
     });
@@ -451,6 +496,7 @@ export function createMatrixStore() {
 
   const emailRoom = async (userIds) => {
     // First check if a DM room already exists
+
     const existingRoomId = await doesRoomExist(userIds);
 
     if (existingRoomId) {
@@ -465,6 +511,13 @@ export function createMatrixStore() {
       preset: 'trusted_private_chat',
       invite: userIds,
       visibility: 'private',
+      /*
+      power_level_content_override: {
+        events: {
+          'matrixbird.email.native': 100,
+        }
+      },
+      */
       initial_state: [
         {
           type: 'matrixbird.room.type',
