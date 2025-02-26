@@ -10,7 +10,6 @@ import logo from '../../logo.png'
 import Switcher from '$lib/switcher/switcher.svelte'
 import Editor from '$lib/editor/editor.svelte'
 
-import Logout from '$lib/auth/logout.svelte'
 import ThemeToggle from '$lib/theme/toggle.svelte'
 
 import Profile from '$lib/profile/profile.svelte'
@@ -93,7 +92,7 @@ function expandWindow() {
 {#if new_user}
 {/if}
 
-{#if !expanded}
+{#if !expanded && ready}
     <div class="profile">
         <Profile />
     </div>
@@ -144,12 +143,6 @@ function expandWindow() {
 </div>
 
 
-
-
-<Logout />
-
-<ThemeToggle />
-
 <style>
 .loading {
     background: var(--background);
@@ -169,6 +162,7 @@ function expandWindow() {
 }
 .profile {
     position: fixed;
+    z-index: 1000;
     top: 2rem;
     left: 2rem;
 }

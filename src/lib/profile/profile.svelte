@@ -2,6 +2,7 @@
 import { createMatrixStore } from '$lib/store/matrix.svelte.js'
 
 import Popup from '$lib/components/popup/popup.svelte'
+import Menu from './menu.svelte'
 
 const store = createMatrixStore()
 
@@ -46,16 +47,26 @@ function kill() {
     popup.kill()
 }
 
+let popup_active = $state(false);
+
+function toggle(status) {
+    popup_active = status
+}
+
+let placement = $derived.by(() => {
+    if(expanded) return 'right-start'
+    return 'bottom-start'
+})
+
 </script>
 
-<Popup bind:this={popup} {trigger} {content}>
+<Popup bind:this={popup} {placement}
+    offsetDistance={10} {trigger} {content} {toggle}>
 
 </Popup>
 
 {#snippet content()}
-    <button onclick={kill}>
-        test
-    </button>
+    <Menu {kill} />
 {/snippet}
 
 {#snippet trigger()}
@@ -63,8 +74,9 @@ function kill() {
     <div class="user rounded-[50%] cursor-pointer
         hover:bg-neutral-800 grid place-items-center 
         bg-neutral-900" 
-    class:w-12={!expanded}
-    class:h-12={!expanded}
+    class:active={popup_active}
+    class:w-11={!expanded}
+    class:h-11={!expanded}
     class:w-9={expanded}
     class:h-9={expanded}>
         <div class="font-semibold text-white uppercase">
@@ -74,7 +86,10 @@ function kill() {
 </div>
 {/snippet}
 
-<style>
-.user {
+<style lang="postcss">
+@reference "tailwindcss/theme";
+.active {
+    transition: 0.1s;
+    outline: 4px solid theme('colors.neutral.300');
 }
 </style>

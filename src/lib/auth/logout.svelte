@@ -15,18 +15,19 @@ async function logout() {
 
 </script>
 
-<div class="logout">
-    <form bind:this={form} method="POST" action="/logout">
-    </form>
-    <button onclick={logout} class="p-3 flex items-center gap-2 text-neutral-600
-        hover:text-neutral-900"> Log out
-    </button>
+<form bind:this={form} method="POST" action="/logout">
+</form>
+
+<div class="logout flex place-items-center p-3 
+    hover:bg-neutral-100
+    gap-2 cursor-pointer">
+    <div class="">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M4 20V4h8.02v1H5v14h7.02v1zm12.462-4.461l-.702-.72l2.319-2.319H9.192v-1h8.887l-2.32-2.32l.702-.718L20 12z"/></svg>
+    </div>
+    <div onclick={logout} class="text-md hover:underline">
+        Log out
+    </div>
 </div>
 
 <style>
-.logout {
-    position: fixed;
-    bottom: 1rem;
-    left: 1rem;
-}
 </style>

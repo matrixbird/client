@@ -11,11 +11,12 @@ import {
 } from '@floating-ui/dom';
 
 let {
+    toggle,
     trigger,
     content,
-    placement = "right",
+    placement = "bottom-start",
     offsetDistance = 8,
-    showArrow = true,
+    showArrow = false,
     action = "click",
     hoverDelay = 300
 } = $props();
@@ -131,6 +132,10 @@ function togglePopup() {
     }
 }
 
+$effect(() => {
+    toggle(open)
+})
+
 function handleMouseEnter() {
     if (action === 'hover') {
         clearTimeout(hoverTimeout);
@@ -191,6 +196,27 @@ onDestroy(() => {
     }
 });
 
+
+let br = $derived.by(() => {
+    let isRight = placement.includes('right');
+    return isRight ? 0 : 1;
+})
+
+let bl = $derived.by(() => {
+    let isLeft = placement.includes('left');
+    return isLeft ? 0 : 1;
+})
+
+let bt = $derived.by(() => {
+    let isTop = placement.includes('top');
+    return isTop ? 0 : 1;
+})
+
+let bb = $derived.by(() => {
+    let isBottom = placement.includes('bottom');
+    return isBottom ? 0 : 1;
+})
+
 </script>
 
 
@@ -206,18 +232,25 @@ onDestroy(() => {
 {#if open}
     <div 
         class="popup"
+        style="--br: {br}px;--bl: {bl}px;--bt: {bt}px;--bb: {bb}px;"
         bind:this={popupEl}
         role="dialog"
         aria-modal="true"
         onmouseenter={handlePopupMouseEnter}
         onmouseleave={handlePopupMouseLeave}
     >
-        {@render content()}
-        <div class="arrow" bind:this={arrowEl}></div>
+
+        <div class="popup-content">
+            {@render content()}
+        </div>
+        {#if showArrow}
+            <div class="arrow" bind:this={arrowEl}></div>
+        {/if}
     </div>
 {/if}
 
-<style>
+<style lang="postcss">
+@reference "tailwindcss/theme";
 .popup-trigger {
     display: inline-block;
     cursor: pointer;
@@ -225,12 +258,23 @@ onDestroy(() => {
 
 .popup {
     position: absolute;
-    z-index: 1000;
+    z-index: 10000;
     background: white;
-    border-radius: 4px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    border: 1px solid #eaeaea;
-    min-width: 180px;
+    border: 1px solid var(--border);
+    transform: translate(0, 0);
+    border-radius: 1px;
+    -webkit-box-shadow: 2px 0px 17px 0px rgba(0,0,0,0.23);
+    -moz-box-shadow: 2px 0px 17px 0px rgba(0,0,0,0.23);
+    box-shadow: 2px 0px 17px 0px rgba(0,0,0,0.23);
+}
+
+.popup:hover {
+}
+
+
+.popup-content {
+    position: relative;
+    z-index: 2;
 }
 
 .arrow {
@@ -239,8 +283,11 @@ onDestroy(() => {
     height: 12px;
     background: white;
     transform: rotate(45deg);
-    border: 1px solid #eaeaea;
-    z-index: -1;
+    border-right: var(--br) solid var(--border);
+    border-left: var(--bl) solid var(--border);
+    border-top: var(--bt) solid var(--border);
+    border-bottom: var(--bb) solid var(--border);
+    z-index: 1;
 }
 
 </style>
