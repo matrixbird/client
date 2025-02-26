@@ -58,9 +58,13 @@ let placement = $derived.by(() => {
     return 'bottom-start'
 })
 
+let mask = $derived.by(() => {
+    if(expanded) return true
+    return false
+})
 </script>
 
-<Popup bind:this={popup} {placement}
+<Popup bind:this={popup} {placement} {mask}
     offsetDistance={10} {trigger} {content} {toggle}>
 
 </Popup>

@@ -14,6 +14,7 @@ let {
     toggle,
     trigger,
     content,
+    mask,
     placement = "bottom-start",
     offsetDistance = 8,
     showArrow = false,
@@ -219,6 +220,10 @@ let bb = $derived.by(() => {
 
 </script>
 
+{#if mask && open}
+    <div class="mask" onclick={handleClickOutside}>
+    </div>
+{/if}
 
 
 
@@ -288,6 +293,16 @@ let bb = $derived.by(() => {
     border-top: var(--bt) solid var(--border);
     border-bottom: var(--bb) solid var(--border);
     z-index: 1;
+}
+
+.mask {
+    z-index: 99;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
 }
 
 </style>
