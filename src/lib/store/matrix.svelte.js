@@ -473,19 +473,33 @@ export function createMatrixStore() {
     const currentUserId = client.getUserId();
     const allRelevantUserIds = [...new Set([...userIds, currentUserId])];
 
-    // Loop through each room
     for (const room of rooms) {
       // Check if the room has the required state event
       const stateEvent = room.currentState.getStateEvents("matrixbird.room.type", "");
       if (!stateEvent || stateEvent.getContent().type !== "email") continue;
 
-      // Get all members in the room
-      const members = room.getJoinedMembers();
-      const memberUserIds = members.map(member => member.userId);
+      // Get all joined members in the room
+      const joinedMembers = room.getJoinedMembers();
+      const joinedUserIds = joinedMembers.map(member => member.userId);
+
+      // Get all invited members in the room
+      const invitedMembers = [];
+      const memberEvents = room.currentState.getStateEvents("m.room.member");
+
+      for (const event of memberEvents) {
+        if (event.getContent().membership === "invite") {
+          invitedMembers.push({ userId: event.getStateKey() });
+        }
+      }
+
+      const invitedUserIds = invitedMembers.map(member => member.userId);
+
+      // Combine joined and invited member IDs for the check
+      const allMemberUserIds = [...new Set([...joinedUserIds, ...invitedUserIds])];
 
       // Check if the members match exactly what we're looking for
-      if (memberUserIds.length === allRelevantUserIds.length && 
-        allRelevantUserIds.every(userId => memberUserIds.includes(userId))) {
+      if (allMemberUserIds.length === allRelevantUserIds.length && 
+        allRelevantUserIds.every(userId => allMemberUserIds.includes(userId))) {
         return room.roomId;
       }
     }
