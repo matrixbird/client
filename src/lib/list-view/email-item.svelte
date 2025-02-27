@@ -69,7 +69,10 @@ function log(e) {
     let rect = e.target.getBoundingClientRect()
 
     email_context_menu.email = email
-    email_context_menu.rect = rect
+    email_context_menu.pos = {
+        x: e.clientX,
+        y: e.clientY,
+    }
     email_context_menu.element = el
 
     e.preventDefault()

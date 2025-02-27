@@ -298,7 +298,7 @@ input::placeholder {
 }
 
 .tooltip {
-    position: absolute;
+    position: fixed;
     font-family: "Silkscreen", serif;
     background: theme('colors.neutral.900');
     color: white;
@@ -308,5 +308,6 @@ input::placeholder {
     pointer-events: none;
     z-index: 100;
     opacity: 0;
+    visibility: hidden;
     max-width: 250px;
 }

@@ -7,6 +7,7 @@ import {
 import { browser } from '$app/environment';
 import '../../app.css';
 import logo from '../../logo.png'
+import Header from '$lib/header/header.svelte'
 import Switcher from '$lib/switcher/switcher.svelte'
 import Editor from '$lib/editor/editor.svelte'
 import EmailContextMenu from '$lib/components/email/context-menu.svelte'
@@ -108,24 +109,7 @@ function expandWindow() {
     class:box={!expanded}
     class:expanded={expanded}>
 
-        <div class="flex bg-neutral-900 p-2 text-white font-medium">
-
-            <div class="flex place-items-center silk cursor-pointer text ml-1 tracking-wide
-">
-                matrixbird
-            </div>
-
-            <div class="flex-1 flex place-items-center ml-3">
-            </div>
-            <div class="cursor-pointer flex place-items-center mr-1"
-            onclick={expandWindow}>
-                {#if expanded}
-                    {@html collapse}
-                {:else}
-                    {@html expand}
-                {/if}
-            </div>
-        </div>
+        <Header />
 
 
         <div class="overflow-hidden 

@@ -10,42 +10,44 @@ import {
 let menuEl = $state(null);
 let open = $state(false);
 
-function updatePosition() {
-    if (menuEl) {
-        Object.assign(menuEl.style, {
-            left: `${rect.x + 2}px`,
-            top: `${rect.y + 2}px`,
-        });
-    }
-}
-
 function handleClickOutside(event) {
     if (!open) return;
 
     const insideMenu = menuEl && menuEl.contains(event.target);
     
     if (!insideMenu) {
-        open = false;
+        kill();
     }
 }
 
 export function kill() {
+    email_context_menu.email = null;
+    email_context_menu.pos = null;
     open = false;
+    cleanup();
 }
 
 let active = $derived.by(() => {
     return email_context_menu.email !== null &&
-        email_context_menu.rect !== null;
+        email_context_menu.pos !== null;
 })
 
-let rect = $derived.by(() => {
-    return email_context_menu?.rect;
+let pos = $derived.by(() => {
+    return email_context_menu?.pos;
+})
+
+let top = $derived.by(() => {
+    return pos?.y + 2;
+})
+
+let left = $derived.by(() => {
+    return pos?.x + 2;
 })
 
 $effect(() => {
-    if(active && rect) {
+    if(active && top && left) {
         open = true;
-        setTimeout(updatePosition, 100);
+        //setTimeout(updatePosition, 100);
     }
 })
 
@@ -57,26 +59,26 @@ $effect(() => {
 
 function setup() {
     if (open) {
-        document.addEventListener('mousedown', handleClickOutside);
-        document.addEventListener('contextmenu', handleClickOutside);
-        window.addEventListener('resize', kill);
-        window.addEventListener('scroll', kill);
-    } else {
-        document.removeEventListener('mousedown', handleClickOutside);
-        document.removeEventListener('contextmenu', handleClickOutside);
-        window.removeEventListener('resize', kill);
-        window.removeEventListener('scroll', kill);
+        setTimeout(() => {
+            document.addEventListener('mousedown', handleClickOutside);
+            document.addEventListener('contextmenu', handleClickOutside);
+            window.addEventListener('resize', kill);
+            window.addEventListener('scroll', kill);
+        }, 100);
     }
 }
 
 onDestroy(() => {
+});
+
+function cleanup() {
     if(browser) {
         document.removeEventListener('mousedown', handleClickOutside);
         document.removeEventListener('contextmenu', handleClickOutside);
         window.removeEventListener('resize', kill);
         window.removeEventListener('scroll', kill);
     }
-});
+}
 </script>
 
 {#if open}
@@ -85,8 +87,9 @@ onDestroy(() => {
         bind:this={menuEl}
         role="menu"
         aria-modal="true"
+        style="--top:{top}px;--left:{left}px;"
     >
-        <div class="context-menu-content">
+        <div class="context-menu-content p-4">
         </div>
     </div>
 {/if}
@@ -99,8 +102,10 @@ onDestroy(() => {
 }
 
 .context-menu {
-    position: absolute;
+    position: fixed;
     z-index: 10000;
+    top: var(--top);
+    left: var(--left);
     background: white;
     border: 1px solid var(--border);
     transform: translate(0, 0);

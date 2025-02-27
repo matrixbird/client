@@ -9,24 +9,63 @@ import {
 export function tooltip(node, opts = {
   text: '',
   placement: 'top',
+  delay: 0,    
 }) {
 
-  const tooltip = document.createElement('div');
-  tooltip.className = 'tooltip';
-  tooltip.textContent = opts.text;
-  
-  document.body.appendChild(tooltip);
-  
-  let cleanup;
-  
+  let tooltip = null;
+  let cleanup = null;
+  let showTimeout = null;
+  let hideTimeout = null;
+
+  function createTooltip() {
+
+    if (!tooltip) {
+      tooltip = document.createElement('div');
+      tooltip.className = `tooltip`;
+      tooltip.textContent = opts.text;
+      tooltip.setAttribute('role', 'tooltip');
+      document.body.appendChild(tooltip);
+    }
+    return tooltip;
+  }
+
+  function removeTooltip() {
+    if (tooltip) {
+      document.body.removeChild(tooltip);
+      tooltip = null;
+    }
+  }
+
   function showTooltip() {
-    tooltip.style.opacity = '1';
+    // Clear any pending hide timeout
+    if (hideTimeout) {
+      clearTimeout(hideTimeout);
+      hideTimeout = null;
+    }
+
+    // Apply delay if specified
+    if (opts.delay && !showTimeout) {
+      showTimeout = setTimeout(() => {
+        actuallyShowTooltip();
+        showTimeout = null;
+      }, opts.delay);
+    } else {
+      actuallyShowTooltip();
+    }
+  }
+
+  function actuallyShowTooltip() {
+
+    const tooltipEl = createTooltip();
+
+    tooltipEl.style.visibility = 'visible';
+    tooltipEl.style.opacity = '1';
 
     cleanup = autoUpdate(
       node,
-      tooltip,
+      tooltipEl,
       () => {
-        computePosition(node, tooltip, {
+        computePosition(node, tooltipEl, {
           placement: opts.placement,
           middleware: [
             autoPlacement(),
@@ -34,39 +73,75 @@ export function tooltip(node, opts = {
             shift({ padding: 5 }) 
           ]
         }).then(({ x, y }) => {
-          Object.assign(tooltip.style, {
-            left: `${x}px`,
-            top: `${y}px`
+            Object.assign(tooltipEl.style, {
+              left: `${x}px`,
+              top: `${y}px`
+            });
           });
-        });
       }
     );
   }
-  
+
   function hideTooltip() {
-    tooltip.style.opacity = '0';
-    if (cleanup) {
-      cleanup();
-      cleanup = undefined;
+
+    if (showTimeout) {
+      clearTimeout(showTimeout);
+      showTimeout = null;
+    }
+
+    if (tooltip) {
+      tooltip.style.opacity = '0';
+
+      hideTimeout = setTimeout(() => {
+        if (cleanup) {
+          cleanup();
+          cleanup = null;
+        }
+
+        if (tooltip) {
+          tooltip.style.visibility = 'hidden';
+
+          setTimeout(removeTooltip, 100);
+        }
+
+        hideTimeout = null;
+      }, 150);
     }
   }
-  
+
   node.addEventListener('mouseenter', showTooltip);
   node.addEventListener('mouseleave', hideTooltip);
   node.addEventListener('focus', showTooltip);
   node.addEventListener('blur', hideTooltip);
-  
+
+  document.addEventListener('click', hideTooltip);
+
   return {
     update(newopts) {
-      tooltip.textContent = newopts.text;
+      opts = newopts;
+
+      if (tooltip) {
+        tooltip.textContent = newopts.text;
+        tooltip.className = `tooltip`;
+      }
     },
     destroy() {
-      hideTooltip();
+
+      if (showTimeout) clearTimeout(showTimeout);
+      if (hideTimeout) clearTimeout(hideTimeout);
+
+
+      if (cleanup) cleanup();
+
+
       node.removeEventListener('mouseenter', showTooltip);
       node.removeEventListener('mouseleave', hideTooltip);
       node.removeEventListener('focus', showTooltip);
       node.removeEventListener('blur', hideTooltip);
-      document.body.removeChild(tooltip);
+      document.removeEventListener('click', hideTooltip);
+
+
+      removeTooltip();
     }
   };
 }

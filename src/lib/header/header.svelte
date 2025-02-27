@@ -1,23 +1,51 @@
 <script>
-import Search from '$lib/search/search.svelte'
 import { page } from '$app/stores';
-import { createStore } from '$lib/store/store.svelte.js'
-const store = createStore()
+import { expand, collapse } from '$lib/assets/icons.js'
+import { tooltip } from '$lib/components/tooltip/tooltip'
 
-let title = $derived.by(() => {
-    let str = $page.route.id.slice(7).split('/')[0];
-    return `${str[0].toUpperCase()}${str.slice(1)}`;
-})
+import { ui_state } from '$lib/store/store.svelte.js'
+
+let expanded = $derived(ui_state?.expanded)
+
+function expandWindow() {
+    if(expanded) {
+        ui_state.expanded = false
+    } else {
+        ui_state.expanded = true
+    }
+
+    if(expanded) {
+        localStorage.setItem('expanded', 'true')
+    } else {
+        localStorage.removeItem('expanded')
+    }
+}
+
+let opts = {
+    text: expanded ? "Minimize" : "Maximize",
+    placement: "right"
+}
+
 </script>
 
-<div class="flex border-b border-border p-2">
-    <div class="flex place-items-center">
-        <button class="primary py-2 px-3">New email</button>
+<div class="flex bg-neutral-900 p-1 text-white font-medium">
+
+    <div class="flex place-items-center silk cursor-pointer text ml-1 tracking-wide
+">
+        matrixbird
     </div>
-    <div class="ml-1 font-semibold flex-1 text-center">
+
+    <div class="flex-1 flex place-items-center ml-3">
     </div>
-    <div class="flex place-items-center">
-        <Search />
+    <div class="cursor-pointer flex place-items-center mr-1"
+    onclick={expandWindow}
+    use:tooltip={opts}>
+
+        {#if expanded}
+            {@html collapse}
+        {:else}
+            {@html expand}
+        {/if}
     </div>
 </div>
 

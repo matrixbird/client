@@ -22,7 +22,7 @@ export const route_state = $state({
 
 export const email_context_menu = $state({
     email: null,
-    rect: null,
+    pos: null,
     element: null,
 });
 

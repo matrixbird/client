@@ -22,10 +22,6 @@ $effect(() => {
         })
 
     }
-    if(events.length == 2) {
-        let event_id = events[0].event_id
-        console.log(event_id)
-    }
 })
 
 </script>
