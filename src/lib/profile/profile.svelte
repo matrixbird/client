@@ -55,7 +55,7 @@ function toggle(status) {
 
 let placement = $derived.by(() => {
     if(expanded) return 'right-start'
-    return 'bottom-start'
+    return 'bottom-end'
 })
 
 let mask = $derived.by(() => {

@@ -15,6 +15,11 @@ import {
     check_small
 } from '$lib/assets/icons.js'
 
+import { 
+    route_state,
+    email_context_menu
+} from '$lib/store/store.svelte.js'
+
 import { createMatrixStore } from '$lib/store/matrix.svelte.js'
 const store = createMatrixStore()
 
@@ -61,8 +66,14 @@ function open() {
 }
 
 function log(e) {
+    let rect = e.target.getBoundingClientRect()
+
+    email_context_menu.email = email
+    email_context_menu.rect = rect
+    email_context_menu.element = el
+
     e.preventDefault()
-    console.log(email)
+    //console.log(email)
 }
 
 let selected = $state(false);
@@ -87,10 +98,19 @@ const has_attachments = $derived.by(() => {
     return email?.content?.attachments?.length > 0
 })
 
+$effect(() => {
+    if(active) {
+        route_state.mail = $page.url.pathname
+    }
+
+})
+
+let el;
+
 </script>
 
 
-<div class="email-item flex flex-col cursor-pointer hover:bg-neutral-50 border-b
+<div bind:this={el} class="email-item flex flex-col cursor-pointer hover:bg-neutral-50 border-b
     border-neutral-300 overflow-x-hidden"
     oncontextmenu={log}
     class:active={active}

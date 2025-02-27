@@ -6,9 +6,9 @@ import {
     settings
 } from '$lib/assets/icons'
 
-import Inbox from './inbox.svelte'
+import Mail from './mail.svelte'
 import Chat from './chat.svelte'
-import Calendar from './calendar.svelte'
+//import Calendar from './calendar.svelte'
 
 import { ui_state } from '$lib/store/store.svelte.js'
 let expanded = $derived(ui_state?.expanded)
@@ -21,11 +21,9 @@ let expanded = $derived(ui_state?.expanded)
         <Profile />
     {/if}
 
-    <Inbox />
+    <Mail />
 
     <Chat />
-
-    <Calendar />
 
     <div class="flex-1 grid place-items-center">
     </div>

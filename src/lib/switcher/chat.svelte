@@ -1,6 +1,7 @@
 <script>
 import { page } from '$app/stores';
 import { goto } from '$app/navigation';
+import { tooltip } from '$lib/components/tooltip/tooltip'
 import { 
     chat_outline, 
     chat_solid, 
@@ -8,7 +9,7 @@ import {
 
 function open() {
     if(!active) {
-        goto(`/chat`)
+        //goto(`/chat`)
     }
 }
 
@@ -16,10 +17,14 @@ let active = $derived.by(() => {
     return $page.route.id.startsWith(`/(app)/chat`)
 })
 
+let opts = {
+    text: "Chat"
+}
+
 </script>
 
 <div class="grid place-items-center cursor-pointer"
-onclick={open}>
+onclick={open} use:tooltip={opts}>
 
     <div class="icon p-2 rounded" class:active={active}>
         {@html chat_solid}

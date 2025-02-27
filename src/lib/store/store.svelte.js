@@ -9,12 +9,23 @@ let session = $state(null);
 
 
 export const userState = $state({
-  new_user: true
+    new_user: false
 });
 
 export const ui_state = $state({
-  expanded: false
+    expanded: false
 });
+
+export const route_state = $state({
+    mail: null,
+});
+
+export const email_context_menu = $state({
+    email: null,
+    rect: null,
+    element: null,
+});
+
 
 function getFromLS() {
     if(localStorage.getItem('expanded')) {

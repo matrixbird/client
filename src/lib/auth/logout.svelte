@@ -18,13 +18,13 @@ async function logout() {
 <form bind:this={form} method="POST" action="/logout">
 </form>
 
-<div class="logout flex place-items-center p-3 
+<div onclick={logout} class="logout flex place-items-center px-3 py-2 
     hover:bg-neutral-100
     gap-2 cursor-pointer">
     <div class="">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M4 20V4h8.02v1H5v14h7.02v1zm12.462-4.461l-.702-.72l2.319-2.319H9.192v-1h8.887l-2.32-2.32l.702-.718L20 12z"/></svg>
     </div>
-    <div onclick={logout} class="text-md hover:underline">
+    <div class="text-md">
         Log out
     </div>
 </div>

@@ -1,6 +1,7 @@
 <script>
 import { browser } from '$app/environment';
 import { onMount, onDestroy } from 'svelte';
+
 import { 
     computePosition, 
     autoUpdate, 

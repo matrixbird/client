@@ -9,6 +9,7 @@ import '../../app.css';
 import logo from '../../logo.png'
 import Switcher from '$lib/switcher/switcher.svelte'
 import Editor from '$lib/editor/editor.svelte'
+import EmailContextMenu from '$lib/components/email/context-menu.svelte'
 
 import ThemeToggle from '$lib/theme/toggle.svelte'
 
@@ -88,6 +89,7 @@ function expandWindow() {
 {/if}
 
 <Editor />
+<EmailContextMenu />
 
 {#if new_user}
 {/if}
@@ -163,7 +165,7 @@ function expandWindow() {
 .profile {
     position: fixed;
     z-index: 1000;
-    top: 2rem;
-    left: 2rem;
+    top: 1rem;
+    right: 1rem;
 }
 </style>

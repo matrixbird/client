@@ -286,13 +286,27 @@ input::placeholder {
 }
 
 .silk {
-  font-family: "Silkscreen", serif;
-  font-weight: 400;
-  font-style: normal;
+    font-family: "Silkscreen", serif;
+    font-weight: 400;
+    font-style: normal;
 }
 
 .ProseMirror {
 }
 .ProseMirror-focused {
     outline: none;
+}
+
+.tooltip {
+    position: absolute;
+    font-family: "Silkscreen", serif;
+    background: theme('colors.neutral.900');
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 1px;
+    font-size: 14px;
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0;
+    max-width: 250px;
 }
