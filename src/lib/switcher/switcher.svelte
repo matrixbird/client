@@ -29,7 +29,7 @@ let expanded = $derived(ui_state?.expanded)
     </div>
 
     <div class="grid place-items-center mb-4 cursor-pointer">
-        <div class="p-2 hover:bg-neutral-200 rounded">
+        <div class="p-2 hover:bg-bird-200 rounded">
             {@html settings}
         </div>
     </div>

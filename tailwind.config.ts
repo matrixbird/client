@@ -2,7 +2,6 @@ import type { Config } from 'tailwindcss';
 
 export default {
     content: ['./src/**/*.{html,js,svelte,ts}'],
-
     theme: {
         extend: {
             fontSize: {
@@ -11,6 +10,7 @@ export default {
             colors: {
                 'primary': 'var(--primary)',
                 'secondary': 'var(--secondary)',
+                'bg': 'var(--bg)',
                 'background': 'var(--background)',
                 'border': 'var(--border)',
                 'container': 'var(--container)',
@@ -18,17 +18,18 @@ export default {
                 'switcher': 'var(--switcher)',
                 'sidebar': 'var(--sidebar)',
                 'view': 'var(--view)',
-                'shade': {
-                    1: 'var(--shade-1)',
-                    2: 'var(--shade-2)',
-                    3: 'var(--shade-3)',
-                    4: 'var(--shade-4)',
-                    5: 'var(--shade-5)',
-                    6: 'var(--shade-6)',
-                    7: 'var(--shade-7)',
-                    8: 'var(--shade-8)',
-                    9: 'var(--shade-9)',
-                    10: 'var(--shade-10)',
+                'bird': {
+                    50: 'var(--bird-50)',
+                    100: 'var(--bird-100)',
+                    200: 'var(--bird-200)',
+                    300: 'var(--bird-300)',
+                    400: 'var(--bird-400)',
+                    500: 'var(--bird-500)',
+                    600: 'var(--bird-600)',
+                    700: 'var(--bird-700)',
+                    800: 'var(--bird-800)',
+                    900: 'var(--bird-900)',
+                    950: 'var(--bird-950)',
                 },
             }
 

@@ -14,7 +14,7 @@ let focused = $state(false);
 
 
 <div class="search flex flex-1"
-    class:border-neutral-800={focused}
+    class:border-bird-800={focused}
     onclick={focus}>
     <div class="flex place-items-center px-2 opacity-70">
         {@html glass}

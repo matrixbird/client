@@ -2,7 +2,6 @@
 import { browser } from '$app/environment';
 let toggle = () => {
     const darkClassActive = document.documentElement.classList.contains('dark');
-    console.log("darkClassActive", darkClassActive)
     if(darkClassActive) {
         document.documentElement.classList.remove('dark');
         localStorage.setItem('theme', 'light');

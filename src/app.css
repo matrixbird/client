@@ -3,9 +3,6 @@
 @import 'tailwindcss/utilities';
 
 
-@custom-variant dark (&:where(.dark, .dark *));
-
-
 @font-face {
     font-family: 'Inter';
     src: url('/fonts/Inter-VariableFont_opsz,wght.ttf');
@@ -38,23 +35,35 @@
     --icon: hsla(0, 0%, 25%, 1);
     --icon-hover: hsla(0, 0%, 45%, 1);
 
+    --bird-50: oklch(0.985 0 0);
+    --bird-100: oklch(0.97 0 0);
+    --bird-200: oklch(0.922 0 0);
+    --bird-300: oklch(0.87 0 0);
+    --bird-400: oklch(0.708 0 0);
+    --bird-500: oklch(0.556 0 0);
+    --bird-600: oklch(0.439 0 0);
+    --bird-700: oklch(0.371 0 0);
+    --bird-800: oklch(0.269 0 0);
+    --bird-900: oklch(0.205 0 0);
+    --bird-950: oklch(0.145 0 0);
+
     --spinner: hsla(0, 0%, 0%, 1);
 
     --button-background: white;
     --button-text: hsla(0, 0%, 0%, 1);
-    --button-hover: theme('colors.neutral.100');
+    --button-hover: theme('colors.bird.100');
     --button-focus: white;
-    --button-active: theme('colors.neutral.200');
-    --button-border: theme('colors.neutral.400');
-    --button-box-shadow: theme('colors.neutral.100');
+    --button-active: theme('colors.bird.200');
+    --button-border: theme('colors.bird.400');
+    --button-box-shadow: theme('colors.bird.100');
 
-    --button-primary-background: theme('colors.neutral.900');
+    --button-primary-background: theme('colors.bird.900');
     --button-primary-text: hsla(0, 0%, 100%, 1);
-    --button-primary-hover: theme('colors.neutral.800');
-    --button-primary-focus: theme('colors.neutral.900');
-    --button-primary-active: theme('colors.neutral.950');
+    --button-primary-hover: theme('colors.bird.800');
+    --button-primary-focus: theme('colors.bird.900');
+    --button-primary-active: theme('colors.bird.950');
     --button-primary-border: transparent;
-    --button-primary-box-shadow: theme('colors.neutral.800');
+    --button-primary-box-shadow: theme('colors.bird.800');
 
     --input-background: hsla(0, 0%, 100%, 1);
     --input-border: hsla(0, 0%, 20%, 1);
@@ -64,12 +73,12 @@
 
     --alert: hsla(0, 100%, 50%, 1);
 
-    --scrollbar-thumb: theme('colors.neutral.700');
-    --scrollbar-track: theme('colors.neutral.100');
+    --scrollbar-thumb: theme('colors.bird.700');
+    --scrollbar-track: theme('colors.bird.100');
 }
 
 :root.black {
-    --background: black;
+    --background: hsla(0, 0%, 7%, 1);
     --text: white;
     --link: hsla(0, 99%, 33%, 1);
     --border: hsla(0, 0%, 90%, 1);
@@ -81,7 +90,20 @@
     --icon: hsla(0, 0%, 25%, 1);
     --icon-hover: hsla(0, 0%, 45%, 1);
 
-    --spinner: hsla(0, 0%, 0%, 1);
+    --bird-50: blue;
+    --bird-100: yellow;
+    --bird-200: oklch(0.922 0 0);
+    --bird-300: oklch(0.87 0 0);
+    --bird-400: oklch(0.708 0 0);
+    --bird-500: oklch(0.556 0 0);
+    --bird-600: oklch(0.439 0 0);
+    --bird-700: oklch(0.371 0 0);
+    --bird-800: oklch(0.269 0 0);
+    --bird-900: oklch(0.205 0 0);
+    --bird-950: oklch(0.145 0 0);
+
+
+    --spinner: hsla(0, 0%, 100%, 1);
 
     --button-background: hsla(0, 0%, 15%, 1);
     --button-text: hsla(0, 0%, 100%, 1);
@@ -132,7 +154,6 @@ html {
     height: -webkit-fill-available;
     width: 100%;
     background-color: var(--background);
-    background-image: url("data:image/svg+xml,<svg id='patternId' width='100%' height='100%' xmlns='http://www.w3.org/2000/svg'><defs><pattern id='a' patternUnits='userSpaceOnUse' width='20' height='20' patternTransform='scale(1) rotate(0)'><rect x='0' y='0' width='100%' height='100%' fill='transparent'/><path d='M 10,-2.55e-7 V 20 Z M -1.1677362e-8,10 H 20 Z'  stroke-width='0.5' stroke='%23f0f0f0' fill='none'/></pattern></defs><rect width='800%' height='800%' transform='translate(0,0)' fill='url(%23a)'/></svg>");
 }
 
 body {
@@ -143,7 +164,6 @@ body {
     margin: 0;
     padding: 0;
     color: var(--text);
-    background-image: linear-gradient(white 0%, transparent 30vh);
     width: 100%;
 }
 
@@ -300,7 +320,7 @@ input::placeholder {
 .tooltip {
     position: fixed;
     font-family: "Silkscreen", serif;
-    background: theme('colors.neutral.900');
+    background: theme('colors.bird.900');
     color: white;
     padding: 0.25rem 0.5rem;
     border-radius: 1px;

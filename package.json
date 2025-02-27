@@ -44,7 +44,9 @@
 		"dayjs": "^1.11.13",
 		"dompurify": "^3.2.4",
 		"email-validator": "^2.0.4",
+		"install": "^0.13.0",
 		"matrix-js-sdk": "^36.2.0",
+		"npm": "^11.1.0",
 		"uuid": "^11.0.5"
 	}
 }

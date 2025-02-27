@@ -230,7 +230,7 @@ let focused = $state(false);
         <div class:focus={focused} 
             onclick={() => usernameInput.focus()}
             class="server pointer-events-none
-select-none flex items-center px-3 ml-[-1px] border border-neutral-900">
+select-none flex items-center px-3 ml-[-1px] border border-bird-900">
             @{PUBLIC_HOMESERVER_NAME}
         </div>
 
@@ -301,7 +301,7 @@ select-none flex items-center px-3 ml-[-1px] border border-neutral-900">
 
     {#if !code_valid && !invite_code_email}
     <div class="mt-4">
-        <a href="/request/invite" class="text-neutral-900 text-sm
+        <a href="/request/invite" class="text-bird-900 text-sm
             hover:underline">Need an invite code?</a>
     </div>
     {/if}

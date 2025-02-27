@@ -35,17 +35,17 @@ function toggle() {
                 disabled={locked}
                 type="email" 
                 placeholder="you@work-email.com" 
-                class="px-4 py-2 border border-neutral-400 rounded-sm
+                class="px-4 py-2 border border-bird-400 rounded-sm
                 text-[14px] mono h-[36px] 
-                focus:outline-none focus:border-neutral-900 focus:ring-opacity-50" />
+                focus:outline-none focus:border-bird-900 focus:ring-opacity-50" />
         </div>
         <div class="">
             <button 
                 onclick={toggle}
                 disabled={locked}
-                class="bg-neutral-800 text-white px-4 py-2 
+                class="bg-bird-800 text-white px-4 py-2 
                 h-[36px]
-                hover:bg-neutral-700 uppercase">
+                hover:bg-bird-700 uppercase">
                 Request Invite
             </button>
         </div>

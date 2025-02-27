@@ -30,10 +30,10 @@ let is_inbox = $derived.by(() => {
 </script>
 
 <div class="flex place-items-center mt-1 
-    hover:bg-neutral-100 p-1 
+    hover:bg-bird-100 p-1 
     cursor-pointer"
     class:font-semibold={active}
-    class:bg-neutral-100={active}
+    class:bg-bird-100={active}
 onclick={open}>
 
     <div class="px-2 flex place-items-center"

@@ -76,8 +76,8 @@ let mask = $derived.by(() => {
 {#snippet trigger()}
 <div class="grid place-items-center w-full mb-2 select-none">
     <div class="user rounded-[50%] cursor-pointer
-        hover:bg-neutral-800 grid place-items-center 
-        bg-neutral-900" 
+        hover:bg-bird-800 grid place-items-center 
+        bg-bird-900" 
     class:active={popup_active}
     class:w-11={!expanded}
     class:h-11={!expanded}
@@ -94,6 +94,6 @@ let mask = $derived.by(() => {
 @reference "tailwindcss/theme";
 .active {
     transition: 0.1s;
-    outline: 4px solid theme('colors.neutral.300');
+    outline: 4px solid theme('colors.bird.300');
 }
 </style>

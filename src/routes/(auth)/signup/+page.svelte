@@ -86,8 +86,8 @@ function setVerified(event) {
 
 <div class="grid place-items-center w-full mt-6">
     <div class="">
-        <span class="text-neutral-700">Already have an account?</span>
-        <a href="/login" class="text-neutral-900 underline">
+        <span class="text-bird-700">Already have an account?</span>
+        <a href="/login" class="text-bird-900 underline">
             Log in
         </a>
     </div>

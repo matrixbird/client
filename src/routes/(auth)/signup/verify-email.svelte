@@ -205,7 +205,7 @@ async function reset() {
     <div class="mt-6">
         <button 
             onclick={verifyCode}
-            class="bg-neutral-900 text-white px-2 w-full py-3 uppercase
+            class="bg-bird-900 text-white px-2 w-full py-3 uppercase
             text-base font-medium" >
                 Verify Code
         </button>
@@ -261,7 +261,7 @@ async function reset() {
     <div class="mt-6">
         <button 
             onclick={verify}
-            class="bg-neutral-900 text-white px-2 w-full py-3 uppercase
+            class="bg-bird-900 text-white px-2 w-full py-3 uppercase
             text-base font-medium" >
             Send code
         </button>

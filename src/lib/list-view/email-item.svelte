@@ -113,8 +113,8 @@ let el;
 </script>
 
 
-<div bind:this={el} class="email-item flex flex-col cursor-pointer hover:bg-neutral-50 border-b
-    border-neutral-300 overflow-x-hidden"
+<div bind:this={el} class="email-item flex flex-col cursor-pointer hover:bg-bird-50 border-b
+    border-bird-300 overflow-x-hidden"
     oncontextmenu={log}
     class:active={active}
     class:inactive={!active}
@@ -129,8 +129,8 @@ let el;
         </div>
 
         <div class="flex place-items-center">
-            <div class="text-sm bg-neutral-700 w-8 h-8 
-                hover:bg-white hover:border-4 hover:border-neutral-700
+            <div class="text-sm bg-bird-700 w-8 h-8 
+                hover:bg-white hover:border-4 hover:border-bird-700
                 rounded-[50%]"
             onclick={select}>
             </div>
@@ -144,7 +144,7 @@ let el;
 
                 {#if native && is_matrixbird}
                     <div class="text-xs font-medium flex place-items-center">
-                        <span class="mr-2 bg-neutral-700 text-white px-1
+                        <span class="mr-2 bg-bird-700 text-white px-1
                             rounded-[3px]">
                             Matrixbird
                         </span>
@@ -162,7 +162,7 @@ let el;
                         {#if name}
                             <span class="mr-2">{name}</span>
                         {/if}
-                            <span class="text-xs text-neutral-800">&lt;{address}&gt;</span>
+                            <span class="text-xs text-bird-800">&lt;{address}&gt;</span>
                     </div>
                 {/if}
 
@@ -172,7 +172,7 @@ let el;
 
 
         <div class="flex flex-col ml-4">
-            <div class="text-[12px] text-neutral-800">
+            <div class="text-[12px] text-bird-800">
                 <Date event={email} />
             </div>
 
@@ -205,7 +205,7 @@ let el;
     min-height: 72px;
 }
 .active {
-    border-left: 3px solid theme('colors.neutral.700');
+    border-left: 3px solid theme('colors.bird.700');
 }
 
 .inactive {

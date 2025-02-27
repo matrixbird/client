@@ -241,7 +241,7 @@ function processPaste(event) {
     class:base={!expanded}
     class:expand={expanded}>
 
-    <div class="flex bg-neutral-900 text-white font-medium"
+    <div class="flex bg-bird-900 text-white font-medium"
     >
 
         <div class="flex p-2 flex-1 place-items-center cursor-pointer text-sm ml-1 tracking-wide"
@@ -283,9 +283,9 @@ function processPaste(event) {
 
                 {#each emails as email, i}
                     <div class="flex place-items-center my-2 px-2
-                        hover:border-neutral-500 duration-100
-                        border border-neutral-400
-                        bg-neutral-50 rounded cursor-pointer"
+                        hover:border-bird-500 duration-100
+                        border border-bird-400
+                        bg-bird-50 rounded cursor-pointer"
                             onclick={() => removeEmail(i)}>
                         <div class="">
                             {email}

@@ -128,7 +128,7 @@ let focused = $state(false);
             <div class:focus={focused} 
                 onclick={() => emailInput.focus()}
                 class="server pointer-events-none
-    select-none flex items-center px-3 ml-[-1px] border border-neutral-900">
+    select-none flex items-center px-3 ml-[-1px] border border-bird-900">
                 @{PUBLIC_HOMESERVER_NAME}
             </div>
 
@@ -161,8 +161,8 @@ let focused = $state(false);
 
 <div class="grid place-items-center w-full mt-6">
     <div class="">
-        <span class="text-neutral-700">Already have an account?</span>
-        <a href="/login" class="text-neutral-900 underline">
+        <span class="text-bird-700">Already have an account?</span>
+        <a href="/login" class="text-bird-900 underline">
             Log in
         </a>
     </div>

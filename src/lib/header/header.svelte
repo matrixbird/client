@@ -28,7 +28,7 @@ let opts = {
 
 </script>
 
-<div class="flex bg-neutral-900 p-1 text-white font-medium">
+<div class="flex bg-bird-900 p-2 text-white font-medium">
 
     <div class="flex place-items-center silk cursor-pointer text ml-1 tracking-wide
 ">

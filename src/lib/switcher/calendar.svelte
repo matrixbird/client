@@ -30,15 +30,15 @@ onclick={open}>
 @reference "tailwindcss/theme";
 .active {
     fill: white;
-    background-color: theme('colors.neutral.200');
+    background-color: theme('colors.bird.200');
 }
 .icon {
-    fill: theme('colors.neutral.700');
+    fill: theme('colors.bird.700');
 }
 .icon:hover {
-    background-color: theme('colors.neutral.100');
+    background-color: theme('colors.bird.100');
 }
 .active:hover {
-    background-color: theme('colors.neutral.200');
+    background-color: theme('colors.bird.200');
 }
 </style>

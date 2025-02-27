@@ -87,7 +87,7 @@ let user = $derived.by(() =>{
         {#if native && user}
             <div class="text-sm">
                 <span class="font-medium">{user?.name}</span>
-                <span class="text-xs text-neutral-800">&lt;{user?.address}&gt;</span>
+                <span class="text-xs text-bird-800">&lt;{user?.address}&gt;</span>
             </div>
         {/if}
 
