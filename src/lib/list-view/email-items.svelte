@@ -28,7 +28,7 @@ $effect(() => {
 
 <div class="flex flex-col overflow-x-hidden">
     {#if processed}
-        {#each processed as email}
+        {#each processed as email (email.event_id)}
             <EmailItem {email} />
         {/each}
     {/if}

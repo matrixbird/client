@@ -3,7 +3,6 @@ import { onMount, tick } from 'svelte';
 import { v4 as uuidv4 } from 'uuid';
 
 import Composer from './composer.svelte'
-import Recipient from './recipient.svelte'
 
 import {
     email_to_mxid,
@@ -16,10 +15,6 @@ import {
 } from '$lib/utils/email.js'
 
 import { 
-    expand, 
-    collapse, 
-    minimize, 
-    maximize,
     close 
 } from '$lib/assets/icons.js'
 
@@ -40,63 +35,7 @@ let subject = $derived.by(() => {
     return email?.content?.subject || ''
 })
 
-let expanded = $state(false)
-let minimized = $state(false)
 
-let maximized_exists = $derived.by(() => {
-    return editorStore.maximized !== null
-})
-
-$effect(() => {
-    if(maximized_exists) {
-        if(editorStore.maximized != item.id) {
-            minimizeWindow()
-        }
-    }
-})
-
-function expandWindow() {
-    if(minimized) {
-        minimized = false
-        return
-    }
-    expanded = !expanded
-    if(expanded) {
-        focusComposer()
-    }
-    if(!expanded) {
-        editorStore.maximizeEditor(null)
-    }
-}
-
-$effect(() => {
-    if(expanded) {
-        console.log('expanded', item.id)
-        editorStore.maximizeEditor(item.id)
-    }
-})
-
-function minimizeWindow() {
-    minimized = true
-    expanded = false
-    if(editorStore.maximized === item.id) {
-        editorStore.maximizeEditor(null)
-    }
-}
-
-function toggleMinimize() {
-    minimized = !minimized
-    if(expanded) {
-        expanded = false
-    }
-    if(!minimized) {
-        focusTo()
-    }
-}
-
-function closeWindow() {
-    editorStore.killEditor(item.id)
-}
 
 
 let body = $state('');
@@ -105,47 +44,20 @@ onMount(() => {
     composer.focus()
 })
 
-async function focusTo() {
-    await tick()
-    to_input.focus()
-}
 
 async function process() {
 
+    let thread_id = email.event_id
 
-    let mxids = emails.map(e => email_to_mxid(e))
-
-    for(let email of emails) {
-        let domain = get_email_domain(email)
+    if(email?.content?.["m.relates_to"]?.event_id) {
+        thread_id = email.content["m.relates_to"].event_id
     }
 
 
-    //return
-
-    /*
-    const resp = await store.client.getProfileInfo(mxid)
-    console.log('resp', resp)
-    */
-
 
     try {
-        //const resp = await store.testRooms()
-        //console.log("dm rooms", resp)
 
-        let initMsg = {
-            from: {
-                name: store.user?.displayName,
-                address: mxid_to_email(store.user?.userId)
-            },
-            subject: subject,
-            body: {
-                text: body.text,
-                html: body.html
-            }
-        }
-
-
-        let room_id = await store.emailRoom(mxids)
+        let room_id = email.room_id
         console.log("room id", room_id)
 
         const msg = await store.client.sendEvent(
@@ -160,13 +72,17 @@ async function process() {
                 body: {
                     text: body.text,
                     html: body.html
-                }
+                },
+                "m.relates_to": {
+                    "event_id": thread_id,
+                    "m.in_reply_to": email.event_id,
+                    "rel_type": "m.thread"
+                },
             },
             uuidv4()
         );
         console.log('msg', msg)
-
-        closeWindow()
+        killReply()
 
     } catch(e) {
         console.log('error', e)
@@ -197,82 +113,14 @@ async function focusComposer() {
     composer.focus()
 }
 
-let emails = $state([]);
-
-function processInput(event) {
-
-    if(event.code == 'Backspace' && to.length == 0) {
-        emails.pop()
-        return
-    }
-
-    if(event.code == 'Comma' || event.code == 'Space' || event.code == 'Enter') {
-        let email_valid = validate(to);
-
-        let exists = emails.find(e => e == to)
-
-        if(email_valid && !exists) {
-            emails.push(to)
-            to = ''
-            event.preventDefault()
-        }
-    }
-
-    if(event.key === 'Enter') {
-    }
-
-}
-
-function removeEmail(email) {
-    let i = emails.findIndex(e => e == email)
-    if(i != -1) {
-        emails.splice(i, 1)
-    }
-}
-
-function processBlur(event) {
-    if(to.length == 0) return;
-
-    let exists = emails.find(e => e == to)
-
-    let email_valid = validate(to);
-    if(email_valid && !exists) {
-        emails.push(to)
-        to = ''
-        event.preventDefault()
-    }
-}
-
-function processPaste(event) {
-    let clipboardData, pastedData;
-
-    event.stopPropagation();
-    event.preventDefault();
-
-    clipboardData = event.clipboardData || window.clipboardData;
-    pastedData = clipboardData.getData('Text');
-
-    let pasted = pastedData.split(/[\s,]+/)
-
-    pasted.forEach(email => {
-        let email_valid = validate(email);
-        let exists = emails.find(e => e == email)
-        if(email_valid && !exists) {
-            emails.push(email)
-        }
-    })
-}
-
 </script>
 
 
-<div class="editor grid grid-rows-[auto_1fr] bg-white
-    rounded-xl border border-bird-300
-    select-none"
-    class:base={!expanded}
-    class:expand={expanded}>
+<div class="editor grid grid-rows-[auto_1fr_auto] 
+    select-none">
 
-    <div class="header flex">
+    <div class="header flex rounded-t-xl border-t border-x border-bird-300
+        sticky top-0">
 
         <div class="flex py-3 px-4 flex-1 place-items-center text-sm text-light ">
             Re: {subject}
@@ -285,30 +133,19 @@ function processPaste(event) {
         </div>
     </div>
 
-    {#if !minimized}
-        <div class="content text-sm grid
-            grid-rows-[1fr_auto]"
-        class:max={expanded}>
+    <div class="content text-sm grid border-x border-bird-300">
 
+            <Composer bind:this={composer} isReply={true} {state}
+                {updateComposer} />
+    </div>
 
-            <div class="composer h-full">
-                <Composer bind:this={composer} isReply={true} {state}
-                    {updateComposer} />
-            </div>
-
-            <div class="px-4 py-3">
-                <button class="primary text-sm font-medium px-5 py-2" onclick={process}>
-                    Send
-                </button>
-            </div>
-        </div>
-    {/if}
+    <div class="tools px-4 py-3 border-b border-x border-bird-300 rounded-b-xl">
+        <button class="primary text-sm font-medium px-5 py-2" onclick={process}>
+            Send
+        </button>
+    </div>
 </div>
 
-{#if expanded}
-    <div class="mask" onclick={minimizeWindow}>
-    </div>
-{/if}
 
 <style lang="postcss">
 @reference "tailwindcss/theme";
@@ -325,32 +162,4 @@ button {
     min-height: 15dvh;
 }
 
-.max {
-    max-width: 100%;
-}
-
-.expand {
-    position: fixed;
-    top: 3rem;
-    bottom: 3rem;
-    right: 10rem;
-    left: 10rem;
-}
-
-.mask {
-    z-index: 99;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.4);
-}
-
-input, textarea {
-    border:none;
-    resize: none;
-    height: 100%;
-    outline: none;
-}
 </style>

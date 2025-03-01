@@ -66,7 +66,7 @@ function open() {
 }
 
 function log(e) {
-    let rect = e.target.getBoundingClientRect()
+    console.log(email)
 
     email_context_menu.email = email
     email_context_menu.pos = {

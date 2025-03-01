@@ -41,6 +41,8 @@ onMount(() => {
     if(state) {
         editor.chain().focus().setTextSelection(caret).run()
     }
+    element.scrollIntoView({ block: "start", inline: "nearest"
+    });
 });
 
 onDestroy(() => {
@@ -70,7 +72,7 @@ export function focus() {
     outline: none;
 }
 .mxh {
-    max-height: 35dvh;
+    max-height: 30dvh;
 }
 </style>
 

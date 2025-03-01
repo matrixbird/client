@@ -84,59 +84,62 @@ function killReply() {
 
 </script>
 
+<div class="email-item">
 
-<div class="meta p-3 flex flex-col">
-    <div class="flex place-items-center mb-3">
-        <div class="flex-1 text-xl font-medium leading-1">
-            {subject}
+    <div class="meta p-3 flex flex-col">
+        <div class="flex place-items-center mb-3">
+            <div class="flex-1 text-xl font-medium leading-1">
+                {subject}
+            </div>
         </div>
+
+        {#if native && user}
+            <div class="text-sm">
+                <span class="font-medium">{user?.name}</span>
+                <span class="text-xs text-bird-800">&lt;{user?.address}&gt;</span>
+            </div>
+        {/if}
+
+        {#if !native}
+            <div class="">
+                {#if name}
+                    <span>{name}</span>
+                {/if}
+                    <span>{address}</span>
+            </div>
+        {/if}
+
     </div>
 
-    {#if native && user}
-        <div class="text-sm">
-            <span class="font-medium">{user?.name}</span>
-            <span class="text-xs text-bird-800">&lt;{user?.address}&gt;</span>
-        </div>
-    {/if}
 
-    {#if !native}
-        <div class="">
-            {#if name}
-                <span>{name}</span>
-            {/if}
-                <span>{address}</span>
-        </div>
-    {/if}
-
-</div>
+        {#if is_html && clean}
+            <div class="p-4">
+                {@html clean}
+            </div>
+        {/if}
+        {#if !is_html}
+            <div class="p-4 leading-5" style="white-space: pre-wrap;">
+                {body}
+            </div>
+        {/if}
 
 
-    {#if is_html && clean}
-        <div class="p-4">
-            {@html clean}
-        </div>
-    {/if}
-    {#if !is_html}
-        <div class="p-4 leading-5" style="white-space: pre-wrap;">
-            {body}
-        </div>
-    {/if}
+    <div class="px-4 mb-4">
 
+        {#if !replying}
+            <button class="text-sm font-medium px-4 py-1"
+            onclick={reply}>
+                Reply
+            </button>
+        {/if}
 
-<div class="p-4 mt-3">
+        {#if replying}
+            <div class="reply-container border-[6px] border-bird-100 rounded-2xl">
+                <ReplyComposer {email} {killReply}/>
+            </div>
+        {/if}
+    </div>
 
-    {#if !replying}
-        <button class="text-sm font-medium px-4 py-1"
-        onclick={reply}>
-            Reply
-        </button>
-    {/if}
-
-    {#if replying}
-        <div class="reply-container border-[6px] border-bird-100 rounded-2xl">
-            <ReplyComposer {email} {killReply}/>
-        </div>
-    {/if}
 </div>
 
 <style lang="postcss">
