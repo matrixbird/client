@@ -103,7 +103,7 @@ function expandWindow() {
 {/if}
 
 <div class="grid h-screen w-screen overflow-hidden">
-    <div class="grid grid-rows-[auto_1fr] overflow-hidden bg-bird-50
+    <div class="grid grid-rows-[auto_1fr] overflow-hidden bg-white
             sm:max-w-[1400px] mx-10 justify-self-center self-center 
             w-full h-full max-h-full select-none
             lg:h-8/10 lg:max-h-[800px]"

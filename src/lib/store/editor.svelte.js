@@ -6,6 +6,9 @@ let editor = $state({
 
 let maximized = $state(null);
 
+export const reply_editors = $state({});
+
+
 export function createEditorStore() {
 
   function newEditor(){

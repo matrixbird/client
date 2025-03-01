@@ -29,6 +29,8 @@ const store = createMatrixStore()
 import { createEditorStore } from '$lib/store/editor.svelte.js'
 const editorStore = createEditorStore()
 
+import { reply_editors } from '$lib/store/editor.svelte.js'
+
 let { 
     email,
     killReply
@@ -172,8 +174,22 @@ async function process() {
 }
 
 function updateComposer(data) {
-    body = data
+    body = {
+        text: data.text,
+        html: data.html
+    }
+    let editor = reply_editors[email.event_id]
+    if(editor) {
+        reply_editors[email.event_id].state = data
+    }
 }
+
+let state = $derived.by(() => {
+    let editor = reply_editors[email.event_id]
+    if(editor?.state) {
+        return editor.state
+    }
+})
 
 let composer;
 async function focusComposer() {
@@ -250,15 +266,15 @@ function processPaste(event) {
 </script>
 
 
-<div class="box editor grid grid-rows-[auto_1fr] bg-white
-    rounded-xl
+<div class="editor grid grid-rows-[auto_1fr] bg-white
+    rounded-xl border border-bird-300
     select-none"
     class:base={!expanded}
     class:expand={expanded}>
 
     <div class="header flex">
 
-        <div class="flex py-3 px-4 flex-1 place-items-center text-sm">
+        <div class="flex py-3 px-4 flex-1 place-items-center text-sm text-light ">
             Re: {subject}
         </div>
 
@@ -276,7 +292,7 @@ function processPaste(event) {
 
 
             <div class="composer h-full">
-                <Composer bind:this={composer} isReply={true}
+                <Composer bind:this={composer} isReply={true} {state}
                     {updateComposer} />
             </div>
 
@@ -300,12 +316,13 @@ function processPaste(event) {
 button {
     border-radius: 500px;
 }
+
 .editor {
     z-index: 100;
 }
 
 .content {
-    min-height: 30dvh;
+    min-height: 15dvh;
 }
 
 .max {

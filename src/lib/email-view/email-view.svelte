@@ -7,6 +7,8 @@ import ReplyComposer from '$lib/editor/reply-composer.svelte'
 import { createMatrixStore } from '$lib/store/matrix.svelte.js'
 const store = createMatrixStore()
 
+import { reply_editors } from '$lib/store/editor.svelte.js'
+
 let { email } = $props();
 
 const body = $derived.by(() => {
@@ -64,14 +66,20 @@ let user = $derived.by(() =>{
     }
 })
 
-let replying = $state(true);
+
+let replying = $derived.by(() => {
+    return reply_editors[email?.event_id] ? true : false
+})
 
 function reply() {
-    replying = true
+    reply_editors[email?.event_id] = {
+        email: email,
+        state: null,
+    }
 }
 
 function killReply() {
-    replying = false
+    delete reply_editors[email?.event_id]
 }
 
 </script>
@@ -125,7 +133,9 @@ function killReply() {
     {/if}
 
     {#if replying}
-        <ReplyComposer {email} {killReply}/>
+        <div class="reply-container border-[6px] border-bird-100 rounded-2xl">
+            <ReplyComposer {email} {killReply}/>
+        </div>
     {/if}
 </div>
 

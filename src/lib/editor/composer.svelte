@@ -3,27 +3,44 @@ import { onMount, onDestroy } from 'svelte';
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 
-let { updateComposer, isReply } = $props();
+let { 
+    state,
+    updateComposer, 
+    isReply
+} = $props();
 
 let element;
 let editor;
+
+let content = $derived.by(() => {
+    return state?.html
+})
+
+let caret = $derived.by(() => {
+    return state?.selection
+})
 
 onMount(() => {
     editor = new Editor({
         element: element,
         extensions: [StarterKit],
-        content: ``,
-        onTransaction: () => {
-            // force re-render so `editor.isActive` works as expected
+        content: content ? content : '',
+        onTransaction: ({ editor }) => {
             editor = editor;
             let data = {
                 html: editor.getHTML(),
-                //json: editor.getJSON(),
+                json: editor.getJSON(),
                 text: editor.getText(),
+                selection: editor.state.selection.anchor,
             }
             updateComposer(data);
         },
+        onCreate: ({ editor }) => {
+        }
     });
+    if(state) {
+        editor.chain().focus().setTextSelection(caret).run()
+    }
 });
 
 onDestroy(() => {

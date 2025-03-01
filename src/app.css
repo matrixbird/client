@@ -25,10 +25,10 @@
 :root {
     --background: hsla(0, 0%, 97%, 1);
     --text: hsla(0, 0%, 10%, 1);
+    --light: hsla(0, 0%, 30%, 1);
     --link: hsla(0, 99%, 33%, 1);
     --border: hsla(0, 0%, 60%, 1);
     --primary: hsla(0, 99%, 33%, 1);
-    --light: hsla(0, 0%, 25%, 1);
     --logo-background: hsla(0, 0%, 10%, 1);
     --logo-fill: hsla(0, 99%, 44%, 1);
     --logo-fill-inactive: hsla(0, 100%, 41.6%, 1);
@@ -80,10 +80,10 @@
 :root.black {
     --background: hsla(0, 0%, 7%, 1);
     --text: white;
+    --light: white;
     --link: hsla(0, 99%, 33%, 1);
     --border: hsla(0, 0%, 90%, 1);
     --primary: hsla(0, 99%, 33%, 1);
-    --light: hsla(0, 0%, 25%, 1);
     --logo-background: hsla(0, 0%, 10%, 1);
     --logo-fill: hsla(0, 99%, 44%, 1);
     --logo-fill-inactive: hsla(0, 100%, 41.6%, 1);
@@ -308,7 +308,7 @@ input::placeholder {
 
 
 .boxed {
-    box-shadow: 6px 6px 0 #a7a7a729;
+    box-shadow: 6px 6px 0 theme('colors.bird.200');
     transform: translate(0, 0);
 }
 

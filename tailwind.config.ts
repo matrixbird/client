@@ -10,6 +10,7 @@ export default {
             colors: {
                 'primary': 'var(--primary)',
                 'secondary': 'var(--secondary)',
+                'light': 'var(--light)',
                 'bg': 'var(--bg)',
                 'background': 'var(--background)',
                 'border': 'var(--border)',
