@@ -11,7 +11,9 @@ const store = createMatrixStore()
 
 const events = $derived(store?.events)
 
-const email = $derived(events?.find(e => e.event_id === $page.params.event))
+const email = $derived.by(() => {
+    return events.get($page.params.event)
+})
 
 </script>
 

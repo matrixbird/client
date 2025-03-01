@@ -1,5 +1,5 @@
 <script>
-import { createMatrixStore } from '$lib/store/matrix.svelte.js'
+import { createMatrixStore, status } from '$lib/store/matrix.svelte.js'
 import EmailItem from './email-item.svelte'
 import { goto } from '$app/navigation';
 
@@ -11,16 +11,19 @@ let user = $derived(store?.user)
 
 let processed = $state(null);
 
+let ready = $derived(status?.events_ready == true)
+
 $effect(() => {
-    if(events) {
+    if(events && ready) {
+        /*
         let reversed = events.sort((a, b) => {
             return b.origin_server_ts - a.origin_server_ts
         })
-
-        processed = reversed.filter((event) => {
-            return event.sender != user?.userId
-        })
-
+        */
+        let sorted = [...events.values()].sort((a, b) => 
+            b.origin_server_ts - a.origin_server_ts
+        );
+        processed = sorted
     }
 })
 

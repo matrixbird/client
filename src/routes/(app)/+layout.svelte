@@ -114,7 +114,8 @@ function expandWindow() {
 
 
         <div class="overflow-hidden 
-            grid grid-cols-[auto_1fr] "
+            grid grid-cols-[auto_1fr]"
+            class:grid-cols-[3rem_1fr]={expanded}
             class:boxed-content={!expanded}>
 
             <Switcher />

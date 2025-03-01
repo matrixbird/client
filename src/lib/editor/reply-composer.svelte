@@ -53,8 +53,6 @@ async function process() {
         thread_id = email.content["m.relates_to"].event_id
     }
 
-
-
     try {
 
         let room_id = email.room_id
@@ -64,6 +62,7 @@ async function process() {
             room_id,
             "matrixbird.email.native",
             {
+                to: email.sender,
                 from: {
                     name: store.user?.displayName,
                     address: mxid_to_email(store.user?.userId)

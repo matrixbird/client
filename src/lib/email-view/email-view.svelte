@@ -86,7 +86,7 @@ function killReply() {
 
 <div class="email-item">
 
-    <div class="meta p-3 flex flex-col">
+    <div class="meta p-4 flex flex-col">
         <div class="flex place-items-center mb-3">
             <div class="flex-1 text-xl font-medium leading-1">
                 {subject}

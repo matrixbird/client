@@ -81,8 +81,8 @@ let mask = $derived.by(() => {
     class:active={popup_active}
     class:w-11={!expanded}
     class:h-11={!expanded}
-    class:w-9={expanded}
-    class:h-9={expanded}>
+    class:w-8={expanded}
+    class:h-8={expanded}>
         <div class="font-semibold text-white uppercase">
             {initials} 
         </div>

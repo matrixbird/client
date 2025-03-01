@@ -8,14 +8,15 @@ import {
 
 import Mail from './mail.svelte'
 import Chat from './chat.svelte'
-//import Calendar from './calendar.svelte'
+
+import Settings from './settings.svelte'
 
 import { ui_state } from '$lib/store/store.svelte.js'
 let expanded = $derived(ui_state?.expanded)
 
 </script>
 
-<div class="flex flex-col border-r border-border pt-3 gap-2">
+<div class="flex flex-col border-r border-border py-3 gap-2">
 
     {#if expanded}
         <Profile />
@@ -28,12 +29,7 @@ let expanded = $derived(ui_state?.expanded)
     <div class="flex-1 grid place-items-center">
     </div>
 
-    <div class="grid place-items-center mb-4 cursor-pointer">
-        <div class="p-2 hover:bg-bird-200 rounded">
-            {@html settings}
-        </div>
-    </div>
-
+    <Settings />
 
 </div>
 

@@ -23,7 +23,8 @@
 
 
 :root {
-    --background: hsla(0, 0%, 97%, 1);
+    --bg: hsla(0, 0%, 97%, 1);
+    --background: hsla(0, 0%, 100%, 1);
     --text: hsla(0, 0%, 10%, 1);
     --light: hsla(0, 0%, 30%, 1);
     --link: hsla(0, 99%, 33%, 1);
@@ -78,6 +79,7 @@
 }
 
 :root.black {
+    --bg: hsla(0, 0%, 7%, 1);
     --background: hsla(0, 0%, 7%, 1);
     --text: white;
     --light: white;
@@ -153,7 +155,7 @@ html {
     font-size: var(--base-font-size);
     height: -webkit-fill-available;
     width: 100%;
-    background-color: var(--background);
+    background-color: var(--bg);
     background-image: url("data:image/svg+xml,<svg id='patternId' width='100%' height='100%' xmlns='http://www.w3.org/2000/svg'><defs><pattern id='a' patternUnits='userSpaceOnUse' width='20' height='20' patternTransform='scale(1) rotate(0)'><rect x='0' y='0' width='100%' height='100%' fill='transparent'/><path d='M 10,-2.55e-7 V 20 Z M -1.1677362e-8,10 H 20 Z'  stroke-width='0.5' stroke='%23f0f0f0' fill='none'/></pattern></defs><rect width='800%' height='800%' transform='translate(0,0)' fill='url(%23a)'/></svg>");
 }
 
@@ -165,7 +167,7 @@ body {
     margin: 0;
     padding: 0;
     color: var(--text);
-    background-image: linear-gradient(white 0%, transparent 30vh);
+    background-image: linear-gradient(var(--bg) 0%, transparent 30vh);
     width: 100%;
 }
 
@@ -297,9 +299,9 @@ input::placeholder {
 }
 
 .box {
-    background: white;
+    background: var(--background);
     border: 1px solid var(--border);
-    box-shadow: 6px 6px 0 #a7a7a729;
+    box-shadow: 6px 6px 0 theme('colors.bird.200');
     transform: translate(0, 0);
 }
 
@@ -310,6 +312,7 @@ input::placeholder {
 .boxed {
     box-shadow: 6px 6px 0 theme('colors.bird.200');
     transform: translate(0, 0);
+    background: var(--background);
 }
 
 .boxed-content {

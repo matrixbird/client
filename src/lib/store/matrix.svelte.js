@@ -1,3 +1,5 @@
+import { SvelteMap } from 'svelte/reactivity';
+
 import { 
   PUBLIC_HOMESERVER,
 } from '$env/static/public';
@@ -20,7 +22,10 @@ let loaded = $state(false);
 
 let rooms = $state({});
 let members = $state([]);
-let events = $state([]);
+let events = $state(new SvelteMap());
+export let status = $state({
+  events_ready: false,
+});
 
 let created_rooms = $state({});
 
@@ -127,18 +132,19 @@ export function createMatrixStore() {
     }
 
     client.on(sdk.RoomMemberEvent.Membership, function (event, room, toStartOfTimeline) {
-        console.log(event?.event)
+      //console.log(event?.event)
     });
 
     client.on(sdk.UserEvent.DisplayName, function (event, room, toStartOfTimeline) {
-        console.log(event?.event)
+      //console.log(event?.event)
     });
 
     client.on(sdk.UserEvent.AvatarUrl, function (event, room, toStartOfTimeline) {
-        console.log(event?.event)
+      //console.log(event?.event)
     });
 
 
+    /*
     client.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
       if(event?.event) {
         let event_type = event.event.type;
@@ -165,7 +171,24 @@ export function createMatrixStore() {
         //console.log(event.event)
       }
     });
+    */
 
+
+    function buildEvents() {
+      let rooms = client.getRooms();
+      rooms.forEach((room) => {
+        const timeline = room.getLiveTimeline();
+        timeline.getEvents().forEach((event) => {
+          let event_type = event.getType();
+          if (event_type === "matrixbird.email.legacy" || 
+            event_type === "matrixbird.email.native") {
+            events.set(event.getId(), event.event);
+          }
+        });
+      });
+      status.events_ready = true;
+      ready = true
+    }
 
 
     client.on("sync", (state, prevState, data) => {
@@ -179,6 +202,11 @@ export function createMatrixStore() {
         let logged_in_user = client.store.getUser(client.getUserId());
         user = logged_in_user;
         //console.log("saving user", user)
+
+
+        buildEvents()
+
+        console.log("initial sync complete")
 
 
         /*
@@ -198,13 +226,13 @@ export function createMatrixStore() {
         });
 
         //console.log(client);
-        */
         Object.keys(client.store.rooms).forEach((roomId) => {
           const room = client.getRoom(roomId);
           rooms[roomId] = room;
         });
         console.log(rooms);
-        ready = true
+        */
+        //ready = true
       }
     });
 
