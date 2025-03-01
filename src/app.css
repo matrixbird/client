@@ -301,7 +301,6 @@ input::placeholder {
     border: 1px solid var(--border);
     box-shadow: 6px 6px 0 #a7a7a729;
     transform: translate(0, 0);
-    border-radius: 1px;
 }
 
 .box:hover {
@@ -311,8 +310,8 @@ input::placeholder {
 .boxed {
     box-shadow: 6px 6px 0 #a7a7a729;
     transform: translate(0, 0);
-    border-radius: 1px;
 }
+
 .boxed-content {
     border-left: 1px solid var(--border);
     border-right: 1px solid var(--border);

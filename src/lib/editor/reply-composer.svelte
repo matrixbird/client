@@ -29,7 +29,14 @@ const store = createMatrixStore()
 import { createEditorStore } from '$lib/store/editor.svelte.js'
 const editorStore = createEditorStore()
 
-let { item, index } = $props();
+let { 
+    email,
+    killReply
+} = $props();
+
+let subject = $derived.by(() => {
+    return email?.content?.subject || ''
+})
 
 let expanded = $state(false)
 let minimized = $state(false)
@@ -90,24 +97,15 @@ function closeWindow() {
 }
 
 
-let to = $state('');
-let to_input;
-let subject = $state('');
-let subject_input;
 let body = $state('');
 
 onMount(() => {
-    focusTo()
+    composer.focus()
 })
 
 async function focusTo() {
     await tick()
     to_input.focus()
-}
-
-async function focusSubject() {
-    await tick()
-    subject_input.focus()
 }
 
 async function process() {
@@ -126,9 +124,6 @@ async function process() {
     const resp = await store.client.getProfileInfo(mxid)
     console.log('resp', resp)
     */
-
-    if(!subject) {
-    }
 
 
     try {
@@ -219,10 +214,7 @@ function removeEmail(email) {
     }
 }
 
-function handleBlur(event) {
-
-    to_focused = false
-
+function processBlur(event) {
     if(to.length == 0) return;
 
     let exists = emails.find(e => e == to)
@@ -255,109 +247,40 @@ function processPaste(event) {
     })
 }
 
-let to_focused = $state(false);
-
-function handleFocus() {
-    to_focused = true
-}
-
-let email_placeholder = $derived.by(() => {
-    if(to_focused) {
-        return ''
-    }
-    if(emails.length == 0) {
-        return `Recipients`
-    }
-})
-
 </script>
 
 
-<div class="boxed editor grid grid-rows-[auto_1fr] bg-white
-    min-w-[34rem]
+<div class="box editor grid grid-rows-[auto_1fr] bg-white
+    rounded-xl
     select-none"
     class:base={!expanded}
     class:expand={expanded}>
 
-    <div class="flex bg-bird-900 text-white font-medium"
-    >
+    <div class="header flex">
 
-        <div class="flex p-2 flex-1 place-items-center cursor-pointer text-sm ml-1 tracking-wide"
-            onclick={toggleMinimize}>
-            {subject ? subject : `New Message`}
+        <div class="flex py-3 px-4 flex-1 place-items-center text-sm">
+            Re: {subject}
         </div>
 
 
-        <div class="cursor-pointer flex place-items-center mr-1"
-            onclick={toggleMinimize}>
-            {#if minimized}
-                {@html maximize}
-            {:else}
-                {@html minimize}
-            {/if}
-        </div>
-
-        <div class="cursor-pointer flex place-items-center mr-1"
-            onclick={expandWindow}>
-            {#if expanded}
-                {@html collapse}
-            {:else}
-                {@html expand}
-            {/if}
-        </div>
-
-        <div class="cursor-pointer flex place-items-center mr-1"
-            onclick={closeWindow}>
+        <div class="cursor-pointer flex place-items-center mr-3"
+            onclick={killReply}>
             {@html close}
         </div>
     </div>
 
     {#if !minimized}
-        <div class="boxed-content content text-sm grid grid-rows-[auto_auto_1fr_auto]"
+        <div class="content text-sm grid
+            grid-rows-[1fr_auto]"
         class:max={expanded}>
 
-            <div class="recipients border-b border-bird-300 mx-4 flex flex-wrap cursor-text"
-            onclick={() => focusTo()}>
 
-                {#if to_focused}
-                <div class="flex place-items-center mr-2">
-                    To
-                </div>
-                {/if}
-
-
-                <div class="flex gap-2">
-                    {#each emails as email (email)}
-                        <Recipient {email} {removeEmail} {to_focused} />
-                    {/each}
-                </div>
-
-                <div class="">
-                <input type="email" class="py-3" 
-                    bind:this={to_input}
-                    bind:value={to}
-                    onkeydown={processInput}
-                    onfocus={handleFocus}
-                    onblur={handleBlur}
-                    onpaste={processPaste}
-                    placeholder={email_placeholder}
-                />
-                </div>
+            <div class="composer h-full">
+                <Composer bind:this={composer} isReply={true}
+                    {updateComposer} />
             </div>
 
-            <div class="subject border-b border-bird-300 mx-4">
-                <input type="text" class="py-3" 
-                    bind:this={subject_input}
-                    bind:value={subject}
-                    placeholder="Subject"
-                />
-            </div>
-
-            <div class="">
-                <Composer bind:this={composer} {updateComposer} />
-            </div>
-
-            <div class="p-3">
+            <div class="px-4 py-3">
                 <button class="primary text-sm font-medium px-5 py-2" onclick={process}>
                     Send
                 </button>
@@ -377,14 +300,12 @@ let email_placeholder = $derived.by(() => {
 button {
     border-radius: 500px;
 }
-
 .editor {
     z-index: 100;
 }
 
 .content {
-    min-height: 48dvh;
-    max-width: 34rem;
+    min-height: 30dvh;
 }
 
 .max {

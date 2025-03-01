@@ -3,7 +3,7 @@ import { onMount, onDestroy } from 'svelte';
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 
-let { updateComposer } = $props();
+let { updateComposer, isReply } = $props();
 
 let element;
 let editor;
@@ -37,7 +37,10 @@ export function focus() {
 }
 </script>
 
-<div class="composer p-2" 
+<div class="composer px-4" 
+    class:pt-4={!isReply}
+    class:mr-1={isReply}
+    class:mxh={isReply}
     onclick={focus}
     bind:this={element}></div>
 
@@ -48,6 +51,9 @@ export function focus() {
     height: 100%;
     cursor: text;
     outline: none;
+}
+.mxh {
+    max-height: 35dvh;
 }
 </style>
 
