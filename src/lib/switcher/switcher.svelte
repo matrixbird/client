@@ -15,7 +15,7 @@ let expanded = $derived(ui_state?.expanded)
 
 </script>
 
-<div class="flex flex-col border-r border-border pt-2 gap-2">
+<div class="flex flex-col border-r border-border pt-3 gap-2">
 
     {#if expanded}
         <Profile />

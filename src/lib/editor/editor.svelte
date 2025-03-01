@@ -18,7 +18,7 @@ let active = $derived.by(() => {
 
 
 {#if items && active}
-<div class="editors flex gap-2 items-end">
+<div class="editors flex gap-3 items-end">
     {#each items as item, i (item.id)}
         <EditorItem {item} index={i} />
     {/each}

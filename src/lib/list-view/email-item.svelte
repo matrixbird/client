@@ -60,23 +60,23 @@ let is_matrixbird = $derived.by(() => {
 })
 
 
-function open() {
+function open(e) {
+    if(e.ctrlKey) {
+        console.log($state.snapshot(email))
+        return
+    }
     const mailbox = $page.params.mailbox
     goto(`/mail/${mailbox}/${email.event_id}`)
 }
 
 function log(e) {
-    console.log(email)
-
     email_context_menu.email = email
     email_context_menu.pos = {
         x: e.clientX,
         y: e.clientY,
     }
     email_context_menu.element = el
-
     e.preventDefault()
-    //console.log(email)
 }
 
 let selected = $state(false);
@@ -121,12 +121,6 @@ let el;
     onclick={open}>
 
     <div class="flex p-3 overflow-x-hidden">
-
-        <div class="flex place-items-center mr-3">
-            <input type="checkbox" class="w-4 h-4" 
-                onclick={selectEmail}
-                checked={selected} />
-        </div>
 
         <div class="flex place-items-center">
             <div class="text-sm bg-bird-700 w-8 h-8 

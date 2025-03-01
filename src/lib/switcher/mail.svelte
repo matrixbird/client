@@ -33,10 +33,10 @@ let opts = {
 
 </script>
 
-<div class="grid place-items-center cursor-pointer"
+<div class="grid place-items-center cursor-pointer mx-1"
 onclick={open} use:tooltip={opts}>
 
-    <div class="icon p-2 rounded" class:active={active}>
+    <div class="icon p-1 rounded" class:active={active}>
         {@html envelope_solid}
     </div>
 </div>

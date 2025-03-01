@@ -103,7 +103,7 @@ function expandWindow() {
 {/if}
 
 <div class="grid h-screen w-screen overflow-hidden">
-    <div class="grid grid-rows-[auto_1fr] overflow-hidden bg-white
+    <div class="grid grid-rows-[auto_1fr_auto] overflow-hidden bg-white
             sm:max-w-[1400px] mx-10 justify-self-center self-center 
             w-full h-full max-h-full select-none
             lg:h-8/10 lg:max-h-[800px]"
@@ -114,7 +114,7 @@ function expandWindow() {
 
 
         <div class="overflow-hidden 
-            grid grid-cols-[3rem_1fr] "
+            grid grid-cols-[auto_1fr] "
             class:boxed-content={!expanded}>
 
             <Switcher />
@@ -125,6 +125,7 @@ function expandWindow() {
             </div>
 
         </div>
+
 
     </div>
 
