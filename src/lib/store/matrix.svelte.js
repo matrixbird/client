@@ -3,12 +3,16 @@ import {
 } from '$env/static/public';
 import { v4 as uuidv4 } from 'uuid';
 
+import { get_messages } from '$lib/appservice/api'
+
 let ready = $state(false);
 let synced = $state(false);
 let session = $state(null);
 let msg = $state(null);
 
 let user = $state(null);
+
+let nextSyncToken = $state(null);
 
 let client = $state(null);
 let sdk;
@@ -31,12 +35,15 @@ export function createMatrixStore() {
     console.log("creating matrix client")
 
     sdk = await import('matrix-js-sdk');
+
     loaded = true;
+
     client =  sdk.createClient({
       baseUrl: PUBLIC_HOMESERVER,
       accessToken: session?.access_token,
       userId: session.user_id,
       deviceId: session.device_id,
+      timelineSupport: true,
       supportsCallTransfer: false,
       useE2eForGroupCall: false
     });
@@ -50,35 +57,33 @@ export function createMatrixStore() {
       }
     }
 
-    client.on(sdk.RoomEvent.MyMembership, function (room, membership, prevMembership) {
+    client.on(sdk.RoomEvent.MyMembership, function (room, membership, prev) {
       if (membership === sdk.KnownMembership.Invite) {
-        console.log(room)
-        join_room(room);
+        //console.log("got invited", room)
+        console.log("membership", membership)
+        console.log("prev", prev)
+        join_room(room.roomId);
       }
     });
 
-    async function join_room(room) {
-      try {
-        // Get all currently joined rooms
-        const joinedRooms = client.getRooms().filter(r => 
-          r.getMyMembership() === "join"
-        ).map(r => r.roomId);
 
-        //console.log(joinedRooms)
-        // Check if we're already in this room
-        if (joinedRooms.includes(room.roomId)) {
-          console.log("Already joined room:", room.roomId);
-          return;
-        }
+
+    async function join_room(roomId) {
+
+      let exists = rooms[roomId];
+      if(exists) {
+        console.log("Already joined room:", roomId);
+        return;
+      }
+
+      try {
 
         // Join the room since we're not already in it
-        console.log("Joining room:", room.roomId);
-        let joined = await client.joinRoom(room.roomId);
-        console.log("joined", joined)
-
-        let storedRoom = await client.getRoom(room.roomId);
-        console.log("room from store is", storedRoom)
-        rooms[room.roomId] = storedRoom;
+        console.log("Joining room:", roomId);
+        let room = await client.joinRoom(roomId, {
+          syncRoom: true,
+        });
+        console.log("joined room:", room)
 
         /*
         setTimeout(async () => {
@@ -117,9 +122,21 @@ export function createMatrixStore() {
 
 
       } catch (error) {
-        console.error("Error joining room:", room.roomId, error);
+        console.error("Error joining room:", roomId, error);
       }
     }
+
+    client.on(sdk.RoomMemberEvent.Membership, function (event, room, toStartOfTimeline) {
+        console.log(event?.event)
+    });
+
+    client.on(sdk.UserEvent.DisplayName, function (event, room, toStartOfTimeline) {
+        console.log(event?.event)
+    });
+
+    client.on(sdk.UserEvent.AvatarUrl, function (event, room, toStartOfTimeline) {
+        console.log(event?.event)
+    });
 
 
     client.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
@@ -136,17 +153,25 @@ export function createMatrixStore() {
       }
     });
 
-    client.on(sdk.RoomMemberEvent.Membership, function (event, room, toStartOfTimeline) {
-      if(event?.event?.content?.membership == "join") {
+    client.on(sdk.RoomStateEvent.Events, function (event, room, toStartOfTimeline) {
+      if(event?.event) {
+        let event_type = event.event.type;
+        if (event_type === "matrixbird.email.native") {
+          let exists = events.find((e) => e.event_id === event.event.event_id);
+          if(!exists) {
+            events.push(event.event);
+          }
+        }
         //console.log(event.event)
       }
     });
 
 
+
     client.on("sync", (state, prevState, data) => {
       if(state === "PREPARED") {
 
-        console.log(data)
+        nextSyncToken = data.nextSyncToken;
 
         synced = true
         //console.log(client.store)
@@ -185,6 +210,7 @@ export function createMatrixStore() {
 
     await client.startClient({
       initialSyncLimit: 1000,
+      lazyLoadMembers: false,
     });
 
 
@@ -328,7 +354,14 @@ export function createMatrixStore() {
           content: {
             type: 'email'
           }
+        },
+        /*
+        {
+          type: 'matrixbird.email.native',
+          state_key: 'initial',
+          content: initMsg
         }
+        */
       ]
     });
 

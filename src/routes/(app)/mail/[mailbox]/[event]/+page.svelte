@@ -79,9 +79,6 @@ let user = $derived.by(() =>{
             <div class="flex-1 text-xl font-medium leading-1">
                 {subject}
             </div>
-            <div class="flex ml-3">
-                <button>reply</button>
-            </div>
         </div>
 
         {#if native && user}

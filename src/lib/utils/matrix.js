@@ -32,12 +32,10 @@ export function get_localpart(matrixId) {
 }
 
 export function get_domain(matrixId) {
-  // Check if the input is a string and starts with @
   if (typeof matrixId !== 'string' || !matrixId.startsWith('@')) {
     return null;
   }
   
-  // Extract the part after the colon
   const match = matrixId.match(/@[^:]+:(.+)/);
   return match ? match[1] : null;
 }

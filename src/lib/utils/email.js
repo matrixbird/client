@@ -17,3 +17,24 @@ export function validate(email) {
   }
   return email_valid;
 }
+
+function localhost_replace(original, pos = 0) {
+  const regex = /^(.+:)(\d)(\d)(\d+)$/;
+  return original.replace(regex, (match, domain, first, second, rest) => {
+    return `${domain}${first}${pos}${rest}`;
+  });
+}
+
+export function get_email_domain(email) {
+  if (!email || typeof email !== 'string' || !email.includes('@')) {
+    return null;
+  }
+
+  const [, domain] = email.split('@');
+
+  if(domain.includes('localhost:') && !domain.includes('.')) {
+    return localhost_replace(domain);
+  }
+
+  return domain;
+}

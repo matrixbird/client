@@ -161,16 +161,19 @@ async function process() {
 
     } catch (err){
         server_down = true
+        busy = false
         console.log('error', err)
     } finally {
-        busy = false
         await tick()
         if(bad_invite_code) {
             codeInput.focus();
+            busy = false
         } else if(unavailable) {
             usernameInput.focus();
+            busy = false
         } else {
             passwordInput.focus();
+            busy = false
         }
     }
 }

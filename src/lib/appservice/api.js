@@ -1,4 +1,4 @@
-import { PUBLIC_APPSERVICE } from '$env/static/public';
+import { PUBLIC_APPSERVICE, PUBLIC_HOMESERVER } from '$env/static/public';
 
 export const login = async (body) => {
   console.log(body)
@@ -126,6 +126,25 @@ export const query_code = async (code) => {
   let options = {
     headers: {
       'Content-Type': 'application/json',
+    },
+  }
+
+  try {
+    const response = await fetch(url, options)
+    return response.json();
+  } catch (error) {
+    throw error
+  }
+
+}
+
+export const get_messages = async (roomId, token) => {
+  const url = `${PUBLIC_HOMESERVER}/_matrix/client/v3/rooms/${roomId}/messages?limit=100&dir=b`;
+
+  let options = {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
     },
   }
 

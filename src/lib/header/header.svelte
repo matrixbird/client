@@ -7,7 +7,7 @@ import { ui_state } from '$lib/store/store.svelte.js'
 
 let expanded = $derived(ui_state?.expanded)
 
-function expandWindow() {
+function toggleExpand() {
     if(expanded) {
         ui_state.expanded = false
     } else {
@@ -28,7 +28,8 @@ let opts = {
 
 </script>
 
-<div class="flex bg-bird-900 p-2 text-white font-medium">
+<div class="flex bg-bird-900 p-1 text-white font-medium"
+ondblclick={toggleExpand}>
 
     <div class="flex place-items-center silk cursor-pointer text ml-1 tracking-wide
 ">
@@ -38,7 +39,7 @@ let opts = {
     <div class="flex-1 flex place-items-center ml-3">
     </div>
     <div class="cursor-pointer flex place-items-center mr-1"
-    onclick={expandWindow}
+    onclick={toggleExpand}
     use:tooltip={opts}>
 
         {#if expanded}

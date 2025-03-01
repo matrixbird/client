@@ -3,8 +3,7 @@ import { onMount, tick } from 'svelte';
 import { v4 as uuidv4 } from 'uuid';
 
 import Composer from './composer.svelte'
-
-import { close_small } from '$lib/assets/icons'
+import Recipient from './recipient.svelte'
 
 import {
     email_to_mxid,
@@ -12,7 +11,8 @@ import {
 } from '$lib/utils/matrix.js'
 
 import {
-    validate
+    validate,
+    get_email_domain
 } from '$lib/utils/email.js'
 
 import { 
@@ -115,7 +115,11 @@ async function process() {
 
     let mxids = emails.map(e => email_to_mxid(e))
 
-    console.log(mxids)
+    for(let email of emails) {
+        let domain = get_email_domain(email)
+    }
+
+
     //return
 
     /*
@@ -130,6 +134,20 @@ async function process() {
     try {
         //const resp = await store.testRooms()
         //console.log("dm rooms", resp)
+
+        let initMsg = {
+            from: {
+                name: store.user?.displayName,
+                address: mxid_to_email(store.user?.userId)
+            },
+            subject: subject,
+            body: {
+                text: body.text,
+                html: body.html
+            }
+        }
+
+
         let room_id = await store.emailRoom(mxids)
         console.log("room id", room_id)
 
@@ -194,9 +212,11 @@ function processInput(event) {
 
 }
 
-function removeEmail(i) {
-    emails.splice(i, 1)
-    focusTo()
+function removeEmail(email) {
+    let i = emails.findIndex(e => e == email)
+    if(i != -1) {
+        emails.splice(i, 1)
+    }
 }
 
 function processBlur(event) {
@@ -235,7 +255,7 @@ function processPaste(event) {
 </script>
 
 
-<div class="box editor grid grid-rows-[auto_1fr] 
+<div class="boxed editor grid grid-rows-[auto_1fr] bg-white
     min-w-[34rem]
     select-none"
     class:base={!expanded}
@@ -275,27 +295,18 @@ function processPaste(event) {
     </div>
 
     {#if !minimized}
-        <div class="content text-sm p-1 grid grid-rows-[auto_auto_1fr_auto]"
+        <div class="boxed-content content text-sm p-1 grid grid-rows-[auto_auto_1fr_auto]"
         class:max={expanded}>
 
             <div class="border-b border-border flex flex-wrap cursor-text"
             onclick={() => focusTo()}>
 
-                {#each emails as email, i}
-                    <div class="flex place-items-center my-2 px-2
-                        hover:border-bird-500 duration-100
-                        border border-bird-400
-                        bg-bird-50 rounded cursor-pointer"
-                            onclick={() => removeEmail(i)}>
-                        <div class="">
-                            {email}
-                        </div>
-                        <div class="cursor-pointer font-semibold ml-1"
-                            onclick={() => removeEmail(i)}>
-                            {@html close_small}
-                        </div>
-                    </div>
-                {/each}
+
+                <div class="flex gap-2">
+                    {#each emails as email (email)}
+                        <Recipient {email} {removeEmail} />
+                    {/each}
+                </div>
 
                 <div class="">
                 <input type="email" class="px-2 py-3" 

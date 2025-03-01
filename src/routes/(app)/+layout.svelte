@@ -104,9 +104,9 @@ function expandWindow() {
 
 <div class="grid h-screen w-screen overflow-hidden">
     <div class="grid grid-rows-[auto_1fr] overflow-hidden bg-bird-50
-            sm:max-w-[1600px] mx-10 justify-self-center self-center 
+            sm:max-w-[1400px] mx-10 justify-self-center self-center 
             w-full h-full max-h-full select-none
-            lg:h-8/10 lg:max-h-[960px]"
+            lg:h-8/10 lg:max-h-[800px]"
     class:boxed={!expanded}
     class:expanded={expanded}>
 
@@ -115,7 +115,7 @@ function expandWindow() {
 
         <div class="overflow-hidden 
             grid grid-cols-[3rem_1fr] "
-            class:bx-b={!expanded}>
+            class:boxed-content={!expanded}>
 
             <Switcher />
 
@@ -153,16 +153,5 @@ function expandWindow() {
     z-index: 1000;
     top: 1rem;
     right: 1rem;
-}
-
-.boxed {
-    box-shadow: 6px 6px 0 #a7a7a729;
-    transform: translate(0, 0);
-    border-radius: 1px;
-}
-.bx-b {
-    border-left: 1px solid var(--border);
-    border-right: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
 }
 </style>

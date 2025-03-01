@@ -154,6 +154,7 @@ html {
     height: -webkit-fill-available;
     width: 100%;
     background-color: var(--background);
+    background-image: url("data:image/svg+xml,<svg id='patternId' width='100%' height='100%' xmlns='http://www.w3.org/2000/svg'><defs><pattern id='a' patternUnits='userSpaceOnUse' width='20' height='20' patternTransform='scale(1) rotate(0)'><rect x='0' y='0' width='100%' height='100%' fill='transparent'/><path d='M 10,-2.55e-7 V 20 Z M -1.1677362e-8,10 H 20 Z'  stroke-width='0.5' stroke='%23f0f0f0' fill='none'/></pattern></defs><rect width='800%' height='800%' transform='translate(0,0)' fill='url(%23a)'/></svg>");
 }
 
 body {
@@ -164,6 +165,7 @@ body {
     margin: 0;
     padding: 0;
     color: var(--text);
+    background-image: linear-gradient(white 0%, transparent 30vh);
     width: 100%;
 }
 
@@ -303,6 +305,18 @@ input::placeholder {
 }
 
 .box:hover {
+}
+
+
+.boxed {
+    box-shadow: 6px 6px 0 #a7a7a729;
+    transform: translate(0, 0);
+    border-radius: 1px;
+}
+.boxed-content {
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
 }
 
 .silk {
