@@ -86,7 +86,7 @@ async function login() {
                 method: 'POST',
                 body: JSON.stringify({
                     session_id: response.session_id,
-                    device_id: response.device_id,
+                    //device_id: response.device_id,
                 }),
             });
 

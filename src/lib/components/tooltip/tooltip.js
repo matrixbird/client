@@ -10,7 +10,7 @@ export function tooltip(node, opts = {
   text: '',
   placement: 'top',
   theme: 'light',
-  font: null,
+  classes: null,
   ofset: 8,
   delay: 0,
 }) {
@@ -25,8 +25,8 @@ export function tooltip(node, opts = {
     className += ' tooltip-dark';
   }
 
-  if(opts?.font) {
-    className += ` ${opts.font}`
+  if(opts?.classes) {
+    className += ` ${opts.classes}`
   }
 
   function createTooltip() {
@@ -73,6 +73,22 @@ export function tooltip(node, opts = {
     tooltipEl.style.visibility = 'visible';
     tooltipEl.style.opacity = '1';
 
+    let _offset = {
+      mainAxis: 10,
+      crossAxis: 0
+    }
+
+    if(!Array.isArray(opts.offset) && opts.offset !== NaN) {
+      if(opts.offset > 0) {
+        _offset.mainAxis = opts.offset;
+      }
+    }
+
+    if(Array.isArray(opts.offset) && opts.offset?.length == 2) {
+      _offset.mainAxis = opts.offset[0];
+      _offset.crossAxis = opts.offset[1];
+    }
+
     cleanup = autoUpdate(
       node,
       tooltipEl,
@@ -80,7 +96,7 @@ export function tooltip(node, opts = {
         computePosition(node, tooltipEl, {
           placement: opts.placement,
           middleware: [
-            offset(opts.offset || 10), 
+            offset(_offset), 
             shift({ mainAxis: true, crossAxis: true}) 
           ]
         }).then(({ x, y }) => {

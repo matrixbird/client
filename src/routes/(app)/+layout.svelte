@@ -33,7 +33,6 @@ let { data, children } = $props();
 let ready = $derived(matrixStore?.ready)
 
 $effect(() => {
-    console.log(data)
     if(data?.access_token && data?.device_id && data?.user_id) {
         matrixStore.updateSession(data)
     }
@@ -47,6 +46,8 @@ onMount(() => {
         dev_mode.enabled = true
     }
 })
+
+let is_dev_mode = $derived(dev_mode?.enabled);
 
 
 const events = $derived(matrixStore?.events)
@@ -95,7 +96,10 @@ function expandWindow() {
 
 <Editor />
 <EmailContextMenu />
+
+{#if is_dev_mode}
 <ThemeToggle />
+{/if}
 
 {#if new_user}
 {/if}

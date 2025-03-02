@@ -153,8 +153,8 @@ $effect(() => {
     if(active) {
         let user = store.user;
         let room = store.client.getRoom(email.room_id)
-        let read = room.getReadReceiptForUserId(user.userId)
-        console.log('read', read)
+        //let read = room.getReadReceiptForUserId(user.userId)
+        //console.log('read', read)
 
         //let sendread = store.client.sendReadReceipt(email.room_id,
         //email.event_id)

@@ -44,7 +44,7 @@ export function createMatrixStore() {
   }
 
   async function createMatrixClient() {
-    console.log("creating matrix client")
+    console.info("Creating matrix client.")
 
     sdk = await import('matrix-js-sdk');
 
@@ -218,13 +218,10 @@ export function createMatrixStore() {
       //ready = true
     }
 
-    client.on("network.error", function(err) {
-      console.error("Network error:", err);
-    });
 
-    client.on("reconnecting", function() {
-      console.log("Attempting to reconnect");
-    });
+    client.once("sync", (state, prevState, data) => {
+      console.log("just once")
+    })
 
     client.on("sync", (state, prevState, data) => {
 
@@ -235,7 +232,6 @@ export function createMatrixStore() {
       }
 
       if (state === "SYNCING") {
-        console.log("syncing...", data);
       }
 
       if (state === "RECONNECTING") {
@@ -253,12 +249,9 @@ export function createMatrixStore() {
 
         let logged_in_user = client.store.getUser(client.getUserId());
         user = logged_in_user;
-        console.log("saving user", user)
 
 
         //buildEvents()
-
-        console.log("initial sync complete")
 
 
         /*
@@ -285,6 +278,7 @@ export function createMatrixStore() {
           const room = client.getRoom(roomId);
           rooms[roomId] = room;
         });
+
         ready = true
       }
     });
@@ -293,7 +287,6 @@ export function createMatrixStore() {
     await client.startClient({
       initialSyncLimit: 1000,
       lazyLoadMembers: false,
-      disablePresence: true,
     });
 
 

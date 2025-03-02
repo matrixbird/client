@@ -64,14 +64,16 @@ let opts = $derived.by(() => {
         text: text,
         placement: 'top-start',
         theme: "dark",
+        classes: 'p-4',
+        offset: [10, 6]
     }
 })
 
 </script>
 
-<div class="flex border-t border-border px-2 py-1 cursor-pointer">
+<div class="flex border-t border-border ">
 
-    <div class="flex place-items-center mx-2"
+    <div class="flex place-items-center px-2 py-1 cursor-pointer"
         use:tooltip={opts}>
         {#if connected}
             {@html cloud}

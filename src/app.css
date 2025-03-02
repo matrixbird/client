@@ -365,7 +365,7 @@ input::placeholder {
     background: var(--tooltip-background-dark);
     border: none;
     color: var(--tooltip-text-dark);
-    box-shadow: 4px 4px 0 theme('colors.bird.400');
+    box-shadow: 4px 4px 0 theme('colors.bird.300');
     padding: 0.25rem 0.5rem;
     border-radius: 2px;
     font-size: 14px;

@@ -27,13 +27,14 @@ let placement = $derived.by(() => {
 })
 
 let offset = $derived.by(() => {
-    return expanded ? 10 : 20
+    return expanded ? [10, -34] : [20, 4]
 })
 
 let opts = $derived.by(() => {
     return {
         text: expanded ? "Minimize" : "Maximize",
         placement: placement,
+        classes: 'silk',
         offset: offset,
     }
 })
