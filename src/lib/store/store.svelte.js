@@ -7,6 +7,10 @@ import {
 
 let session = $state(null);
 
+export const dev_mode = $state({
+    enabled: false
+});
+
 
 export const userState = $state({
     new_user: false

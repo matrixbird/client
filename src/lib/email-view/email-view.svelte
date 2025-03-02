@@ -1,4 +1,6 @@
 <script>
+import { page } from '$app/stores';
+
 import DOMPurify from "dompurify";
 import { mxid_to_email } from '$lib/utils/matrix.js'
 
@@ -9,7 +11,16 @@ const store = createMatrixStore()
 
 import { reply_editors } from '$lib/store/editor.svelte.js'
 
-let { email } = $props();
+let { email, last } = $props();
+
+
+let active = $derived.by(() => {
+    return email?.event_id == $page.params.event
+})
+
+let thread_root = $derived.by(() => {
+    return email?.content?.["m.relates_to"] == undefined 
+})
 
 const body = $derived.by(() => {
     return email?.content?.body?.html ? email?.content?.body?.html :
@@ -36,6 +47,12 @@ $effect(() => {
         clean = DOMPurify.sanitize(body, {
             ADD_ATTR: ['target'],
         })
+    }
+
+    if(active && element) {
+        setTimeout(() => {
+            element.scrollIntoView({block: "center", inline: "nearest"})
+        }, 10)
     }
 })
 
@@ -82,16 +99,20 @@ function killReply() {
     delete reply_editors[email?.event_id]
 }
 
+let element;
+
 </script>
 
-<div class="email-item">
+<div class="email-item border-b border-bird-100" bind:this={element}>
 
     <div class="meta p-4 flex flex-col">
+        {#if thread_root}
         <div class="flex place-items-center mb-3">
-            <div class="flex-1 text-xl font-medium leading-1">
+            <div class="flex-1 text font-semibold leading-1">
                 {subject}
             </div>
         </div>
+        {/if}
 
         {#if native && user}
             <div class="text-sm">
@@ -108,6 +129,9 @@ function killReply() {
                     <span>{address}</span>
             </div>
         {/if}
+        <div class="text-xs text-bird-800">
+            {email?.sender ? email.sender : ''}
+        </div>
 
     </div>
 
@@ -124,6 +148,7 @@ function killReply() {
         {/if}
 
 
+    {#if last}
     <div class="px-4 mb-4">
 
         {#if !replying}
@@ -139,6 +164,7 @@ function killReply() {
             </div>
         {/if}
     </div>
+    {/if}
 
 </div>
 

@@ -22,8 +22,35 @@ import {
 
 import { createMatrixStore } from '$lib/store/matrix.svelte.js'
 const store = createMatrixStore()
+const events = $derived(store?.events)
 
 let { email } = $props();
+
+
+let replies = $derived.by(() => {
+    let count = 0
+    for (const event of events.values()) {
+        if(event.content["m.relates_to"]?.event_id == email.event_id) {
+            count++
+        }
+    }
+    return count
+})
+
+let last_email_in_thread = $derived.by(() => {
+    let emails = []
+    for (const event of events.values()) {
+        if(event.content["m.relates_to"]?.event_id == email.event_id) {
+            emails.push(event)
+        }
+    }
+
+    if(emails.length > 0) {
+        return emails[emails.length - 1]
+    }
+    return email
+})
+
 
 let subject = $derived(email?.content?.subject || "no subject")
 
@@ -60,13 +87,17 @@ let is_matrixbird = $derived.by(() => {
 })
 
 
+
 function open(e) {
     if(e.ctrlKey) {
+        console.log(events.get(email.event_id))
         console.log($state.snapshot(email))
         return
     }
     const mailbox = $page.params.mailbox
-    goto(`/mail/${mailbox}/${email.event_id}`)
+
+
+    goto(`/mail/${mailbox}/${last_email_in_thread.event_id}`)
 }
 
 function log(e) {
@@ -84,7 +115,6 @@ let selected = $state(false);
 function select(e) {
     e.preventDefault()
     e.stopPropagation()
-    console.log("lol")
     selected = !selected
 }
 
@@ -120,7 +150,7 @@ let el;
     class:inactive={!active}
     onclick={open}>
 
-    <div class="flex p-3 overflow-x-hidden">
+    <div class="flex p-2 overflow-x-hidden">
 
         <div class="flex place-items-center">
             <div class="text-sm bg-bird-700 w-8 h-8 
@@ -161,8 +191,15 @@ let el;
                 {/if}
 
 
+
             </div>
         </div>
+
+            {#if replies}
+                <div class="">
+                    {replies} replies
+                </div>
+            {/if}
 
 
         <div class="flex flex-col ml-4">
@@ -196,7 +233,6 @@ let el;
 <style lang="postcss">
 @reference "tailwindcss/theme";
 .email-item {
-    min-height: 72px;
 }
 .active {
     border-left: 3px solid theme('colors.bird.700');

@@ -144,21 +144,29 @@ export function createMatrixStore() {
     });
 
 
-    /*
     client.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
       if(event?.event) {
         let event_type = event.event.type;
         if (event_type === "matrixbird.email.legacy" || 
           event_type === "matrixbird.email.native") {
-          let exists = events.find((e) => e.event_id === event.event.event_id);
-          if(!exists) {
-            events.push(event.event);
+
+          let isSending = event.isSending();
+
+          if(isSending) {
+            setTimeout(() => {
+              events.set(event.event.event_id, event.event);
+            }, 1000)
           }
+
+          if(!isSending) {
+            events.set(event.event.event_id, event.event);
+          }
+
         }
-        //console.log(event.event)
       }
     });
 
+    /*
     client.on(sdk.RoomStateEvent.Events, function (event, room, toStartOfTimeline) {
       if(event?.event) {
         let event_type = event.event.type;
@@ -186,8 +194,8 @@ export function createMatrixStore() {
           }
         });
       });
-      status.events_ready = true;
-      ready = true
+      //status.events_ready = true;
+      //ready = true
     }
 
 
@@ -201,10 +209,10 @@ export function createMatrixStore() {
 
         let logged_in_user = client.store.getUser(client.getUserId());
         user = logged_in_user;
-        //console.log("saving user", user)
+        console.log("saving user", user)
 
 
-        buildEvents()
+        //buildEvents()
 
         console.log("initial sync complete")
 
@@ -232,7 +240,7 @@ export function createMatrixStore() {
         });
         console.log(rooms);
         */
-        //ready = true
+        ready = true
       }
     });
 

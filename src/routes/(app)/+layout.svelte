@@ -5,6 +5,7 @@ import {
 	goto,
 } from '$app/navigation';
 import { browser } from '$app/environment';
+import { page } from '$app/stores';
 import '../../app.css';
 import logo from '../../logo.png'
 import Header from '$lib/header/header.svelte'
@@ -19,7 +20,7 @@ import Profile from '$lib/profile/profile.svelte'
 import { expand, collapse } from '$lib/assets/icons.js'
 
 import { userState, ui_state } from '$lib/store/store.svelte.js'
-import { createStore } from '$lib/store/store.svelte.js'
+import { createStore, dev_mode } from '$lib/store/store.svelte.js'
 const store = createStore()
 
 import { createMatrixStore } from '$lib/store/matrix.svelte.js'
@@ -41,13 +42,16 @@ $effect(() => {
     }
 })
 
+onMount(() => {
+    if($page.url.hostname == "localhost") {
+        dev_mode.enabled = true
+    }
+})
 
 
 const events = $derived(matrixStore?.events)
 const first_event = $derived.by(() => {
-    if(events) {
-        return events[0]
-    }
+    return events?.values().next().value
 })
 let new_user = $derived(userState?.new_user)
 
@@ -101,6 +105,7 @@ function expandWindow() {
         <Profile />
     </div>
 {/if}
+
 
 <div class="grid h-screen w-screen overflow-hidden">
     <div class="grid grid-rows-[auto_1fr_auto] overflow-hidden bg-white

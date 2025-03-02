@@ -114,6 +114,13 @@ async function focusComposer() {
 
 </script>
 
+<div class="text-wrap">
+    Replying to:
+    <pre class="text-xs">
+    event_id {email.content["m.relates_to"]?.event_id}
+    reply_to {email.content["m.relates_to"]?.["m.in_reply_to"]}
+    </pre>
+</div>
 
 <div class="editor grid grid-rows-[auto_1fr_auto] 
     select-none">
