@@ -5,6 +5,8 @@ import { tooltip } from '$lib/components/tooltip/tooltip'
 
 import { ui_state } from '$lib/store/store.svelte.js'
 
+let { dragging } = $props();
+
 let expanded = $derived(ui_state?.expanded)
 
 function toggleExpand() {
@@ -39,6 +41,8 @@ let opts = $derived.by(() => {
     }
 })
 
+let mousedown = $state(false);
+
 </script>
 
 <div class="flex bg-bird-900 p-1 text-white font-medium"
@@ -49,8 +53,13 @@ ondblclick={toggleExpand}>
         matrixbird
     </div>
 
-    <div class="flex-1 flex place-items-center ml-3">
+    <div class="flex-1 flex place-items-center ml-3 cursor-grab"
+        onmousedown={() => mousedown = true}
+        onmouseup={() => mousedown = false}
+    class:cursor-grabbing={dragging || mousedown}>
+
     </div>
+
     <div class="cursor-pointer flex place-items-center mr-1"
     onclick={toggleExpand}
     use:tooltip={opts}>

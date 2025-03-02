@@ -38,6 +38,7 @@
 	"dependencies": {
 		"@floating-ui/dom": "^1.6.13",
 		"@matrix-org/matrix-sdk-crypto-wasm": "^14.0.0",
+		"@neodrag/svelte": "^2.3.1",
 		"@tiptap/core": "^2.11.5",
 		"@tiptap/pm": "^2.11.5",
 		"@tiptap/starter-kit": "^2.11.5",

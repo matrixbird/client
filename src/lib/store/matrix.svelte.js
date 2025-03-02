@@ -287,6 +287,7 @@ export function createMatrixStore() {
     await client.startClient({
       initialSyncLimit: 1000,
       lazyLoadMembers: false,
+      disablePresence: true,
     });
 
 

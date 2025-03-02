@@ -15,13 +15,13 @@ export const dev_mode = $state({
     enabled: false
 });
 
-
 export const userState = $state({
     new_user: false
 });
 
 export const ui_state = $state({
-    expanded: false
+    expanded: false,
+    drag_offset: null,
 });
 
 export const route_state = $state({

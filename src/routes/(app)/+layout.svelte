@@ -1,5 +1,6 @@
 <script>
 import { PUBLIC_HOMESERVER } from '$env/static/public';
+import { draggable } from '@neodrag/svelte';
 import { onMount } from 'svelte';
 import {
 	goto,
@@ -56,6 +57,8 @@ const first_event = $derived.by(() => {
 })
 let new_user = $derived(userState?.new_user)
 
+let _expanded = $state(false);
+
 $effect(() => {
     if(new_user){
     }
@@ -63,9 +66,26 @@ $effect(() => {
         userState.new_user = false
         goto(`/mail/inbox/${first_event.event_id}`)
     }
+
+    if(expanded) {
+        _expanded = true
+        mb.style.translate = '0'
+        mb.style.transform = 'none'
+        setTimeout(() => {
+            mb.style.removeProperty('transform')
+            mb.style.removeProperty('translate')
+        },500)
+    }
+    
+    if(_expanded && !expanded && ui_state?.drag_offset != null) {
+        mb.style.transform = `translate3d(${ui_state.drag_offset[0]}px,
+${ui_state.drag_offset[1]}px, 0px)`
+        _expanded = false
+    }
 })
 
 
+let mb;
 
 let expanded = $derived(ui_state?.expanded)
 
@@ -83,8 +103,28 @@ function expandWindow() {
     }
 }
 
-</script>
+let dragging = $state(false);
 
+let dragopts = $derived.by(() => {
+    return {
+        handle: '.header',
+        disabled: expanded,
+        onDrag: ({ offsetX, offsetY, rootNode, currentNode, event }) => {
+        },
+        onDragStart: ({ offsetX, offsetY, rootNode, currentNode, event }) => {
+            dragging = true
+        },
+        onDragEnd: ({ offsetX, offsetY, rootNode, currentNode, event }) => {
+            dragging = false
+            setTimeout(() => {
+                ui_state.drag_offset = [offsetX, offsetY]
+            }, 3000)
+        },
+    }
+})
+
+
+</script>
 
 {#if !ready}
     <div class="loading grid h-screen w-screen overflow-hidden">
@@ -111,15 +151,20 @@ function expandWindow() {
 {/if}
 
 
-<div class="grid h-screen w-screen overflow-hidden">
-    <div class="grid grid-rows-[auto_1fr_auto] overflow-hidden bg-white
+<div class="grid h-screen w-screen overflow-hidden" >
+
+    <div class="mb grid grid-rows-[auto_1fr_auto] overflow-hidden bg-white
             sm:max-w-[1400px] mx-10 justify-self-center self-center 
             w-full h-full max-h-full select-none
             lg:h-8/10 lg:max-h-[800px]"
-    class:boxed={!expanded}
-    class:expanded={expanded}>
+        class:boxed={!expanded}
+        class:expanded={expanded} 
+        use:draggable={dragopts}
+        bind:this={mb}>
 
-        <Header />
+        <div class="header">
+            <Header {dragging} />
+        </div>
 
 
         <div class="overflow-hidden 
@@ -158,6 +203,12 @@ function expandWindow() {
     max-height: 100vh;
     max-width: 100vw;
     margin: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    translate: 0;
 }
 .profile {
     position: fixed;
