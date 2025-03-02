@@ -82,6 +82,7 @@ $effect(() => {
 ${ui_state.drag_offset[1]}px, 0px)`
         _expanded = false
     }
+
 })
 
 
@@ -105,10 +106,21 @@ function expandWindow() {
 
 let dragging = $state(false);
 
+let defaultPosition = $derived.by(() => {
+    if(browser && !_expanded && !expanded) {
+        let offset = localStorage.getItem('window')
+        if(offset) {
+            let [x, y] = JSON.parse(offset)
+            return { x, y }
+        }
+    }
+})
+
 let dragopts = $derived.by(() => {
     return {
         handle: '.header',
         disabled: expanded,
+        position: defaultPosition,
         onDrag: ({ offsetX, offsetY, rootNode, currentNode, event }) => {
         },
         onDragStart: ({ offsetX, offsetY, rootNode, currentNode, event }) => {
@@ -116,9 +128,12 @@ let dragopts = $derived.by(() => {
         },
         onDragEnd: ({ offsetX, offsetY, rootNode, currentNode, event }) => {
             dragging = false
+            console.log('drag end', offsetX, offsetY)
             setTimeout(() => {
                 ui_state.drag_offset = [offsetX, offsetY]
-            }, 3000)
+                localStorage.setItem('window', JSON.stringify([offsetX,
+                offsetY]))
+            }, 100)
         },
     }
 })

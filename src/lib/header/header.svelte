@@ -53,9 +53,10 @@ ondblclick={toggleExpand}>
         matrixbird
     </div>
 
-    <div class="flex-1 flex place-items-center ml-3 cursor-grab"
+    <div class="flex-1 flex place-items-center ml-3"
         onmousedown={() => mousedown = true}
         onmouseup={() => mousedown = false}
+    class:cursor-grab={!expanded}
     class:cursor-grabbing={dragging || mousedown}>
 
     </div>
