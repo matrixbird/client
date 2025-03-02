@@ -7,6 +7,10 @@ import {
 
 let session = $state(null);
 
+export const app = $state({
+    ready: false
+});
+
 export const dev_mode = $state({
     enabled: false
 });

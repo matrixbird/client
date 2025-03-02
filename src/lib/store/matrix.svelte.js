@@ -21,7 +21,8 @@ let sdk;
 let loaded = $state(false);
 
 let rooms = $state({});
-let members = $state([]);
+let members = $state(new SvelteMap());
+
 let events = $state(new SvelteMap());
 export let status = $state({
   events_ready: false,
@@ -132,7 +133,7 @@ export function createMatrixStore() {
     }
 
     client.on(sdk.RoomMemberEvent.Membership, function (event, room, toStartOfTimeline) {
-      //console.log(event?.event)
+      //console.log(event)
     });
 
     client.on(sdk.UserEvent.DisplayName, function (event, room, toStartOfTimeline) {
@@ -163,6 +164,18 @@ export function createMatrixStore() {
           }
 
         }
+      }
+
+      if(event.event.type == "m.room.member" &&
+        event.event.content?.membership == "join") {
+
+        let exists = members.get(event.event.state_key);
+        if(!exists) {
+          members.set(event.event.state_key, event.event);
+        } else {
+
+        }
+
       }
     });
 
@@ -234,12 +247,13 @@ export function createMatrixStore() {
         });
 
         //console.log(client);
+        console.log(rooms);
+        */
+
         Object.keys(client.store.rooms).forEach((roomId) => {
           const room = client.getRoom(roomId);
           rooms[roomId] = room;
         });
-        console.log(rooms);
-        */
         ready = true
       }
     });

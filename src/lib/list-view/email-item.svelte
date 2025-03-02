@@ -10,6 +10,8 @@ import {
 import Date from '$lib/components/date/date.svelte'
 import AttchmentItems from './attachments/attachment-items.svelte'
 
+import UserAvatar from '$lib/user/avatar.svelte'
+
 import { 
     lock_closed,
     check_small
@@ -78,16 +80,15 @@ const native = $derived.by(() => {
 
 let user = $derived.by(() =>{
     if(!email?.room_id) return
-    const room = store.rooms[email?.room_id]
-    if(room) {
-        const member = room.getMember(email.sender)
-        //console.log(member)
-        if(member) {
-            return {
-                name: member?.name || member?.rawDisplayName,
-                address: mxid_to_email(member.userId),
-                localpart: get_localpart(member.userId)
-            }
+
+    let users = store.client.getUsers()
+    let user = users.find(user => user.userId == email.sender)
+
+    if(user) {
+        return {
+            name: user?.name || user?.rawDisplayName,
+            address: mxid_to_email(user.userId),
+            localpart: get_localpart(user.userId)
         }
     }
 })
@@ -163,15 +164,9 @@ let el;
     class:inactive={!active}
     onclick={open}>
 
-    <div class="flex p-2 overflow-x-hidden">
+    <div class="flex p-2 ml-1 overflow-x-hidden">
 
-        <div class="flex place-items-center">
-            <div class="text-sm bg-bird-700 w-8 h-8 
-                hover:bg-white hover:border-4 hover:border-bird-700
-                rounded-[50%]"
-            onclick={select}>
-            </div>
-        </div>
+        <UserAvatar {email} />
 
         <div class="flex flex-col flex-1 ml-4 overflow-x-hidden">
             <div class="leading-normal whitespace-nowrap overflow-hidden text-ellipsis">

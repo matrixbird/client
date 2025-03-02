@@ -56,14 +56,26 @@ $effect(() => {
 </script>
 
 
-<div class="h-full overflow-x-auto overflow-y-auto select-text">
+<div class="email-thread h-full overflow-x-auto overflow-y-auto select-text">
     {#if emails?.length > 0}
 
         {#each emails as email, i (email.event_id)}
+        <div class="email-item">
             <EmailView {email} last={i == emails.length - 1} />
+        </div>
         {/each}
 
     {:else}
         no email
     {/if}
 </div>
+
+<style lang="postcss">
+@reference "tailwindcss/theme";
+.email-thread .email-item {
+    border-bottom: 1px solid var(--bird-200);
+}
+.email-thread .email-item:last-child {
+    border-bottom: none;
+}
+</style>

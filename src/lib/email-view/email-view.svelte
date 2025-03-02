@@ -4,6 +4,8 @@ import { page } from '$app/stores';
 import DOMPurify from "dompurify";
 import { mxid_to_email } from '$lib/utils/matrix.js'
 
+import { close } from '$lib/assets/icons.js'
+
 import ReplyComposer from '$lib/editor/reply-composer.svelte'
 
 import { createMatrixStore } from '$lib/store/matrix.svelte.js'
@@ -108,15 +110,20 @@ let element;
 
 </script>
 
-<div class="email-item border-b border-bird-100" bind:this={element}>
+<div class="" bind:this={element}>
 
     <div class="meta p-4 flex flex-col">
         {#if thread_root}
-        <div class="flex place-items-center mb-3">
-            <div class="flex-1 text font-semibold leading-1">
-                {subject}
+
+            <div class="flex place-items-center mb-3">
+                <div class="flex-1 text font-semibold leading-1">
+                    {subject}
+                </div>
+                <div class="flex place-items-center">
+                    {@html close}
+                </div>
             </div>
-        </div>
+
         {/if}
 
         {#if native && user}
