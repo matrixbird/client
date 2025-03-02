@@ -150,7 +150,27 @@ $effect(() => {
         route_state.mail = $page.url.pathname
     }
 
+    if(active) {
+        let user = store.user;
+        let room = store.client.getRoom(email.room_id)
+        let read = room.getReadReceiptForUserId(user.userId)
+        console.log('read', read)
+
+        //let sendread = store.client.sendReadReceipt(email.room_id,
+        //email.event_id)
+
+        //markRead()
+    }
+
 })
+
+async function markRead() {
+    let room = store.client.getRoom(email.room_id)
+    let event = room.getLiveTimeline().getEvents().find(event => event.event.event_id == email.event_id)
+
+    let read = await store.client.sendReceipt(event, "m.read")
+    console.log('read', read)
+}
 
 let el;
 

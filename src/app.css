@@ -79,7 +79,7 @@
     --scrollbar-track: theme('colors.bird.100');
 }
 
-:root.dark {
+:root.black {
     --bg: hsla(0, 0%, 7%, 1);
     --background: hsla(0, 0%, 7%, 1);
     --text: white;
