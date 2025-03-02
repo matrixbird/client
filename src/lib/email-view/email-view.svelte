@@ -89,6 +89,11 @@ let replying = $derived.by(() => {
 })
 
 function reply() {
+    if(email.type == "matrixbird.email.legacy") {
+        alert("Replying to regular emails is disabled for now.")
+        return
+    }
+
     reply_editors[email?.event_id] = {
         email: email,
         state: null,
@@ -137,7 +142,7 @@ let element;
 
 
         {#if is_html && clean}
-            <div class="p-4">
+            <div class="body p-4 [&>p]:pb-2 leading-5">
                 {@html clean}
             </div>
         {/if}

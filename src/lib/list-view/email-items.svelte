@@ -36,13 +36,26 @@ $effect(() => {
     }
 })
 
+function process(email) {
+    for (const event of events.values()) {
+        if(event.content["m.relates_to"]?.event_id == email.event_id && event.sender != user?.userId) {
+            return true
+        }
+    }
+    return email.sender != user?.userId
+}
+
 function buildEmails(events) {
-    if(events) {
+    if(events && user) {
         let sorted = [...events.values()].sort((a, b) => 
             b.origin_server_ts - a.origin_server_ts
         );
         let filtered = sorted.filter((email) => {
             return email.content?.["m.relates_to"] == undefined
+        })
+
+        filtered = filtered.filter((email) => {
+            return process(email)
         })
         return filtered
     }

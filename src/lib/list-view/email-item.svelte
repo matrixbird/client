@@ -37,6 +37,16 @@ let replies = $derived.by(() => {
     return count
 })
 
+let thread_events = $derived.by(() => {
+    let emails = []
+    for (const event of events.values()) {
+        if(event.content["m.relates_to"]?.event_id == email.event_id) {
+            emails.push(event)
+        }
+    }
+    return emails
+})
+
 let last_email_in_thread = $derived.by(() => {
     let emails = []
     for (const event of events.values()) {
@@ -124,6 +134,9 @@ function selectEmail(e) {
 }
 
 const active = $derived.by(() => {
+    if(thread_events.length > 0) {
+        return thread_events.find(event => event.event_id == $page.params.event) ? true : false
+    }
     return $page.params.event === email.event_id
 })
 
