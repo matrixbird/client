@@ -21,10 +21,22 @@ function toggleExpand() {
     }
 }
 
-let opts = {
-    text: expanded ? "Minimize" : "Maximize",
-    placement: "right"
-}
+
+let placement = $derived.by(() => {
+    return expanded ? "bottom" : "top-end"
+})
+
+let offset = $derived.by(() => {
+    return expanded ? 10 : 20
+})
+
+let opts = $derived.by(() => {
+    return {
+        text: expanded ? "Minimize" : "Maximize",
+        placement: placement,
+        offset: offset,
+    }
+})
 
 </script>
 

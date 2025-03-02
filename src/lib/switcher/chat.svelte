@@ -18,7 +18,8 @@ let active = $derived.by(() => {
 })
 
 let opts = {
-    text: "Chat"
+    text: "Chat",
+    placement: "right",
 }
 
 </script>

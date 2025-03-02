@@ -30,6 +30,12 @@ export let status = $state({
 
 let created_rooms = $state({});
 
+export let sync = $state({
+  state: null,
+  last_sync: null,
+  last_retry: null,
+});
+
 
 export function createMatrixStore() {
 
@@ -58,6 +64,7 @@ export function createMatrixStore() {
       const whoami = await client.whoami()
       //console.log(whoami);
     } catch(e) {
+      console.log("Error getting whoami", e)
       if(e.errcode === "M_UNKNOWN_TOKEN") {
         console.log("logging out")
       }
@@ -211,9 +218,33 @@ export function createMatrixStore() {
       //ready = true
     }
 
+    client.on("network.error", function(err) {
+      console.error("Network error:", err);
+    });
+
+    client.on("reconnecting", function() {
+      console.log("Attempting to reconnect");
+    });
 
     client.on("sync", (state, prevState, data) => {
+
+      sync.state = state;
+
+      if (state === "ERROR") {
+        sync.last_retry = new Date();
+      }
+
+      if (state === "SYNCING") {
+        console.log("syncing...", data);
+      }
+
+      if (state === "RECONNECTING") {
+        sync.last_retry = new Date();
+      }
+
       if(state === "PREPARED") {
+
+        sync.last_sync = new Date();
 
         nextSyncToken = data.nextSyncToken;
 
@@ -257,6 +288,7 @@ export function createMatrixStore() {
         ready = true
       }
     });
+
 
     await client.startClient({
       initialSyncLimit: 1000,

@@ -77,6 +77,11 @@
 
     --scrollbar-thumb: theme('colors.bird.700');
     --scrollbar-track: theme('colors.bird.100');
+
+    --tooltip-background: hsla(0, 0%, 100%, 1);
+    --tooltip-text: hsla(0, 0%, 0%, 1);
+    --tooltip-background-dark: theme('colors.bird.800');
+    --tooltip-text-dark: hsla(0, 0%, 100%, 1);
 }
 
 :root.black {
@@ -133,6 +138,11 @@
 
     --scrollbar-thumb: hsla(0, 0%, 71%, 1);
     --scrollbar-track: hsla(0, 0%, 90%, 1);
+
+    --tooltip-background: hsla(0, 0%, 100%, 1);
+    --tooltip-text: hsla(0, 0%, 0%, 1);
+    --tooltip-background-dark: theme('colors.bird.800');
+    --tooltip-text-dark: hsla(0, 0%, 100%, 1);
 }
 
 ::-webkit-scrollbar {
@@ -336,15 +346,31 @@ input::placeholder {
 
 .tooltip {
     position: fixed;
-    font-family: "Silkscreen", serif;
-    background: theme('colors.bird.900');
-    color: white;
+    background: var(--tooltip-background);
+    border: 1px solid var(--border);
+    box-shadow: 4px 4px 0 theme('colors.bird.700');
+    color: var(--tooltip-text);
     padding: 0.25rem 0.5rem;
-    border-radius: 1px;
+    border-radius: 2px;
+    font-size: 14px;
+    font-weight: 500;
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.tooltip-dark {
+    position: fixed;
+    background: var(--tooltip-background-dark);
+    border: none;
+    color: var(--tooltip-text-dark);
+    box-shadow: 4px 4px 0 theme('colors.bird.400');
+    padding: 0.25rem 0.5rem;
+    border-radius: 2px;
     font-size: 14px;
     pointer-events: none;
     z-index: 100;
     opacity: 0;
     visibility: hidden;
-    max-width: 250px;
 }

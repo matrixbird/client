@@ -9,7 +9,10 @@ import {
 export function tooltip(node, opts = {
   text: '',
   placement: 'top',
-  delay: 0,    
+  theme: 'light',
+  font: null,
+  ofset: 8,
+  delay: 0,
 }) {
 
   let tooltip = null;
@@ -17,11 +20,20 @@ export function tooltip(node, opts = {
   let showTimeout = null;
   let hideTimeout = null;
 
+  let className = `tooltip`;
+  if(opts?.theme === 'dark') {
+    className += ' tooltip-dark';
+  }
+
+  if(opts?.font) {
+    className += ` ${opts.font}`
+  }
+
   function createTooltip() {
 
     if (!tooltip) {
       tooltip = document.createElement('div');
-      tooltip.className = `tooltip`;
+      tooltip.className = className;
       tooltip.textContent = opts.text;
       tooltip.setAttribute('role', 'tooltip');
       document.body.appendChild(tooltip);
@@ -68,9 +80,8 @@ export function tooltip(node, opts = {
         computePosition(node, tooltipEl, {
           placement: opts.placement,
           middleware: [
-            autoPlacement(),
-            offset(8), 
-            shift({ padding: 5 }) 
+            offset(opts.offset || 10), 
+            shift({ mainAxis: true, crossAxis: true}) 
           ]
         }).then(({ x, y }) => {
             Object.assign(tooltipEl.style, {
@@ -114,7 +125,7 @@ export function tooltip(node, opts = {
   node.addEventListener('focus', showTooltip);
   node.addEventListener('blur', hideTooltip);
 
-  document.addEventListener('click', hideTooltip);
+  document.addEventListener('click', removeTooltip);
 
   return {
     update(newopts) {
@@ -138,7 +149,7 @@ export function tooltip(node, opts = {
       node.removeEventListener('mouseleave', hideTooltip);
       node.removeEventListener('focus', showTooltip);
       node.removeEventListener('blur', hideTooltip);
-      document.removeEventListener('click', hideTooltip);
+      document.removeEventListener('click', removeTooltip);
 
 
       removeTooltip();
