@@ -219,7 +219,7 @@ let el;
     class:inactive={!active}
     onclick={open}>
 
-    <div class="flex p-2 ml-1 overflow-x-hidden">
+    <div class="flex p-2 ml-2 overflow-x-hidden">
 
         <div class="flex flex-col flex-1 overflow-x-hidden">
             <div class=" text-md leading-normal whitespace-nowrap overflow-hidden text-ellipsis">

@@ -219,10 +219,6 @@ export function createMatrixStore() {
     }
 
 
-    client.once("sync", (state, prevState, data) => {
-      console.log("just once")
-    })
-
     client.on("sync", (state, prevState, data) => {
 
       sync.state = state;
@@ -401,7 +397,6 @@ export function createMatrixStore() {
   }
 
   const emailRoom = async (userIds) => {
-    // First check if a DM room already exists
 
     const existingRoomId = await doesRoomExist(userIds);
 
@@ -414,7 +409,7 @@ export function createMatrixStore() {
 
     // Create a new DM room
     const createRoomResult = await client.createRoom({
-      preset: 'trusted_private_chat',
+      preset: 'private_chat',
       invite: userIds,
       visibility: 'private',
       /*
@@ -425,6 +420,13 @@ export function createMatrixStore() {
       },
       */
       initial_state: [
+        {
+          type: 'm.room.guest_access',
+          state_key: '',
+          content: {
+            guest_access: 'can_join'
+          }
+        },
         {
           type: 'matrixbird.room.type',
           state_key: '',

@@ -71,6 +71,12 @@ function showEmails() {
     collapsed = false
 }
 
+$effect(() => {
+    if($page.params.event) {
+        collapsed = true
+    }
+})
+
 </script>
 
 
@@ -108,7 +114,7 @@ function showEmails() {
 
             {#each split[2] as email, i (email.event_id)}
                 <div class="email-item">
-                    <EmailView {email} last={i == emails.length - 1} />
+                    <EmailView {email} last={i == split[2].length - 1} />
                 </div>
             {/each}
 

@@ -8,12 +8,9 @@ export const actions = {
 
     try {
       let url = `${PUBLIC_APPSERVICE}/auth/session/revoke`;
-      const response = await fetch(url, {
+      fetch(url, {
         headers: { 'Authorization': `Bearer ${session_id}` }
       });
-
-      const data = await response.json();
-      console.log(data)
     } catch(_) {
     }
 

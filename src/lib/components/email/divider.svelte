@@ -6,9 +6,9 @@ let count = $derived(emails?.length);
 
 <div class="divider group cursor-pointer" onclick={showEmails}>
     <div class="divider relative h-1 mt-[-10px]">
-        <div class="border border-bird-300 text-xs rounded absolute
+        <div class="border border-bird-300 text-xs rounded-[500px] absolute
             group-hover:border-bird-400 group-hover:bg-bird-50 
-            left-3 bg-background py-1 px-2">
+            left-3 mt-[-2px] bg-background py-1 px-2">
             {count} more
         </div>
     </div>

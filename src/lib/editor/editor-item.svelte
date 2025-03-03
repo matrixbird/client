@@ -130,6 +130,39 @@ async function process() {
     if(!subject) {
     }
 
+    if(mxids.length == 1 && mxids[0] == store.user?.userId) {
+        console.log("this is for me")
+
+        let self_room = await store.client.getAccountDataFromServer("matrixbird.room.self")
+        console.log(self_room)
+        if(self_room?.room_id) {
+            let room_id = self_room.room_id
+            console.log("room id", room_id)
+
+            const msg = await store.client.sendEvent(
+                room_id,
+                "matrixbird.email.native",
+                {
+                    from: {
+                        name: store.user?.displayName,
+                        address: mxid_to_email(store.user?.userId)
+                    },
+                    subject: subject,
+                    body: {
+                        text: body.text,
+                        html: body.html
+                    }
+                },
+                uuidv4()
+            );
+            console.log('msg', msg)
+
+            closeWindow()
+        }
+
+        return
+    }
+
 
     try {
         //const resp = await store.testRooms()
