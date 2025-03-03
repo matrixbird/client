@@ -59,7 +59,7 @@ let placement = $derived.by(() => {
 })
 
 let mask = $derived.by(() => {
-    if(expanded) return true
+    //if(expanded) return true
     return false
 })
 </script>
@@ -81,9 +81,10 @@ let mask = $derived.by(() => {
     class:active={popup_active}
     class:w-11={!expanded}
     class:h-11={!expanded}
-    class:w-8={expanded}
-    class:h-8={expanded}>
-        <div class="font-semibold text-white uppercase">
+    class:w-7={expanded}
+    class:h-7={expanded}>
+        <div class="font-semibold text-md text-white uppercase"
+            class:text-sm={expanded}>
             {initials} 
         </div>
     </div>

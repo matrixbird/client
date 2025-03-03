@@ -35,6 +35,10 @@ export const email_context_menu = $state({
     element: null,
 });
 
+export const count = $state({
+    inbox: null
+});
+
 
 function getFromLS() {
     if(localStorage.getItem('expanded')) {

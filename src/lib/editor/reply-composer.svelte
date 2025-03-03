@@ -117,7 +117,7 @@ async function focusComposer() {
 <div class="editor grid grid-rows-[auto_1fr_auto] 
     select-none">
 
-    <div class="header flex rounded-t-xl border-t border-x border-bird-300
+    <div class="header flex rounded-t-xl border-t border-x border-bird-200
         sticky top-0">
 
         <div class="flex py-3 px-4 flex-1 place-items-center text-sm text-light ">

@@ -1,6 +1,9 @@
 <script>
 import { PUBLIC_HOMESERVER } from '$env/static/public';
 import { draggable } from '@neodrag/svelte';
+import { 
+    mxid_to_email,
+} from '$lib/utils/matrix.js'
 import { onMount } from 'svelte';
 import {
 	goto,
@@ -8,7 +11,8 @@ import {
 import { browser } from '$app/environment';
 import { page } from '$app/stores';
 import '../../app.css';
-import logo from '../../logo.png'
+
+import Listeners from '$lib/app/listeners.svelte'
 import Header from '$lib/header/header.svelte'
 import Switcher from '$lib/switcher/switcher.svelte'
 import Editor from '$lib/editor/editor.svelte'
@@ -16,9 +20,9 @@ import EmailContextMenu from '$lib/components/email/context-menu.svelte'
 
 import ThemeToggle from '$lib/theme/toggle.svelte'
 
-import Profile from '$lib/profile/profile.svelte'
+import Navbar from '$lib/navbar/navbar.svelte';
 
-import { expand, collapse } from '$lib/assets/icons.js'
+
 
 import { userState, ui_state } from '$lib/store/store.svelte.js'
 import { createStore, dev_mode } from '$lib/store/store.svelte.js'
@@ -45,6 +49,9 @@ $effect(() => {
 onMount(() => {
     if($page.url.hostname == "localhost") {
         dev_mode.enabled = true
+    }
+    if(expanded) {
+        localStorage.removeItem('window')
     }
 })
 
@@ -111,6 +118,7 @@ let dragging = $state(false);
 
 let defaultPosition = $derived.by(() => {
     if(browser && !_expanded && !expanded) {
+        console.log("here")
         let offset = localStorage.getItem('window')
         if(offset) {
             let [x, y] = JSON.parse(offset)
@@ -135,9 +143,8 @@ let dragopts = $derived.by(() => {
             dragging = false
             setTimeout(() => {
                 ui_state.drag_offset = [offsetX, offsetY]
-                localStorage.setItem('window', JSON.stringify([offsetX,
-                offsetY]))
-            }, 100)
+                localStorage.setItem('window', JSON.stringify([offsetX, offsetY]))
+            }, 10)
         },
     }
 })
@@ -151,7 +158,34 @@ function dragEnd(e) {
     dragging = false
 }
 
+let mailbox = $derived.by(() => {
+    return $page.params.mailbox
+})
+
+let title = $derived.by(() => {
+    if(mailbox == "inbox") {
+        return "Inbox"
+    } else if(mailbox == "sent") {
+        return "Sent Mail"
+    } else if(mailbox == "drafts") {
+        return "Drafts"
+    }
+})
+
+let email = $derived.by(() => {
+    return mxid_to_email(data.user_id)
+})
+
+
+
+let width = $state(900);
+let height = $state(600);
+
 </script>
+
+<svelte:head>
+    <title>{title} - {email}</title>
+</svelte:head>
 
 {#if !ready}
     <div class="loading grid h-screen w-screen overflow-hidden">
@@ -161,6 +195,7 @@ function dragEnd(e) {
     </div>
 {/if}
 
+<Listeners />
 <Editor />
 <EmailContextMenu />
 
@@ -172,18 +207,17 @@ function dragEnd(e) {
 {/if}
 
 {#if !expanded && ready}
-    <div class="profile">
-        <Profile />
-    </div>
+    <Navbar />
 {/if}
 
 
 <div class="grid h-screen w-screen overflow-hidden" >
 
     <div class="mb grid grid-rows-[auto_1fr_auto] overflow-hidden bg-white
-            sm:max-w-[1400px] mx-10 justify-self-center self-center 
-            w-full h-full max-h-full select-none
-            lg:h-8/10 lg:max-h-[800px]"
+            mx-10 justify-self-center self-center 
+            w-full h-full max-h-full select-none relative
+            "
+        style="--width:{width}px; --height:{height}px;"
         class:drag-shadow={dragging}
         class:boxed={!expanded}
         class:expanded={expanded} 
@@ -196,11 +230,13 @@ function dragEnd(e) {
 
 
         <div class="overflow-hidden 
-            grid grid-cols-[auto_1fr]"
+            grid"
             class:grid-cols-[3rem_1fr]={expanded}
             class:boxed-content={!expanded}>
 
-            <Switcher />
+            {#if expanded}
+                <Switcher />
+            {/if}
 
 
             <div class="page overflow-hidden">
@@ -209,6 +245,9 @@ function dragEnd(e) {
 
         </div>
 
+        <div class="absolute bottom-0 right-0 h-5 w-5 border-r-2 border-b-2
+            border-bird-400 cursor-nwse-resize">
+        </div>
 
     </div>
 
@@ -225,6 +264,12 @@ function dragEnd(e) {
     bottom: 0;
     z-index: 1000;
 }
+.mb{
+    transition: box-shadow 0.1s;
+    max-width: var(--width);
+    max-height: var(--height);
+}
+
 .expanded {
     height: 100vh;
     width: 100vw;
@@ -238,17 +283,8 @@ function dragEnd(e) {
     bottom: 0;
     translate: 0;
 }
-.profile {
-    position: fixed;
-    z-index: 1000;
-    top: 1rem;
-    right: 1rem;
-}
 
-.mb{
-    transition: box-shadow 0.1s;
-}
 .drag-shadow {
-    box-shadow: 8px 8px 0 theme('colors.bird.400');
+    outline: 4px solid theme('colors.bird.600');
 }
 </style>

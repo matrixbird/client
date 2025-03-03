@@ -8,14 +8,19 @@ let event_open = $derived.by(() => {
     return $page.params.event !== undefined
 })
 
+import { userState, ui_state } from '$lib/store/store.svelte.js'
+let expanded = $derived(ui_state?.expanded)
+
 </script>
 
 <div class="grid grid-cols-[1fr] w-full h-full overflow-hidden" 
-class:open={event_open}>
+class:open={expanded}>
 
-    <ListView />
+    {#if !event_open || expanded}
+        <ListView />
+    {/if}
 
-    {#if event_open}
+    {#if event_open || expanded}
         <div class="overflow-hidden border-l border-border">
             {@render children()}
         </div>
@@ -24,7 +29,7 @@ class:open={event_open}>
 
 <style>
 .open {
-    grid-template-columns: 45% 55%;
+    grid-template-columns: 50% 50%;
 }
 </style>
 

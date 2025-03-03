@@ -4,35 +4,32 @@ import EmailItem from './email-item.svelte'
 import { goto } from '$app/navigation';
 import { page } from '$app/stores';
 
+import { count } from '$lib/store/store.svelte.js'
 
 const store = createMatrixStore()
 const events = $derived(store?.events)
 
 let user = $derived(store?.user)
 
-let processed = $state(null);
+let mailbox = $derived.by(() => {
+    return $page.params.mailbox
+})
 
-let ready = $derived(status?.events_ready == true)
+let is_inbox = $derived.by(() => {
+    return mailbox == "inbox"
+})
+
+let is_sent = $derived.by(() => {
+    return mailbox == "sent"
+})
+
+let is_drafts = $derived.by(() => {
+    return mailbox == "drafts"
+})
 
 $effect(() => {
-    if(events && user) {
-        /*
-        let reversed = events.sort((a, b) => {
-            return b.origin_server_ts - a.origin_server_ts
-        })
-        */
-        let sorted = [...events.values()].sort((a, b) => 
-            b.origin_server_ts - a.origin_server_ts
-        );
-
-        //console.log(user)
-
-        //filter by sender
-        let filtered = sorted.filter((email) => {
-            return email.sender != user.userId
-        })
-
-        processed = sorted
+    if(inbox_emails) {
+        count.inbox = inbox_emails.length
     }
 })
 
@@ -45,7 +42,7 @@ function process(email) {
     return email.sender != user?.userId
 }
 
-function buildEmails(events) {
+function buildInboxEmails(events) {
     if(events && user) {
         let sorted = [...events.values()].sort((a, b) => 
             b.origin_server_ts - a.origin_server_ts
@@ -61,15 +58,17 @@ function buildEmails(events) {
     }
 }
 
-let emails = $derived.by(() => {
-    return buildEmails(events)
+let inbox_emails = $derived.by(() => {
+    if(is_inbox) {
+        return buildInboxEmails(events)
+    }
 })
 
 </script>
 
 <div class="flex flex-col overflow-x-hidden">
-    {#if emails}
-        {#each emails as email (email.event_id)}
+    {#if is_inbox && inbox_emails}
+        {#each inbox_emails as email (email.event_id)}
             <EmailItem {email} />
         {/each}
     {/if}

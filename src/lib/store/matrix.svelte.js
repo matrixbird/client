@@ -284,6 +284,8 @@ export function createMatrixStore() {
       initialSyncLimit: 1000,
       lazyLoadMembers: false,
       disablePresence: true,
+      //threadSupport: true,
+      resolveInvitesToProfiles: true,
     });
 
 

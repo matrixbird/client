@@ -40,13 +40,11 @@ export const envelope_outline = `
 </svg>
 `
 export const envelope_solid = `
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="" class="size-6">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="" class="size-5">
   <path d="M1.5 8.67v8.58a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3V8.67l-8.928 5.493a3 3 0 0 1-3.144 0L1.5 8.67Z" />
   <path d="M22.5 6.908V6.75a3 3 0 0 0-3-3h-15a3 3 0 0 0-3 3v.158l9.714 5.978a1.5 1.5 0 0 0 1.572 0L22.5 6.908Z" />
 </svg>
 `
-
-
 
 export const inbox = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4">
@@ -86,7 +84,7 @@ export const chat_outline = `
 `
 
 export const chat_solid = `
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="" class="size-6">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="" class="size-5">
   <path fill-rule="evenodd" d="M4.848 2.771A49.144 49.144 0 0 1 12 2.25c2.43 0 4.817.178 7.152.52 1.978.292 3.348 2.024 3.348 3.97v6.02c0 1.946-1.37 3.678-3.348 3.97a48.901 48.901 0 0 1-3.476.383.39.39 0 0 0-.297.17l-2.755 4.133a.75.75 0 0 1-1.248 0l-2.755-4.133a.39.39 0 0 0-.297-.17 48.9 48.9 0 0 1-3.476-.384c-1.978-.29-3.348-2.024-3.348-3.97V6.741c0-1.946 1.37-3.68 3.348-3.97Z" clip-rule="evenodd" />
 </svg>
 `
