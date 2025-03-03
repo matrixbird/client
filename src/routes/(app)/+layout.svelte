@@ -21,7 +21,7 @@ import EmailContextMenu from '$lib/components/email/context-menu.svelte'
 import ThemeToggle from '$lib/theme/toggle.svelte'
 
 import Navbar from '$lib/navbar/navbar.svelte';
-import Ghost from '$lib/components/ghost/ghost.svelte';
+
 
 
 import { userState, ui_state } from '$lib/store/store.svelte.js'
@@ -101,11 +101,9 @@ $effect(() => {
         if(offset) {
             let [x, y] = JSON.parse(offset)
             position = { x, y }
-            final_position = { x, y }
             console.log("set init pos from localstorage", position)
         } else {
             position = calcPosition()
-            final_position = calcPosition()
         }
     }
 
@@ -149,11 +147,6 @@ let position = $state({
     y: 0
 })
 
-let final_position = $state({
-    x: 0,
-    y: 0
-})
-
 let resizing = $state(false);
 
 let dragopts = $derived.by(() => {
@@ -178,7 +171,6 @@ let dragopts = $derived.by(() => {
         },
         onDragEnd: ({ offsetX, offsetY, rootNode, currentNode, event }) => {
             dragging = false
-            final_position = { x: offsetX, y: offsetY }
             setTimeout(() => {
                 ui_state.drag_offset = [offsetX, offsetY]
                 localStorage.setItem('window_position', JSON.stringify([offsetX, offsetY]))
@@ -187,44 +179,6 @@ let dragopts = $derived.by(() => {
     }
 })
 
-let ghostPosition = $state(null);
-
-function buildGhostWindow() {
-    let ghost = document.createElement('div')
-    let rect = mb.getBoundingClientRect()
-    let w = rect.width
-    let h = rect.height
-    let top = rect.top
-    let left = rect.left
-    console.log("size", w, h)
-    console.log("pos", top, left)
-
-    ghostPosition = {
-        width: w,
-        height: h,
-        top: top,
-        left: left,
-    }
-
-    /*
-    ghost.style.width = `${w}px`
-    ghost.style.height = `${h}px`
-    ghost.style.position = 'absolute'
-    ghost.style.top = `${top}px`
-    ghost.style.left = `${left}px`
-    ghost.style.zIndex = 1000
-    ghost.style.border = '2px solid red'
-    ghost.style.opacity = 0.5
-    ghost.style.pointerEvents = 'none'
-    document.body.appendChild(ghost)
-    */
-}
-
-$effect(() => {
-    if(dragging) {
-        buildGhostWindow()
-    }
-})
 
 function dragStart(e) {
     dragging = true
@@ -311,9 +265,8 @@ function resize(e) {
     <div class="mb grid grid-rows-[auto_1fr_auto] overflow-hidden bg-background
         select-none absolute
         "
-        style="--width:{width}px;--height:{height}px;--offsetX:{final_position?.x}px;--offsetY:{final_position?.y}px;"
+        style="--width:{width}px; --height:{height}px;--offsetX:{position?.x}px;--offsetY:{position?.y}px;"
         class:drag-shadow={dragging}
-        class:pointer-events-none={dragging}
         class:boxed={!expanded}
         class:expanded={expanded} 
         use:draggable={dragopts}
@@ -354,10 +307,6 @@ function resize(e) {
 {/if}
 
 </div>
-
-{#if dragging}
-    <Ghost init={ghostPosition} {position} />
-{/if}
 
 
 <style>
