@@ -17,7 +17,7 @@ import NewMessage from '$lib/editor/new-message.svelte';
 
 .navbar {
     position: fixed;
-    z-index: 1000;
+    z-index: 1;
     top: 1rem;
     width: 100%;
 }

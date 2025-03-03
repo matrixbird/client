@@ -4,9 +4,9 @@ import { draggable } from '@neodrag/svelte';
 import { 
     mxid_to_email,
 } from '$lib/utils/matrix.js'
-import { onMount } from 'svelte';
+import { onMount, onDestroy } from 'svelte';
 import {
-	goto,
+    goto,
 } from '$app/navigation';
 import { browser } from '$app/environment';
 import { page } from '$app/stores';
@@ -21,7 +21,7 @@ import EmailContextMenu from '$lib/components/email/context-menu.svelte'
 import ThemeToggle from '$lib/theme/toggle.svelte'
 
 import Navbar from '$lib/navbar/navbar.svelte';
-
+import Ghost from '$lib/components/ghost/ghost.svelte';
 
 
 import { userState, ui_state } from '$lib/store/store.svelte.js'
@@ -50,10 +50,21 @@ onMount(() => {
     if($page.url.hostname == "localhost") {
         dev_mode.enabled = true
     }
-    if(expanded) {
-        localStorage.removeItem('window')
+    if(browser) {
+        window.addEventListener('resize', handleResize);
     }
 })
+
+onDestroy(() => {
+    if(browser) {
+        window.removeEventListener('resize', handleResize);
+    }
+})
+
+function handleResize(e) {
+    //position = calcPosition()
+    //localStorage.setItem('window_position', JSON.stringify([position.x,position.y]))
+}
 
 let is_dev_mode = $derived(dev_mode?.enabled);
 
@@ -74,81 +85,146 @@ $effect(() => {
         goto(`/mail/inbox/${first_event.event_id}`)
     }
 
-    if(expanded) {
-        _expanded = true
-        mb.style.translate = '0'
-        mb.style.transform = 'none'
-        setTimeout(() => {
-            mb.style.removeProperty('transform')
-            mb.style.removeProperty('translate')
-        },500)
-    }
-    
+    //calculate when collapsed from expanded position
     if(_expanded && !expanded && browser) {
-        let offset = localStorage.getItem('window')
+        let offset = localStorage.getItem('window_position')
         if(offset) {
             let [x, y] = JSON.parse(offset)
-            mb.style.transform = `translate3d(${x}px,${y}px, 0px)`
+            mb.style.translate = `${x}px, ${y}px`
         }
         _expanded = false
     }
 
+    // calculate on startup
+    if(browser && position.x == 0 && position.y == 0) {
+        let offset = localStorage.getItem('window_position')
+        if(offset) {
+            let [x, y] = JSON.parse(offset)
+            position = { x, y }
+            final_position = { x, y }
+            console.log("set init pos from localstorage", position)
+        } else {
+            position = calcPosition()
+            final_position = calcPosition()
+        }
+    }
+
+    //set initial window size from localstorage
+    if(!resizing) {
+        let size = localStorage.getItem('window_size')
+        if(size) {
+            let [w, h] = JSON.parse(size)
+            width = w
+            height = h
+        }
+    }
+
 })
+
+
+function calcPosition() {
+    if (!browser && !mb) return;
+
+    const width = mb.offsetWidth;
+    const height = mb.offsetHeight;
+
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    const left = (vw - width) / 2;
+    const top = (vh - height) / 2;
+
+    return { x: left, y: top }
+}
 
 
 let mb;
 
 let expanded = $derived(ui_state?.expanded)
 
-function expandWindow() {
-    if(expanded) {
-        ui_state.expanded = false
-    } else {
-        ui_state.expanded = true
-    }
-
-    if(expanded) {
-        localStorage.setItem('expanded', 'true')
-    } else {
-        localStorage.removeItem('expanded')
-    }
-}
-
 let dragging = $state(false);
 
-let defaultPosition = $derived.by(() => {
-    if(browser && !_expanded && !expanded) {
-        console.log("here")
-        let offset = localStorage.getItem('window')
-        if(offset) {
-            let [x, y] = JSON.parse(offset)
-            return { x, y }
-        }
-    }
+let position = $state({
+    x: 0,
+    y: 0
 })
+
+let final_position = $state({
+    x: 0,
+    y: 0
+})
+
+let resizing = $state(false);
 
 let dragopts = $derived.by(() => {
     return {
         handle: '.header',
-        disabled: expanded,
-        position: defaultPosition,
-        bounds: 'body',
+        disabled: expanded || resizing,
+        legacyTranslate: false, 
+        gpuAcceleration: true,
+        position: position,
+        //bounds: 'body',
+        transform: ({ offsetX, offsetY, node }) => {
+            if(!node) return
+            //node.style.translate = `${offsetX + 50}px ${offsetY + 20}px`;
+            //node.style.translate = `${offsetX + 50}px ${offsetY + 20}px`;
+        },
         onDrag: ({ offsetX, offsetY, rootNode, currentNode, event }) => {
             dragging = true
+            position = { x: offsetX, y: offsetY }
         },
         onDragStart: ({ offsetX, offsetY, rootNode, currentNode, event }) => {
             dragging = true
         },
         onDragEnd: ({ offsetX, offsetY, rootNode, currentNode, event }) => {
             dragging = false
+            final_position = { x: offsetX, y: offsetY }
             setTimeout(() => {
                 ui_state.drag_offset = [offsetX, offsetY]
-                localStorage.setItem('window', JSON.stringify([offsetX, offsetY]))
+                localStorage.setItem('window_position', JSON.stringify([offsetX, offsetY]))
             }, 10)
         },
     }
 })
 
+let ghostPosition = $state(null);
+
+function buildGhostWindow() {
+    let ghost = document.createElement('div')
+    let rect = mb.getBoundingClientRect()
+    let w = rect.width
+    let h = rect.height
+    let top = rect.top
+    let left = rect.left
+    console.log("size", w, h)
+    console.log("pos", top, left)
+
+    ghostPosition = {
+        width: w,
+        height: h,
+        top: top,
+        left: left,
+    }
+
+    /*
+    ghost.style.width = `${w}px`
+    ghost.style.height = `${h}px`
+    ghost.style.position = 'absolute'
+    ghost.style.top = `${top}px`
+    ghost.style.left = `${left}px`
+    ghost.style.zIndex = 1000
+    ghost.style.border = '2px solid red'
+    ghost.style.opacity = 0.5
+    ghost.style.pointerEvents = 'none'
+    document.body.appendChild(ghost)
+    */
+}
+
+$effect(() => {
+    if(dragging) {
+        buildGhostWindow()
+    }
+})
 
 function dragStart(e) {
     dragging = true
@@ -177,9 +253,32 @@ let email = $derived.by(() => {
 })
 
 
-
 let width = $state(900);
 let height = $state(600);
+
+
+function startResize(e) {
+    resizing = true
+
+
+    document.addEventListener('mousemove', resize)
+    document.addEventListener('mouseup', stopResize)
+}
+
+function stopResize(e) {
+    resizing = false
+    document.removeEventListener('mousemove', resize)
+    document.removeEventListener('mouseup', stopResize)
+    console.log("final dimentions are", width, height)
+    localStorage.setItem('window_size', JSON.stringify([width, height]))
+}
+
+function resize(e) {
+    if(resizing) {
+        width += e.movementX
+        height += e.movementY
+    }
+}
 
 </script>
 
@@ -199,10 +298,6 @@ let height = $state(600);
 <Editor />
 <EmailContextMenu />
 
-{#if is_dev_mode}
-<ThemeToggle />
-{/if}
-
 {#if new_user}
 {/if}
 
@@ -211,14 +306,14 @@ let height = $state(600);
 {/if}
 
 
-<div class="grid h-screen w-screen overflow-hidden" >
+<div class="grid h-screen w-screen overflow-hidden select-none relative" >
 
-    <div class="mb grid grid-rows-[auto_1fr_auto] overflow-hidden bg-white
-            mx-10 justify-self-center self-center 
-            w-full h-full max-h-full select-none relative
-            "
-        style="--width:{width}px; --height:{height}px;"
+    <div class="mb grid grid-rows-[auto_1fr_auto] overflow-hidden bg-background
+        select-none absolute
+        "
+        style="--width:{width}px;--height:{height}px;--offsetX:{final_position?.x}px;--offsetY:{final_position?.y}px;"
         class:drag-shadow={dragging}
+        class:pointer-events-none={dragging}
         class:boxed={!expanded}
         class:expanded={expanded} 
         use:draggable={dragopts}
@@ -246,12 +341,23 @@ let height = $state(600);
         </div>
 
         <div class="absolute bottom-0 right-0 h-5 w-5 border-r-2 border-b-2
-            border-bird-400 cursor-nwse-resize">
+            hover:border-bird-600
+            border-bird-400 cursor-nwse-resize"
+            onmousedown={startResize}
+            onmouseup={stopResize}>
         </div>
 
     </div>
 
+{#if is_dev_mode}
+    <ThemeToggle />
+{/if}
+
 </div>
+
+{#if dragging}
+    <Ghost init={ghostPosition} {position} />
+{/if}
 
 
 <style>
@@ -264,10 +370,13 @@ let height = $state(600);
     bottom: 0;
     z-index: 1000;
 }
+
 .mb{
-    transition: box-shadow 0.1s;
-    max-width: var(--width);
-    max-height: var(--height);
+    z-index: 2;
+    width: var(--width);
+    height: var(--height);
+    top: var(--offsetY);
+    left: var(--offsetX);
 }
 
 .expanded {

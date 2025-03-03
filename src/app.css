@@ -23,7 +23,7 @@
 
 
 :root {
-    --bg: hsla(0, 0%, 97%, 1);
+    --bg: hsla(0, 0%, 94%, 1);
     --background: hsla(0, 0%, 100%, 1);
     --text: hsla(0, 0%, 10%, 1);
     --light: hsla(0, 0%, 30%, 1);
@@ -50,6 +50,8 @@
     --bird-950: oklch(0.145 0 0);
 
     --spinner: hsla(0, 0%, 0%, 1);
+
+    --box-shadow: theme('colors.bird.200');
 
     --button-background: white;
     --button-text: hsla(0, 0%, 0%, 1);
@@ -82,15 +84,20 @@
     --tooltip-text: hsla(0, 0%, 0%, 1);
     --tooltip-background-dark: theme('colors.bird.800');
     --tooltip-text-dark: hsla(0, 0%, 100%, 1);
+
+    --popup-background: hsla(0, 0%, 100%, 1);
+    --popup-text: hsla(0, 0%, 1%, 1);
+    --popup-border: hsla(0, 0%, 60%, 1);
+    --popup-shadow: hsla(0, 0%, 70%, 1);
 }
 
-:root.black {
-    --bg: hsla(0, 0%, 7%, 1);
-    --background: hsla(0, 0%, 7%, 1);
+:root.dark {
+    --bg: hsla(0, 0%, 15%, 1);
+    --background: hsla(0, 0%, 10%, 1);
     --text: white;
     --light: white;
     --link: hsla(0, 99%, 33%, 1);
-    --border: hsla(0, 0%, 90%, 1);
+    --border: hsla(0, 0%, 9%, 1);
     --primary: hsla(0, 99%, 33%, 1);
     --logo-background: hsla(0, 0%, 10%, 1);
     --logo-fill: hsla(0, 99%, 44%, 1);
@@ -99,10 +106,10 @@
     --icon-hover: hsla(0, 0%, 45%, 1);
     --pattern: red;
 
-    --bird-50: blue;
-    --bird-100: yellow;
+    --bird-50: oklch(0.185 0 0);
+    --bird-100: oklch(0.97 0 0);
     --bird-200: oklch(0.922 0 0);
-    --bird-300: oklch(0.87 0 0);
+    --bird-300: oklch(0.287 0 0);
     --bird-400: oklch(0.708 0 0);
     --bird-500: oklch(0.556 0 0);
     --bird-600: oklch(0.439 0 0);
@@ -113,6 +120,8 @@
 
 
     --spinner: hsla(0, 0%, 100%, 1);
+
+    --box-shadow: transparent;
 
     --button-background: hsla(0, 0%, 15%, 1);
     --button-text: hsla(0, 0%, 100%, 1);
@@ -128,7 +137,7 @@
     --button-primary-active: hsla(0, 0%, 88%, 1);
     --button-primary-border: transparent;
 
-    --input-background: hsla(0, 0%, 100%, 1);
+    --input-background: hsla(0, 0%, 9%, 1);
     --input-border: hsla(0, 0%, 20%, 1);
     --input-focus: hsla(0, 0%, 20%, 1);
     --input-text: hsla(0, 0%, 0%, 1);
@@ -136,13 +145,18 @@
 
     --alert: hsla(0, 100%, 50%, 1);
 
-    --scrollbar-thumb: hsla(0, 0%, 71%, 1);
-    --scrollbar-track: hsla(0, 0%, 90%, 1);
+    --scrollbar-thumb: theme('colors.bird.700');
+    --scrollbar-track: transparent;
 
     --tooltip-background: hsla(0, 0%, 100%, 1);
     --tooltip-text: hsla(0, 0%, 0%, 1);
     --tooltip-background-dark: theme('colors.bird.800');
     --tooltip-text-dark: hsla(0, 0%, 100%, 1);
+
+    --popup-background: hsla(0, 0%, 10%, 1);
+    --popup-text: hsla(0, 0%, 100%, 1);
+    --popup-border: hsla(0, 0%, 20%, 1);
+    --popup-shadow: hsla(0, 0%, 0%, 1);
 }
 
 ::-webkit-scrollbar {
@@ -178,7 +192,6 @@ body {
     margin: 0;
     padding: 0;
     color: var(--text);
-    background-image: linear-gradient(var(--bg) 0%, transparent 30vh);
     width: 100%;
 }
 
@@ -252,6 +265,7 @@ button.primary:disabled:hover {
 input {
     width: 100%;
     border: 1px solid var(--input-border);
+    background-color: var(--background);
 }
 
 input:-webkit-autofill,
@@ -313,7 +327,7 @@ input::placeholder {
 .box {
     background: var(--background);
     border: 1px solid var(--border);
-    box-shadow: 6px 6px 0 theme('colors.bird.200');
+    box-shadow: 6px 6px 0 var(--box-shadow);
     transform: translate(0, 0);
 }
 
@@ -322,7 +336,7 @@ input::placeholder {
 
 
 .boxed {
-    box-shadow: 6px 6px 0 theme('colors.bird.200');
+    box-shadow: 6px 6px 0 var(--box-shadow);
     transform: translate(0, 0);
     background: var(--background);
 }

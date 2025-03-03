@@ -86,7 +86,7 @@ ondblclick={toggleExpand}>
         </div>
     {/if}
 
-    <div class="flex place-items-center silk cursor-pointer tracking-wide
+    <div class="flex place-items-center silk cursor-pointer text-sm py-1
 " class:ml-1={expanded}>
         {title}
     </div>
@@ -95,7 +95,7 @@ ondblclick={toggleExpand}>
         onmousedown={start}
         onmouseup={end}
     class:cursor-grab={!expanded}
-    class:cursor-grabbing={dragging || mousedown}>
+    class:cursor-grabbing={(dragging || mousedown) && !expanded}>
 
     </div>
 

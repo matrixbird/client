@@ -265,13 +265,13 @@ let bb = $derived.by(() => {
 .popup {
     position: absolute;
     z-index: 10000;
-    background: white;
-    border: 1px solid var(--border);
+    background: var(--popup-background);
+    border: 1px solid var(--popup-border);
     transform: translate(0, 0);
     border-radius: 1px;
-    -webkit-box-shadow: 2px 0px 17px 0px rgba(0,0,0,0.23);
-    -moz-box-shadow: 2px 0px 17px 0px rgba(0,0,0,0.23);
-    box-shadow: 2px 0px 17px 0px rgba(0,0,0,0.23);
+    -webkit-box-shadow: 2px 0px 17px 0px var(--popup-shadow);
+    -moz-box-shadow: 2px 0px 17px 0px var(--popup-shadow);
+    box-shadow: 2px 0px 17px 0px var(--popup-shadow);
 }
 
 .popup:hover {
@@ -287,7 +287,7 @@ let bb = $derived.by(() => {
     position: absolute;
     width: 12px;
     height: 12px;
-    background: white;
+    background: var(--popup-background);
     transform: rotate(45deg);
     border-right: var(--br) solid var(--border);
     border-left: var(--bl) solid var(--border);
