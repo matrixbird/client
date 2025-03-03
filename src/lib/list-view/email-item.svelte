@@ -13,7 +13,6 @@ import AttchmentItems from './attachments/attachment-items.svelte'
 import UserAvatar from '$lib/user/avatar.svelte'
 
 import { 
-    lock_closed,
     check_small
 } from '$lib/assets/icons.js'
 
@@ -23,11 +22,24 @@ import {
 } from '$lib/store/store.svelte.js'
 
 import { createMatrixStore } from '$lib/store/matrix.svelte.js'
+
+import { app } from '$lib/store/store.svelte.js'
+
 const store = createMatrixStore()
 const events = $derived(store?.events)
 
 let { email } = $props();
 
+let started_at = $derived(app.started_at)
+
+let is_new = $derived.by(() => {
+    if(!email) return
+    if(active) return
+    if(last_email_in_thread?.sender != store.user.userId) {
+        return last_email_in_thread.origin_server_ts > started_at
+    }
+    return email.origin_server_ts > started_at
+})
 
 let replies = $derived.by(() => {
     let count = 0
@@ -49,6 +61,20 @@ let thread_events = $derived.by(() => {
     return emails
 })
 
+let thread_users = $derived.by(() => {
+    if(thread_events.length == 0) {
+        return email.sender
+    }
+
+    let users = []
+    for (const event of thread_events) {
+        if(!users.includes(event.sender)) {
+            users.push(event.sender)
+        }
+    }
+    return users
+})
+
 let last_email_in_thread = $derived.by(() => {
     let emails = []
     for (const event of events.values()) {
@@ -63,15 +89,23 @@ let last_email_in_thread = $derived.by(() => {
     return email
 })
 
+let which_email = $derived.by(() => {
+    if(last_email_in_thread) {
+
+        return last_email_in_thread
+    }
+    return email
+})
+
 
 let subject = $derived(email?.content?.subject || "no subject")
 
 let name = $derived.by(() => {
-    return email?.content?.from?.name
+    return which_email?.content?.from?.name
 })
 
 let address = $derived.by(() => {
-    return email?.content?.from?.address
+    return which_email?.content?.from?.address
 })
 
 const native = $derived.by(() => {
@@ -79,10 +113,10 @@ const native = $derived.by(() => {
 })
 
 let user = $derived.by(() =>{
-    if(!email?.room_id) return
+    if(!which_email?.room_id) return
 
     let users = store.client.getUsers()
-    let user = users.find(user => user.userId == email.sender)
+    let user = users.find(user => user.userId == which_email.sender)
 
     if(user) {
         return {
@@ -94,7 +128,7 @@ let user = $derived.by(() =>{
 })
 
 let is_matrixbird = $derived.by(() => {
-    return get_localpart(email.sender) == "matrixbird"
+    return get_localpart(which_email.sender) == "matrixbird"
 })
 
 
@@ -174,6 +208,7 @@ async function markRead() {
 
 let el;
 
+
 </script>
 
 
@@ -186,10 +221,8 @@ let el;
 
     <div class="flex p-2 ml-1 overflow-x-hidden">
 
-        <UserAvatar {email} />
-
-        <div class="flex flex-col flex-1 ml-4 overflow-x-hidden">
-            <div class="leading-normal whitespace-nowrap overflow-hidden text-ellipsis">
+        <div class="flex flex-col flex-1 overflow-x-hidden">
+            <div class=" text-md leading-normal whitespace-nowrap overflow-hidden text-ellipsis">
                 {subject}
             </div>
             <div class="mt-1">
@@ -235,15 +268,13 @@ let el;
                 <Date event={email} />
             </div>
 
-            {#if native}
-                <div class="grid place-items-end mt-2">
-                    {@html lock_closed}
-                </div>
-            {/if}
-
         </div>
 
     </div>
+
+    {#if is_new}
+        NEW
+    {/if}
 
     {#if has_attachments}
         <AttchmentItems {email} />

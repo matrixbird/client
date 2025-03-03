@@ -198,6 +198,7 @@ button {
     background-color: var(--button-background);
     color: var(--button-text);
     transition: background-color 0.1s;
+    user-select: none;
 }
 
 button.primary {

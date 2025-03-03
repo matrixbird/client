@@ -77,9 +77,12 @@ $effect(() => {
         },500)
     }
     
-    if(_expanded && !expanded && ui_state?.drag_offset != null) {
-        mb.style.transform = `translate3d(${ui_state.drag_offset[0]}px,
-${ui_state.drag_offset[1]}px, 0px)`
+    if(_expanded && !expanded && browser) {
+        let offset = localStorage.getItem('window')
+        if(offset) {
+            let [x, y] = JSON.parse(offset)
+            mb.style.transform = `translate3d(${x}px,${y}px, 0px)`
+        }
         _expanded = false
     }
 
@@ -121,14 +124,15 @@ let dragopts = $derived.by(() => {
         handle: '.header',
         disabled: expanded,
         position: defaultPosition,
+        bounds: 'body',
         onDrag: ({ offsetX, offsetY, rootNode, currentNode, event }) => {
+            dragging = true
         },
         onDragStart: ({ offsetX, offsetY, rootNode, currentNode, event }) => {
             dragging = true
         },
         onDragEnd: ({ offsetX, offsetY, rootNode, currentNode, event }) => {
             dragging = false
-            console.log('drag end', offsetX, offsetY)
             setTimeout(() => {
                 ui_state.drag_offset = [offsetX, offsetY]
                 localStorage.setItem('window', JSON.stringify([offsetX,
@@ -138,6 +142,14 @@ let dragopts = $derived.by(() => {
     }
 })
 
+
+function dragStart(e) {
+    dragging = true
+}
+
+function dragEnd(e) {
+    dragging = false
+}
 
 </script>
 
@@ -172,13 +184,14 @@ let dragopts = $derived.by(() => {
             sm:max-w-[1400px] mx-10 justify-self-center self-center 
             w-full h-full max-h-full select-none
             lg:h-8/10 lg:max-h-[800px]"
+        class:drag-shadow={dragging}
         class:boxed={!expanded}
         class:expanded={expanded} 
         use:draggable={dragopts}
         bind:this={mb}>
 
         <div class="header">
-            <Header {dragging} />
+            <Header {dragging} {dragStart} {dragEnd} />
         </div>
 
 
@@ -230,5 +243,12 @@ let dragopts = $derived.by(() => {
     z-index: 1000;
     top: 1rem;
     right: 1rem;
+}
+
+.mb{
+    transition: box-shadow 0.1s;
+}
+.drag-shadow {
+    box-shadow: 8px 8px 0 theme('colors.bird.400');
 }
 </style>

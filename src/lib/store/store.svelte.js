@@ -8,6 +8,7 @@ import {
 let session = $state(null);
 
 export const app = $state({
+    started_at: new Date().valueOf(),
     ready: false
 });
 

@@ -25,11 +25,18 @@ let user = $derived.by(() =>{
     }
 })
 
+let initials = $derived.by(() => {
+    return user?.name ? user?.name[0] : ``
+})
+
 </script>
 
 <div class="flex place-items-center">
-    <div class="text-sm bg-bird-700 w-6 h-6 
+    <div class="grid place-items-center text-xs bg-bird-700 w-6 h-6 
         hover:bg-white hover:border-4 hover:border-bird-700
         rounded-[50%]">
+        <div class="font-semibold text-white uppercase">
+            {initials} 
+        </div>
     </div>
 </div>
