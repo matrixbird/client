@@ -1,6 +1,6 @@
 <script>
 import { page } from '$app/stores';
-import { expand, collapse } from '$lib/assets/icons.js'
+import { expand, collapse, inbox } from '$lib/assets/icons.js'
 import { tooltip } from '$lib/components/tooltip/tooltip'
 
 import { ui_state } from '$lib/store/store.svelte.js'
@@ -53,14 +53,42 @@ function end() {
     dragEnd()
 }
 
+let mailbox = $derived.by(() => {
+    return $page.params.mailbox
+})
+
+let mailbox_title = $derived.by(() => {
+    if(mailbox == "inbox") {
+        return "Inbox"
+    } else if(mailbox == "sent") {
+        return "Sent Mail"
+    } else if(mailbox == "drafts") {
+        return "Drafts"
+    }
+})
+
+let title = $derived.by(() => {
+    if(expanded) {
+        return `matrixbird`
+    }
+    return mailbox_title
+})
+
 </script>
 
-<div class="flex bg-bird-900 p-1 text-white font-medium"
+<div class="flex bg-bird-900 text-white font-medium"
+    class:p-1={expanded}
 ondblclick={toggleExpand}>
 
-    <div class="flex place-items-center silk cursor-pointer text ml-1 tracking-wide
-">
-        matrixbird
+    {#if !expanded}
+        <div class="flex place-items-center mx-2 py-1">
+            {@html inbox}
+        </div>
+    {/if}
+
+    <div class="flex place-items-center silk cursor-pointer tracking-wide
+" class:ml-1={expanded}>
+        {title}
     </div>
 
     <div class="flex-1 flex place-items-center ml-3"

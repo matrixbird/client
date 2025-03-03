@@ -285,6 +285,6 @@ let height = $state(600);
 }
 
 .drag-shadow {
-    outline: 4px solid theme('colors.bird.600');
+    outline: 2px solid theme('colors.bird.700');
 }
 </style>

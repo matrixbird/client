@@ -21,7 +21,9 @@ class:open={expanded}>
     {/if}
 
     {#if event_open || expanded}
-        <div class="overflow-hidden border-l border-border">
+        <div class="overflow-hidden"
+        class:border-l={expanded}
+        class:border-border={expanded}>
             {@render children()}
         </div>
     {/if}

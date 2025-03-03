@@ -3,7 +3,9 @@ import EmailView from "$lib/email-view/email-view.svelte";
 import Divider from "$lib/components/email/divider.svelte";
 
 import { page } from '$app/stores';
+import { goto } from '$app/navigation';
 
+import { close } from '$lib/assets/icons.js'
 
 import { createMatrixStore } from '$lib/store/matrix.svelte.js'
 const store = createMatrixStore()
@@ -77,8 +79,21 @@ $effect(() => {
     }
 })
 
+
+function killEmailView() {
+    goto('/mail/inbox')
+}
+
 </script>
 
+<div class="thread-container h-full grid grid-rows-[auto_1fr] overflow-hidden">
+
+    <div class="">
+        <div class="flex place-items-center cursor-pointer" 
+        onclick={killEmailView}>
+            {@html close}
+        </div>
+    </div>
 
 <div class="email-thread h-full overflow-x-auto overflow-y-auto select-text">
 
@@ -125,6 +140,7 @@ $effect(() => {
         no email
     {/if}
 
+</div>
 </div>
 
 <style lang="postcss">

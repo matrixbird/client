@@ -1,13 +1,8 @@
 <script>
 import { page } from '$app/stores';
-import {
-	goto,
-} from '$app/navigation';
-
 import DOMPurify from "dompurify";
 import { mxid_to_email } from '$lib/utils/matrix.js'
 
-import { close } from '$lib/assets/icons.js'
 
 import ReplyComposer from '$lib/editor/reply-composer.svelte'
 
@@ -110,14 +105,9 @@ function killReply() {
 }
 
 let element;
-
-function killEmailView() {
-    goto('/mail/inbox')
-}
-
 </script>
 
-<div class="" bind:this={element}>
+<div class="email-view" bind:this={element}>
 
     <div class="meta p-4 flex flex-col">
         {#if thread_root}
@@ -125,10 +115,6 @@ function killEmailView() {
             <div class="flex place-items-center mb-3">
                 <div class="flex-1 text font-semibold leading-1">
                     {subject}
-                </div>
-                <div class="flex place-items-center cursor-pointer" 
-                onclick={killEmailView}>
-                    {@html close}
                 </div>
             </div>
 

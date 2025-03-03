@@ -14,8 +14,7 @@ function newMessage() {
 
 <button 
     onclick={newMessage}
-    class="flex place-items-center py-2 px-3 w-full min-w-[200px]"
-    class:primary={!expanded}>
+    class="flex place-items-center py-2 px-3 w-full min-w-[200px]">
     <div class="ml-5">
         {@html plus}
     </div>
