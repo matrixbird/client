@@ -11,8 +11,8 @@ import {
     login as appservice_login,
 } from '$lib/appservice/api.js';
 
-import { createStore } from '$lib/store/store.svelte.js'
-const store = createStore()
+import { createMatrixStore } from '$lib/store/matrix.svelte.js'
+const store = createMatrixStore()
 
 onMount(() => {
     usernameInput.focus();
@@ -92,7 +92,13 @@ async function login() {
 
             const json = await res.json();
 
-            console.log("found it", json)
+            console.log("resp", json)
+
+            store.createMatrixClient({
+                user_id: response.user_id,
+                access_token: response.access_token,
+                device_id: response.device_id,
+            })
 
             goto('/mail/inbox')
         }

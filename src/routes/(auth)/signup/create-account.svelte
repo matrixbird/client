@@ -14,6 +14,9 @@ import {
 
 import { page } from '$app/state';
 
+import { createMatrixStore } from '$lib/store/matrix.svelte.js'
+const store = createMatrixStore()
+
 import { userState } from '$lib/store/store.svelte.js'
 
 import { 
@@ -151,10 +154,17 @@ async function process() {
                 method: 'POST',
                 body: JSON.stringify({
                     session_id: response.session_id,
-                    device_id: response.device_id,
+                    //device_id: response.device_id,
                 }),
             });
             userState.new_user = true
+
+            store.createMatrixClient({
+                user_id: response.user_id,
+                access_token: response.access_token,
+                device_id: response.device_id,
+            })
+
             goto('/mail/inbox')
         }
 

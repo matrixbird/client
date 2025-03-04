@@ -1,4 +1,6 @@
+import * as sdk from 'matrix-js-sdk';
 import { SvelteMap } from 'svelte/reactivity';
+import { browser } from '$app/environment';
 
 import { 
   PUBLIC_HOMESERVER,
@@ -17,7 +19,6 @@ let user = $state(null);
 let nextSyncToken = $state(null);
 
 let client = $state(null);
-let sdk;
 let loaded = $state(false);
 
 let rooms = $state({});
@@ -43,16 +44,19 @@ export function createMatrixStore() {
     session = data
   }
 
-  async function createMatrixClient() {
-    console.info("Creating matrix client.")
+  async function createMatrixClient(opts) {
+    console.info("Creating matrix client.", opts)
 
-    sdk = await import('matrix-js-sdk');
+    if(!opts?.access_token || !opts?.user_id || !opts?.device_id) {
+      console.error("No session provided.")
+      return;
+    }
 
-    loaded = true;
+    session = opts
 
     client =  sdk.createClient({
       baseUrl: PUBLIC_HOMESERVER,
-      accessToken: session?.access_token,
+      accessToken: session.access_token,
       userId: session.user_id,
       deviceId: session.device_id,
       timelineSupport: true,
@@ -62,7 +66,7 @@ export function createMatrixStore() {
 
     try {
       const whoami = await client.whoami()
-      //console.log(whoami);
+      console.log(whoami);
     } catch(e) {
       console.log("Error getting whoami", e)
       if(e.errcode === "M_UNKNOWN_TOKEN") {

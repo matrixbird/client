@@ -34,16 +34,16 @@ let {
 
 let ready = $derived(matrixStore?.ready)
 
+let created = $state(false);
+
 $effect(() => {
-    if(data?.access_token && data?.device_id && data?.user_id) {
-        matrixStore.updateSession(data)
-    }
-    if(browser && session) {
-        matrixStore.createMatrixClient()
-    }
 })
 
 onMount(() => {
+    if(data?.access_token && data?.device_id && data?.user_id) {
+        matrixStore.createMatrixClient(data)
+    }
+
     if($page.url.hostname == "localhost") {
         dev_mode.enabled = true
     }
