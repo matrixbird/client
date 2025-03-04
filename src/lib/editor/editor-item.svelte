@@ -400,7 +400,7 @@ let email_placeholder = $derived.by(() => {
 </div>
 
 {#if expanded}
-    <div class="mask" onclick={minimizeWindow}>
+    <div class="mask bg-mask" onclick={minimizeWindow}>
     </div>
 {/if}
 
@@ -432,15 +432,6 @@ button {
     left: 10rem;
 }
 
-.mask {
-    z-index: 99;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: var(--mask);
-}
 
 input, textarea {
     border:none;

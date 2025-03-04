@@ -7,6 +7,7 @@ import {
 } from '@floating-ui/dom';
 
 export function tooltip(node, opts = {
+  disabled: false,
   text: '',
   placement: 'top',
   theme: 'light',
@@ -71,7 +72,11 @@ export function tooltip(node, opts = {
     const tooltipEl = createTooltip();
 
     tooltipEl.style.visibility = 'visible';
-    tooltipEl.style.opacity = '1';
+    if(opts?.disabled) {
+      tooltipEl.style.opacity = '0.4';
+    } else {
+      tooltipEl.style.opacity = '1';
+    }
 
     let _offset = {
       mainAxis: 10,

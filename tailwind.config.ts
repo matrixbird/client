@@ -19,6 +19,7 @@ export default {
                 'switcher': 'var(--switcher)',
                 'sidebar': 'var(--sidebar)',
                 'view': 'var(--view)',
+                'mask': 'var(--mask)',
                 'bird': {
                     50: 'var(--bird-50)',
                     100: 'var(--bird-100)',

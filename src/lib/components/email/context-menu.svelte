@@ -92,6 +92,8 @@ function cleanup() {
         <div class="context-menu-content p-4">
         </div>
     </div>
+    <div class="mask" onclick={kill}>
+    </div>
 {/if}
 
 <style lang="postcss">

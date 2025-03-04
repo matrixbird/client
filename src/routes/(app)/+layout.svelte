@@ -92,15 +92,12 @@ let _expanded = $state(false);
 
 $effect(() => {
     if(!_compact && compact && browser) {
-        console.log("eeek")
-        console.log(width, height)
         if(width < 1280 ) {
             width = 1280
         }
         if(height < 760) {
             height = 760
         }
-        console.log(width, height)
         //position = calcPosition()
         const vw = window.innerWidth;
         const vh = window.innerHeight;
@@ -140,6 +137,21 @@ $effect(() => {
         _expanded = false
         _compact = false
     }
+    if(_compact && !compact && browser) {
+        let offset = localStorage.getItem('window_position')
+        if(offset) {
+            let [x, y] = JSON.parse(offset)
+            position = { x, y }
+        }
+        let size = localStorage.getItem('window_size')
+        if(size) {
+            let [w, h] = JSON.parse(size)
+            width = w
+            height = h
+        }
+        _expanded = false
+        _compact = false
+    }
 
     // calculate on startup
     if(browser && position.x == 0 && position.y == 0) {
@@ -147,7 +159,6 @@ $effect(() => {
         if(offset) {
             let [x, y] = JSON.parse(offset)
             position = { x, y }
-            console.log("set init pos from localstorage", position)
         } else {
             position = calcPosition()
         }
@@ -270,7 +281,6 @@ function stopResize(e) {
     resizing = false
     document.removeEventListener('mousemove', resize)
     document.removeEventListener('mouseup', stopResize)
-    console.log("final dimentions are", width, height)
     localStorage.setItem('window_size', JSON.stringify([width, height]))
 }
 

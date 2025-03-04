@@ -1,6 +1,6 @@
 <script>
 import { page } from '$app/stores';
-import { expand_vertical, collapse, inbox, fullscreen } from '$lib/assets/icons.js'
+import { expand_vertical, circle, collapse, inbox, fullscreen } from '$lib/assets/icons.js'
 import { tooltip } from '$lib/components/tooltip/tooltip'
 
 import { ui_state } from '$lib/store/store.svelte.js'
@@ -10,8 +10,7 @@ let { dragging, dragStart, dragEnd } = $props();
 let expanded = $derived(ui_state?.expanded)
 let compact = $derived(ui_state?.compact)
 
-function toggleExpand() {
-
+function cycle() {
     if(!compact && !expanded) {
         ui_state.compact = true
         localStorage.setItem('compact', 'true')
@@ -35,6 +34,31 @@ function toggleExpand() {
     }
 }
 
+function minimize(e) {
+    e.stopPropagation()
+    console.log("minimizing")
+    ui_state.expanded = false
+    ui_state.compact = false
+    localStorage.removeItem('expanded')
+    localStorage.removeItem('compact')
+}
+
+function expand(e) {
+    e.stopPropagation()
+    ui_state.compact = true
+    ui_state.expanded = false
+    localStorage.setItem('compact', 'true')
+    localStorage.removeItem('expanded')
+}
+
+function maximize(e) {
+    e.stopPropagation()
+    ui_state.compact = false
+    ui_state.expanded = true
+    localStorage.removeItem('compact')
+    localStorage.setItem('expanded', 'true')
+}
+
 
 let placement = $derived.by(() => {
     return expanded ? "bottom" : "top-end"
@@ -44,19 +68,30 @@ let offset = $derived.by(() => {
     return expanded ? [10, -34] : [20, 4]
 })
 
-let text = $derived.by(() => {
-    if(expanded) {
-        return "Minimize"
+let opts_min = $derived.by(() => {
+    return {
+        disabled: !expanded && !compact,
+        text: "Minimize",
+        placement: placement,
+        classes: 'silk',
+        offset: offset,
     }
-    if(compact) {
-        return "Maximize"
-    }
-    return "Expand"
 })
 
-let opts = $derived.by(() => {
+let opts_compact = $derived.by(() => {
     return {
-        text: text,
+        disabled: compact,
+        text: "Expand",
+        placement: placement,
+        classes: 'silk',
+        offset: offset,
+    }
+})
+
+let opts_expanded = $derived.by(() => {
+    return {
+        disabled: expanded,
+        text: "Maximize",
         placement: placement,
         classes: 'silk',
         offset: offset,
@@ -99,8 +134,7 @@ let title = $derived.by(() => {
 </script>
 
 <div class="flex bg-bird-900 text-white font-medium"
-    class:p-1={expanded}
-ondblclick={toggleExpand}>
+ondblclick={cycle}>
 
     {#if !expanded && !compact}
         <div class="flex place-items-center mx-2 py-1">
@@ -123,17 +157,27 @@ ondblclick={toggleExpand}>
     </div>
 
     <div class="cursor-pointer flex place-items-center mr-1"
-    onclick={toggleExpand}
-    use:tooltip={opts}>
-
-        {#if expanded}
-            {@html collapse}
-        {:else if compact}
-            {@html fullscreen}
-        {:else}
-            {@html expand_vertical}
-        {/if}
+        class:opacity-50={!expanded && !compact}
+    onclick={minimize}
+    use:tooltip={opts_min}>
+        {@html circle}
     </div>
+
+    <div class="cursor-pointer flex place-items-center mr-1"
+        class:opacity-50={compact}
+    onclick={expand}
+    use:tooltip={opts_compact}>
+        {@html expand_vertical}
+    </div>
+
+    <div class="cursor-pointer flex place-items-center mr-1"
+        class:opacity-50={expanded}
+    onclick={maximize}
+    use:tooltip={opts_expanded}>
+
+            {@html fullscreen}
+    </div>
+
 </div>
 
 <style lang="postcss">

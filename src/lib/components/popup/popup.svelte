@@ -20,7 +20,7 @@ let {
     offsetDistance = 8,
     showArrow = false,
     action = "click",
-    hoverDelay = 300
+    hoverDelay = 3
 } = $props();
 
 let triggerEl = $state(null);
@@ -152,7 +152,7 @@ function handleMouseLeave() {
         clearTimeout(hoverTimeout);
         hoverTimeout = setTimeout(() => {
             open = false;
-        }, hoverDelay);
+        }, hoverDelay + 500);
     }
 }
 
@@ -166,7 +166,7 @@ function handlePopupMouseLeave() {
     if (action === 'hover') {
         hoverTimeout = setTimeout(() => {
             open = false;
-        }, hoverDelay);
+        }, hoverDelay + 200);
     }
 }
 
