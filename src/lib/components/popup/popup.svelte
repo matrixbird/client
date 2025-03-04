@@ -15,13 +15,43 @@ let {
     toggle,
     trigger,
     content,
-    mask,
-    placement = "bottom-start",
-    offsetDistance = 8,
-    showArrow = false,
-    action = "click",
-    hoverDelay = 3
+    opts = {
+        mask: false,
+        placement: "bottom-start",
+        offsetDistance: [0, 0],
+        showArrow: false,
+        action: "click",
+        hoverDelay: 10,
+        decoration: true,
+    }
 } = $props();
+
+
+let placement = $derived.by(() => {
+    return opts.placement;
+})
+let mask = $derived.by(() => {
+    return opts?.mask || false;
+})
+let offsetDistance = $derived.by(() => {
+    return opts?.offsetDistance || [0, 0];
+})
+let showArrow = $derived.by(() => {
+    return opts?.showArrow || false;
+})
+let action = $derived.by(() => {
+    return opts?.action || "click";
+})
+let hoverDelay = $derived.by(() => {
+    return opts?.hoverDelay || 10;
+})
+let decoration = $derived.by(() => {
+    if(opts?.decoration === undefined) {
+        return true;
+    }
+    return opts?.decoration;
+})
+
 
 let triggerEl = $state(null);
 let popupEl = $state(null);
@@ -41,9 +71,11 @@ function updatePosition() {
     }
 
     const middleware = [
-        offset(offsetDistance),
+        offset({
+            mainAxis: offsetDistance[1],
+            crossAxis: offsetDistance[0],
+        }),
         flip(),
-        shift({ padding: 5 }),
     ];
 
     if (showArrow && arrowEl) {
@@ -152,7 +184,7 @@ function handleMouseLeave() {
         clearTimeout(hoverTimeout);
         hoverTimeout = setTimeout(() => {
             open = false;
-        }, hoverDelay + 500);
+        }, hoverDelay);
     }
 }
 
@@ -166,7 +198,7 @@ function handlePopupMouseLeave() {
     if (action === 'hover') {
         hoverTimeout = setTimeout(() => {
             open = false;
-        }, hoverDelay + 200);
+        }, hoverDelay);
     }
 }
 
@@ -238,6 +270,7 @@ let bb = $derived.by(() => {
 {#if open}
     <div 
         class="popup"
+        class:decoration={decoration}
         style="--br: {br}px;--bl: {bl}px;--bt: {bt}px;--bb: {bb}px;"
         bind:this={popupEl}
         role="dialog"
@@ -265,6 +298,10 @@ let bb = $derived.by(() => {
 .popup {
     position: absolute;
     z-index: 10000;
+    transform: translate(0, 0);
+}
+
+.decoration {
     background: var(--popup-background);
     border: 1px solid var(--popup-border);
     transform: translate(0, 0);
@@ -276,7 +313,6 @@ let bb = $derived.by(() => {
 
 .popup:hover {
 }
-
 
 .popup-content {
     position: relative;

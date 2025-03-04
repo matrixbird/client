@@ -62,10 +62,20 @@ let mask = $derived.by(() => {
     //if(expanded) return true
     return false
 })
+
+
+    let opts = $derived.by(() => {
+    return {
+        mask: mask,
+        placement: placement,
+        offsetDistance: [0, 20],
+    }
+})
+
 </script>
 
-<Popup bind:this={popup} {placement} {mask}
-    offsetDistance={10} {trigger} {content} {toggle}>
+<Popup bind:this={popup} {opts}
+    {trigger} {content} {toggle}>
 
 </Popup>
 

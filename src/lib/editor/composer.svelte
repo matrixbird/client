@@ -3,6 +3,13 @@ import { onMount, onDestroy } from 'svelte';
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 
+import { ui_state } from '$lib/store/store.svelte.js'
+
+let expanded = $derived(ui_state?.expanded)
+let compact = $derived(ui_state?.compact)
+let minimized = $derived(!expanded && !compact)
+
+
 let { 
     state,
     updateComposer, 
@@ -59,20 +66,21 @@ export function focus() {
 <div class="composer px-4" 
     class:pt-4={!isReply}
     class:mr-1={isReply}
-    class:mxh={isReply}
+    class:max-h-[50dvh]={!isReply}
+    class:max-h-[30dvh]={isReply && expanded}
+    class:max-h-[15dvh]={isReply && compact}
+    class:max-h-[10dvh]={isReply && minimized}
     onclick={focus}
     bind:this={element}></div>
 
-<style>
+<style lang="postcss">
+@reference "tailwindcss/theme";
+
 .composer {
     overflow: auto;
-    max-height: 60dvh;
     height: 100%;
     cursor: text;
     outline: none;
-}
-.mxh {
-    max-height: 30dvh;
 }
 </style>
 

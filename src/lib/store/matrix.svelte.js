@@ -375,8 +375,10 @@ export function createMatrixStore() {
 
     for (const room of rooms) {
       // Check if the room has the required state event
-      const stateEvent = room.currentState.getStateEvents("matrixbird.room.type", "");
-      if (!stateEvent || stateEvent.getContent().type !== "email") continue;
+      let stateEvent = room.currentState.getStateEvents("matrixbird.room.type")[0];
+      let is_email = stateEvent.getContent().type === "EMAIL";
+      let is_inbox = stateEvent.getContent().type === "INBOX";
+      if (!stateEvent || (!is_email && !is_inbox) ) continue;
 
       // Get all joined members in the room
       const joinedMembers = room.getJoinedMembers();
@@ -443,7 +445,7 @@ export function createMatrixStore() {
           type: 'matrixbird.room.type',
           state_key: '',
           content: {
-            type: 'email'
+            type: 'EMAIL'
           }
         },
         /*

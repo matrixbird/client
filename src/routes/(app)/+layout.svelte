@@ -402,5 +402,6 @@ function resize(e) {
 
 .drag-shadow {
     outline: 2px solid theme('colors.bird.700');
+    box-shadow: none;
 }
 </style>

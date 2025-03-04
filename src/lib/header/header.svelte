@@ -3,12 +3,15 @@ import { page } from '$app/stores';
 import { expand_vertical, circle, collapse, inbox, fullscreen } from '$lib/assets/icons.js'
 import { tooltip } from '$lib/components/tooltip/tooltip'
 
+import Mailbox from './mailbox.svelte'
+
 import { ui_state } from '$lib/store/store.svelte.js'
 
 let { dragging, dragStart, dragEnd } = $props();
 
 let expanded = $derived(ui_state?.expanded)
 let compact = $derived(ui_state?.compact)
+let minimized = $derived(!expanded && !compact)
 
 function cycle() {
     if(!compact && !expanded) {
@@ -136,17 +139,17 @@ let title = $derived.by(() => {
 <div class="flex bg-bird-900 text-white font-medium"
 ondblclick={cycle}>
 
-    {#if !expanded && !compact}
-        <div class="flex place-items-center mx-2 py-1">
-            {@html inbox}
-        </div>
+    {#if !expanded && !compact && minimized}
+        <Mailbox />
     {/if}
 
-    <div class="flex place-items-center silk cursor-pointer text-sm py-1" 
-        class:ml-2={compact}
-        class:ml-1={expanded}>
-        {title}
-    </div>
+    {#if !minimized}
+        <div class="flex place-items-center silk cursor-pointer text-sm py-1" 
+            class:ml-2={compact}
+            class:ml-1={expanded}>
+            matrixbird
+        </div>
+    {/if}
 
     <div class="flex-1 flex place-items-center ml-3"
         onmousedown={start}

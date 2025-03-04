@@ -89,10 +89,12 @@ let replying = $derived.by(() => {
 })
 
 function reply() {
+    /*
     if(email.type == "matrixbird.email.legacy") {
         alert("Replying to regular emails is disabled for now.")
         return
     }
+    */
 
     reply_editors[email?.event_id] = {
         email: email,
@@ -105,9 +107,19 @@ function killReply() {
 }
 
 let element;
+
+function debug(e) {
+    if(e.ctrlKey) {
+        console.log($state.snapshot(email))
+    }
+}
+
+let debug_mode = $state(false);
+
 </script>
 
-<div class="email-view" bind:this={element}>
+<div class="email-view" bind:this={element}
+    onclick={debug}>
 
     <div class="meta p-4 flex flex-col">
         {#if thread_root}
