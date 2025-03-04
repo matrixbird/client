@@ -8,7 +8,6 @@ const logo = `
    id="svg1"
    inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
    sodipodi:docname="logo-latest.svg"
-   inkscape:export-filename="logo-new.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -72,12 +71,12 @@ const logo = `
     <path
        d="M 24.201722,73.761148 V 26.238839 h 9.504465 v 9.504455 h 9.504456 v 9.504466 h 9.504466 v 9.504466 H 43.210643 V 45.24776 h -9.504456 v 28.513388 z m 38.017853,0 V 45.24776 h -9.504466 v -9.504466 h 9.504466 v -9.504455 h 9.504466 v 47.522309 z"
        id="text1"
-       style="fill:#ffffff;fill-opacity:0.397332;stroke-width:1.01993"
+       style="fill:var(--logo-fill);fill-opacity:0.397332;stroke-width:1.01993"
        aria-label="M" />
     <path
        d="M 28.275952,73.761148 V 26.238839 h 9.504465 v 9.504455 h 9.504456 v 9.504466 h 9.504466 v 9.504466 H 47.284873 V 45.24776 h -9.504456 v 28.513388 z m 38.017853,0 V 45.24776 h -9.504466 v -9.504466 h 9.504466 v -9.504455 h 9.504466 v 47.522309 z"
        id="text1-2"
-       style="fill:#ffffff;stroke-width:1.01993"
+       style="fill:var(--logo-fill);stroke-width:1.01993"
        aria-label="M" />
   </g>
 </svg>

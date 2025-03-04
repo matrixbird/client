@@ -1,28 +1,22 @@
 <script>
+import '../../app.css';
 import { PUBLIC_HOMESERVER } from '$env/static/public';
-import { draggable } from '@neodrag/svelte';
-import { 
-    mxid_to_email,
-} from '$lib/utils/matrix.js'
 import { onMount, onDestroy } from 'svelte';
-import {
-    goto,
-} from '$app/navigation';
+import { goto } from '$app/navigation';
 import { browser } from '$app/environment';
 import { page } from '$app/stores';
-import '../../app.css';
+import { draggable } from '@neodrag/svelte';
+import { mxid_to_email } from '$lib/utils/matrix.js'
+
+import logo from '$lib/logo/logo.js'
 
 import Listeners from '$lib/app/listeners.svelte'
 import Header from '$lib/header/header.svelte'
 import Switcher from '$lib/switcher/switcher.svelte'
 import Editor from '$lib/editor/editor.svelte'
 import EmailContextMenu from '$lib/components/email/context-menu.svelte'
-
 import ThemeToggle from '$lib/theme/toggle.svelte'
-
 import Navbar from '$lib/navbar/navbar.svelte';
-
-
 
 import { userState, ui_state } from '$lib/store/store.svelte.js'
 import { createStore, dev_mode } from '$lib/store/store.svelte.js'
@@ -33,7 +27,10 @@ const matrixStore = createMatrixStore()
 
 const session = $derived(matrixStore?.session)
 
-let { data, children } = $props();
+let { 
+    data, 
+    children 
+} = $props();
 
 let ready = $derived(matrixStore?.ready)
 
@@ -292,8 +289,8 @@ function resize(e) {
 
 {#if !ready}
     <div class="loading grid h-screen w-screen overflow-hidden">
-        <div class="flex flex-col justify-self-center self-center">
-            <div class="spinner"></div>
+        <div class="logo animate-pulse animate-ping duration-[0.1s] flex flex-col h-10 w-10 justify-self-center self-center">
+            {@html logo}
         </div>
     </div>
 {/if}

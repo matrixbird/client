@@ -31,7 +31,7 @@
     --border: hsla(0, 0%, 75%, 1);
     --primary: hsla(0, 99%, 33%, 1);
     --logo-background: hsla(0, 0%, 10%, 1);
-    --logo-fill: hsla(0, 99%, 44%, 1);
+    --logo-fill: hsla(0, 0%, 100%, 1);
     --logo-fill-inactive: hsla(0, 100%, 41.6%, 1);
     --icon: hsla(0, 0%, 25%, 1);
     --icon-hover: hsla(0, 0%, 45%, 1);
@@ -93,7 +93,7 @@
     --mask: rgba(0, 0, 0, 0.2);
 }
 
-:root.dark {
+:root.black {
     --bg: hsla(0, 0%, 3%, 1);
     --background: hsla(0, 0%, 15%, 1);
     --text: white;
