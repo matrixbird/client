@@ -45,7 +45,11 @@ export function createMatrixStore() {
   }
 
   async function createMatrixClient(opts) {
-    console.info("Creating matrix client.", opts)
+
+    if(session) {
+      console.info("Session already exists.")
+      return;
+    }
 
     if(!opts?.access_token || !opts?.user_id || !opts?.device_id) {
       console.error("No session provided.")
@@ -53,6 +57,8 @@ export function createMatrixStore() {
     }
 
     session = opts
+
+    console.info("Creating matrix client.", opts)
 
     client =  sdk.createClient({
       baseUrl: PUBLIC_HOMESERVER,
