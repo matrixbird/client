@@ -75,24 +75,36 @@ const first_event = $derived.by(() => {
 })
 let new_user = $derived(userState?.new_user)
 
-let _expanded = $state(false);
+let _compact = $state(false);
 
 $effect(() => {
+    if(!_compact && compact && browser) {
+        console.log(width, height)
+        if(width < 1400 ) {
+            width = 1400
+        }
+        if(height < 900) {
+            height = 900
+        }
+        console.log(width, height)
+        //position = calcPosition()
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+
+        const left = (vw - width) / 2;
+        const top = (vh - height) / 2;
+        position = { x: left, y: top }
+        //localStorage.setItem('window_position', JSON.stringify([left, top]))
+        //localStorage.setItem('window_size', JSON.stringify([width, height]))
+
+        _compact = true
+    }
+
     if(new_user){
     }
     if(new_user && first_event) {
         userState.new_user = false
         goto(`/mail/inbox/${first_event.event_id}`)
-    }
-
-    //calculate when collapsed from expanded position
-    if(_expanded && !expanded && browser) {
-        let offset = localStorage.getItem('window_position')
-        if(offset) {
-            let [x, y] = JSON.parse(offset)
-            mb.style.translate = `${x}px, ${y}px`
-        }
-        _expanded = false
     }
 
     // calculate on startup
@@ -108,7 +120,7 @@ $effect(() => {
     }
 
     //set initial window size from localstorage
-    if(!resizing) {
+    if(!resizing && !_compact) {
         let size = localStorage.getItem('window_size')
         if(size) {
             let [w, h] = JSON.parse(size)
@@ -139,6 +151,7 @@ function calcPosition() {
 let mb;
 
 let expanded = $derived(ui_state?.expanded)
+let compact = $derived(ui_state?.compact)
 
 let dragging = $state(false);
 

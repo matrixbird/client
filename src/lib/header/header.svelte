@@ -8,18 +8,30 @@ import { ui_state } from '$lib/store/store.svelte.js'
 let { dragging, dragStart, dragEnd } = $props();
 
 let expanded = $derived(ui_state?.expanded)
+let compact = $derived(ui_state?.compact)
 
 function toggleExpand() {
-    if(expanded) {
-        ui_state.expanded = false
-    } else {
+
+    if(!compact && !expanded) {
+        ui_state.compact = true
+        localStorage.setItem('compact', 'true')
+        localStorage.removeItem('expanded')
+        return
+    }
+
+    if(compact && !expanded) {
+        ui_state.compact = false
         ui_state.expanded = true
+        localStorage.removeItem('compact')
+        localStorage.setItem('expanded', 'true')
+        return
     }
 
     if(expanded) {
-        localStorage.setItem('expanded', 'true')
-    } else {
+        ui_state.expanded = false
         localStorage.removeItem('expanded')
+        localStorage.removeItem('compact')
+        return
     }
 }
 
@@ -68,7 +80,7 @@ let mailbox_title = $derived.by(() => {
 })
 
 let title = $derived.by(() => {
-    if(expanded) {
+    if(expanded || compact) {
         return `matrixbird`
     }
     return mailbox_title
@@ -80,14 +92,14 @@ let title = $derived.by(() => {
     class:p-1={expanded}
 ondblclick={toggleExpand}>
 
-    {#if !expanded}
+    {#if !expanded && !compact}
         <div class="flex place-items-center mx-2 py-1">
             {@html inbox}
         </div>
     {/if}
 
     <div class="flex place-items-center silk cursor-pointer text-sm py-1
-" class:ml-1={expanded}>
+" class:ml-1={expanded || compact}>
         {title}
     </div>
 

@@ -22,6 +22,7 @@ export const userState = $state({
 
 export const ui_state = $state({
     expanded: false,
+    compact: false,
     drag_offset: null,
 });
 
@@ -40,15 +41,16 @@ export const count = $state({
 });
 
 
-function getFromLS() {
-    if(localStorage.getItem('expanded')) {
+function getFromLS(item) {
+    if(localStorage.getItem(item)) {
         return true
     }
     return false
 }
 
 if(browser) {
-    ui_state.expanded = getFromLS()
+    ui_state.expanded = getFromLS('expanded')
+    ui_state.compact = getFromLS('compact')
 }
 
 export function createStore() {
