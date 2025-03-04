@@ -426,8 +426,8 @@ button {
 
 .expand {
     position: fixed;
-    top: 3rem;
-    bottom: 3rem;
+    top: 4rem;
+    bottom: 4rem;
     right: 10rem;
     left: 10rem;
 }

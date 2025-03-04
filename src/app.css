@@ -89,11 +89,13 @@
     --popup-text: hsla(0, 0%, 1%, 1);
     --popup-border: hsla(0, 0%, 60%, 1);
     --popup-shadow: hsla(0, 0%, 70%, 1);
+
+    --mask: rgba(0, 0, 0, 0.2);
 }
 
-:root.black {
-    --bg: hsla(0, 0%, 15%, 1);
-    --background: hsla(0, 0%, 10%, 1);
+:root.dark {
+    --bg: hsla(0, 0%, 3%, 1);
+    --background: hsla(0, 0%, 15%, 1);
     --text: white;
     --light: white;
     --link: hsla(0, 99%, 33%, 1);
@@ -157,6 +159,8 @@
     --popup-text: hsla(0, 0%, 100%, 1);
     --popup-border: hsla(0, 0%, 20%, 1);
     --popup-shadow: hsla(0, 0%, 0%, 1);
+
+    --mask: rgba(0, 0, 0, 0.8);
 }
 
 ::-webkit-scrollbar {

@@ -307,6 +307,7 @@ function resize(e) {
 
 {#if !expanded && ready}
     <Navbar />
+    <Switcher />
 {/if}
 
 
@@ -361,7 +362,7 @@ function resize(e) {
 
 <style>
 .loading {
-    background: var(--background);
+    background: var(--bg);
     position: fixed;
     top: 0;
     left: 0;

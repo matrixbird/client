@@ -2,6 +2,12 @@
 import { page } from '$app/stores';
 import { goto } from '$app/navigation';
 import Profile from '$lib/profile/profile.svelte'
+
+import { ui_state } from '$lib/store/store.svelte.js'
+
+let expanded = $derived(ui_state?.expanded)
+let compact = $derived(ui_state?.compact)
+
 import { 
     settings
 } from '$lib/assets/icons'
@@ -11,20 +17,22 @@ import Chat from './chat.svelte'
 
 import Settings from './settings.svelte'
 
-import { ui_state } from '$lib/store/store.svelte.js'
-let expanded = $derived(ui_state?.expanded)
 
 </script>
 
-<div class="flex flex-col border-r border-border py-3 gap-2">
+<div class="flex flex-col py-3 gap-2"
+class:gap-3={!expanded}
+class:border-r={expanded}
+class:border-border={expanded}
+class:float={!expanded}>
 
     {#if expanded}
         <Profile />
     {/if}
 
-    <Mail />
+    <Mail {expanded} />
 
-    <Chat />
+    <Chat {expanded} />
 
     <div class="flex-1 grid place-items-center">
     </div>
@@ -34,4 +42,11 @@ let expanded = $derived(ui_state?.expanded)
 </div>
 
 <style>
+.float {
+    position: fixed;
+    top: 5rem;
+    bottom: 2rem;
+    left: 1rem;
+    z-index: 5;
+}
 </style>

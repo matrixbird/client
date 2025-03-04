@@ -79,8 +79,8 @@ let mask = $derived.by(() => {
         hover:bg-bird-800 grid place-items-center 
         bg-bird-900" 
     class:active={popup_active}
-    class:w-11={!expanded}
-    class:h-11={!expanded}
+    class:w-10={!expanded}
+    class:h-10={!expanded}
     class:w-7={expanded}
     class:h-7={expanded}>
         <div class="font-semibold text-md text-white uppercase"

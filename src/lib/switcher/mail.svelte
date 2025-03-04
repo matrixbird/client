@@ -6,6 +6,8 @@ import { tooltip } from '$lib/components/tooltip/tooltip'
 
 import { route_state } from '$lib/store/store.svelte.js'
 
+let {expanded} = $props();
+
 import { 
     envelope_outline, 
     envelope_solid,
@@ -37,7 +39,10 @@ let opts = {
 <div class="grid place-items-center cursor-pointer mx-1"
 onclick={open} use:tooltip={opts}>
 
-    <div class="icon p-1 rounded" class:active={active}>
+    <div class="icon p-1 rounded h-7 w-7" 
+        class:h-8={!expanded}
+        class:w-8={!expanded}
+        class:active={active}>
         {@html envelope_solid}
     </div>
 </div>
