@@ -1,6 +1,6 @@
 <script>
 import { page } from '$app/stores';
-import { expand, collapse, inbox } from '$lib/assets/icons.js'
+import { expand_vertical, collapse, inbox, fullscreen } from '$lib/assets/icons.js'
 import { tooltip } from '$lib/components/tooltip/tooltip'
 
 import { ui_state } from '$lib/store/store.svelte.js'
@@ -44,9 +44,19 @@ let offset = $derived.by(() => {
     return expanded ? [10, -34] : [20, 4]
 })
 
+let text = $derived.by(() => {
+    if(expanded) {
+        return "Minimize"
+    }
+    if(compact) {
+        return "Maximize"
+    }
+    return "Expand"
+})
+
 let opts = $derived.by(() => {
     return {
-        text: expanded ? "Minimize" : "Maximize",
+        text: text,
         placement: placement,
         classes: 'silk',
         offset: offset,
@@ -98,8 +108,9 @@ ondblclick={toggleExpand}>
         </div>
     {/if}
 
-    <div class="flex place-items-center silk cursor-pointer text-sm py-1
-" class:ml-1={expanded || compact}>
+    <div class="flex place-items-center silk cursor-pointer text-sm py-1" 
+        class:ml-2={compact}
+        class:ml-1={expanded}>
         {title}
     </div>
 
@@ -117,8 +128,10 @@ ondblclick={toggleExpand}>
 
         {#if expanded}
             {@html collapse}
+        {:else if compact}
+            {@html fullscreen}
         {:else}
-            {@html expand}
+            {@html expand_vertical}
         {/if}
     </div>
 </div>

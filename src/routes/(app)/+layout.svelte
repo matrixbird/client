@@ -52,8 +52,22 @@ onMount(() => {
     }
     if(browser) {
         window.addEventListener('resize', handleResize);
+        setTimeout(() => {
+            storeWindow()
+        }, 1000)
     }
 })
+
+function storeWindow() {
+    let pos = localStorage.getItem('window_position')
+    if(!pos) {
+        localStorage.setItem('window_position', JSON.stringify([position.x,position.y]))
+    }
+    let size = localStorage.getItem('window_size')
+    if(!size) {
+        localStorage.setItem('window_size', JSON.stringify([width, height]))
+    }
+}
 
 onDestroy(() => {
     if(browser) {
@@ -77,14 +91,17 @@ let new_user = $derived(userState?.new_user)
 
 let _compact = $state(false);
 
+let _expanded = $state(false);
+
 $effect(() => {
     if(!_compact && compact && browser) {
+        console.log("eeek")
         console.log(width, height)
-        if(width < 1400 ) {
-            width = 1400
+        if(width < 1280 ) {
+            width = 1280
         }
-        if(height < 900) {
-            height = 900
+        if(height < 760) {
+            height = 760
         }
         console.log(width, height)
         //position = calcPosition()
@@ -100,11 +117,31 @@ $effect(() => {
         _compact = true
     }
 
-    if(new_user){
-    }
     if(new_user && first_event) {
-        userState.new_user = false
-        goto(`/mail/inbox/${first_event.event_id}`)
+        //userState.new_user = false
+        //goto(`/mail/inbox/${first_event.event_id}`)
+    }
+
+
+    if(browser && expanded) {
+        _expanded = true
+    }
+
+    //calculate when collapsed from expanded position
+    if(_expanded && !expanded && browser) {
+        let offset = localStorage.getItem('window_position')
+        if(offset) {
+            let [x, y] = JSON.parse(offset)
+            position = { x, y }
+        }
+        let size = localStorage.getItem('window_size')
+        if(size) {
+            let [w, h] = JSON.parse(size)
+            width = w
+            height = h
+        }
+        _expanded = false
+        _compact = false
     }
 
     // calculate on startup
@@ -220,8 +257,8 @@ let email = $derived.by(() => {
 })
 
 
-let width = $state(900);
-let height = $state(600);
+let width = $state(700);
+let height = $state(500);
 
 
 function startResize(e) {

@@ -273,7 +273,6 @@ let el;
     </div>
 
     {#if is_new}
-        NEW
     {/if}
 
     {#if has_attachments}
