@@ -84,10 +84,11 @@ let mask = $derived.by(() => {
 {/snippet}
 
 {#snippet trigger()}
-<div class="grid place-items-center w-full mb-2 select-none">
+<div class="grid place-items-center w-full select-none">
     <div class="user rounded-[50%] cursor-pointer
         hover:bg-bird-800 grid place-items-center 
         bg-bird-900" 
+    class:mb-2={expanded}
     class:active={popup_active}
     class:w-10={!expanded}
     class:h-10={!expanded}

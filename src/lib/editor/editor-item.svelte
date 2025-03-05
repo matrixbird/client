@@ -10,6 +10,8 @@ import {
     mxid_to_email
 } from '$lib/utils/matrix.js'
 
+import { tooltip } from '$lib/components/tooltip/tooltip'
+
 import {
     validate,
     get_email_domain
@@ -29,7 +31,7 @@ const store = createMatrixStore()
 import { createEditorStore } from '$lib/store/editor.svelte.js'
 const editorStore = createEditorStore()
 
-let { item, index } = $props();
+let { editor, index } = $props();
 
 let expanded = $state(false)
 let minimized = $state(false)
@@ -40,7 +42,7 @@ let maximized_exists = $derived.by(() => {
 
 $effect(() => {
     if(maximized_exists) {
-        if(editorStore.maximized != item.id) {
+        if(editorStore.maximized != editor.id) {
             minimizeWindow()
         }
     }
@@ -62,14 +64,14 @@ function expandWindow() {
 
 $effect(() => {
     if(expanded) {
-        editorStore.maximizeEditor(item.id)
+        editorStore.maximizeEditor(editor.id)
     }
 })
 
 function minimizeWindow() {
     minimized = true
     expanded = false
-    if(editorStore.maximized === item.id) {
+    if(editorStore.maximized === editor.id) {
         editorStore.maximizeEditor(null)
     }
 }
@@ -85,7 +87,7 @@ function toggleMinimize() {
 }
 
 function closeWindow() {
-    editorStore.killEditor(item.id)
+    editorStore.killEditor(editor.id)
 }
 
 
@@ -350,6 +352,36 @@ let email_placeholder = $derived.by(() => {
     }
 })
 
+let opts_min = $derived.by(() => {
+    return {
+        disabled: false,
+        text: minimized ? "Maximize" : "Minimize",
+        placement: 'top-end',
+        classes: 'silk',
+        offset: [12, 4]
+    }
+})
+
+let opts_exp = $derived.by(() => {
+    return {
+        disabled: false,
+        text: expanded ? "Collapse" : "Expand",
+        placement: 'top-end',
+        classes: 'silk',
+        offset: [12, 4]
+    }
+})
+
+let opts_close = $derived.by(() => {
+    return {
+        disabled: false,
+        text: 'Save & Close',
+        placement: 'top-end',
+        classes: 'silk',
+        offset: [12, 4]
+    }
+})
+
 </script>
 
 
@@ -359,16 +391,17 @@ let email_placeholder = $derived.by(() => {
     class:base={!expanded}
     class:expand={expanded}>
 
-    <div class="flex bg-bird-900 text-white font-medium"
+    <div class="editor-header flex bg-bird-900 text-white font-medium"
     >
 
-        <div class="flex py-1 px-2 flex-1 place-items-center cursor-pointer text-sm ml-1 tracking-wide"
+        <div class="flex px-2 flex-1 place-items-center cursor-pointer text-sm ml-1 tracking-wide"
             onclick={toggleMinimize}>
             {subject ? subject : `New Message`}
         </div>
 
 
         <div class="cursor-pointer flex place-items-center mr-1"
+        use:tooltip={opts_min}
             onclick={toggleMinimize}>
             {#if minimized}
                 {@html maximize}
@@ -378,6 +411,7 @@ let email_placeholder = $derived.by(() => {
         </div>
 
         <div class="cursor-pointer flex place-items-center mr-1"
+        use:tooltip={opts_exp}
             onclick={expandWindow}>
             {#if expanded}
                 {@html collapse}
@@ -387,6 +421,7 @@ let email_placeholder = $derived.by(() => {
         </div>
 
         <div class="cursor-pointer flex place-items-center mr-1"
+        use:tooltip={opts_close}
             onclick={closeWindow}>
             {@html close}
         </div>

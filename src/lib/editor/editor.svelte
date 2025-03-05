@@ -4,23 +4,23 @@ import EditorItem from './editor-item.svelte';
 import { createEditorStore } from '$lib/store/editor.svelte.js'
 const store = createEditorStore()
 
-let items = $derived.by(() => {
-    return store.editor?.items
+let editors = $derived.by(() => {
+    return store.editor?.editors
 })
 
 
 let active = $derived.by(() => {
-    return items?.length > 0
+    return editors?.length > 0
 })
 
 
 </script>
 
 
-{#if items && active}
+{#if editors && active}
 <div class="editors flex gap-3 items-end">
-    {#each items as item, i (item.id)}
-        <EditorItem {item} index={i} />
+    {#each editors as editor, i (editor.id)}
+        <EditorItem {editor} index={i} />
     {/each}
 </div>
 {/if}

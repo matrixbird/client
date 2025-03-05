@@ -17,10 +17,12 @@ let compact = $derived(ui_state?.compact)
             <ViewToggle />
     </div>
 
-    <div class="flex justify-end py-2">
-        {#if !compact}
-            <NewMessage />
-        {/if}
+    <div class="flex justify-end">
+        <div class="flex justify-end ">
+            {#if !compact}
+                <NewMessage />
+            {/if}
+        </div>
     </div>
 </div>
 

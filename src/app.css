@@ -91,6 +91,7 @@
     --popup-shadow: hsla(0, 0%, 70%, 1);
 
     --mask: rgba(0, 0, 0, 0.2);
+
 }
 
 :root.black {
@@ -403,3 +404,6 @@ input::placeholder {
     bottom: 0;
 }
 
+
+.icon svg {
+}

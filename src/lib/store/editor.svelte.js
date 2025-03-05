@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 
-let editor = $state({
-  items: [],
+export let editor = $state({
+  editors: [],
 });
 
 let maximized = $state(null);
@@ -11,23 +11,23 @@ export const reply_editors = $state({});
 
 export function createEditorStore() {
 
-  function newEditor(){
+  function create(){
 
-    if(editor.items.length == 4) {
+    if(editor.editors.length == 4) {
       return
     }
 
     let id = uuidv4();
-    editor.items.unshift({
+    editor.editors.unshift({
       id: id,
       state: null
     });
   }
 
   function killEditor(id){
-    let index = editor.items.findIndex((i) => i.id === id);
-    editor.items.splice(index, 1)
-    if(editor.items.length == 0) {
+    let index = editor.editors.findIndex((i) => i.id === id);
+    editor.editors.splice(index, 1)
+    if(editor.editors.length == 0) {
       maximized = null;
     }
   }
@@ -46,7 +46,7 @@ export function createEditorStore() {
 			return maximized;
 		},
 
-    newEditor,
+    create,
     killEditor,
     maximizeEditor,
   };

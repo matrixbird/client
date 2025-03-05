@@ -260,7 +260,7 @@ let bb = $derived.by(() => {
 
 
 
-<div class="popup-trigger" bind:this={triggerEl} 
+<div class="popup-trigger flex" bind:this={triggerEl} 
     onmouseenter={handleMouseEnter}
     onmouseleave={handleMouseLeave}
     onclick={togglePopup}>
