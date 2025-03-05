@@ -111,8 +111,21 @@ async function focusSubject() {
 
 async function process() {
 
+    if(emails.length == 0) {
+        to_input.focus()
+        return
+    }
 
-    let mxids = emails.map(e => email_to_mxid(e))
+    for(let email of emails) {
+        if(!email.valid) {
+            alert(`Sending regular emails is disabled for now. Please choose a valid matrix email address.`)
+            await tick()
+            to_input.focus()
+            return
+        }
+    }
+
+    let mxids = emails.map(e => email_to_mxid(e.email))
 
     for(let email of emails) {
         let domain = get_email_domain(email)
@@ -231,8 +244,9 @@ let emails = $state([]);
 
 function processInput(event) {
 
-    if(event.code == 'Backspace' && to.length == 0) {
-        emails.pop()
+    if(event.code == 'Backspace' && to.length == 0 && emails?.length > 0) {
+        emails[emails.length - 1].highlight = true
+        to_input.blur()
         return
     }
 
@@ -244,6 +258,7 @@ function processInput(event) {
         if(email_valid && !exists) {
             emails.push({
                 email: to,
+                valid: false,
             })
             to = ''
             event.preventDefault()
@@ -260,9 +275,21 @@ function removeEmail(email) {
     if(i != -1) {
         emails.splice(i, 1)
     }
+    to_input.focus()
+}
+
+function validateEmail(email) {
+    let i = emails.findIndex(e => e.email == email)
+    if(i != -1) {
+        emails[i].valid = true
+    }
 }
 
 function processEmailField(event) {
+    if(emails?.length > 0) {
+        emails[emails.length - 1].highlight = false
+    }
+
 
     to_focused = false
 
@@ -274,9 +301,12 @@ function processEmailField(event) {
     if(email_valid && !exists) {
         emails.push({
             email: to,
+            valid: false,
         })
         to = ''
     }
+
+
 }
 
 function processPaste(event) {
@@ -296,6 +326,7 @@ function processPaste(event) {
         if(email_valid && !exists) {
             emails.push({
                 email: email,
+                valid: false,
             })
         }
     })
@@ -305,6 +336,9 @@ let to_focused = $state(false);
 
 function handleFocus() {
     to_focused = true
+    if(emails?.length > 0) {
+        emails[emails.length - 1].highlight = false
+    }
 }
 
 let email_placeholder = $derived.by(() => {
@@ -328,7 +362,7 @@ let email_placeholder = $derived.by(() => {
     <div class="flex bg-bird-900 text-white font-medium"
     >
 
-        <div class="flex p-2 flex-1 place-items-center cursor-pointer text-sm ml-1 tracking-wide"
+        <div class="flex py-1 px-2 flex-1 place-items-center cursor-pointer text-sm ml-1 tracking-wide"
             onclick={toggleMinimize}>
             {subject ? subject : `New Message`}
         </div>
@@ -372,11 +406,12 @@ let email_placeholder = $derived.by(() => {
                 {/if}
 
 
-                <div class="flex gap-2">
                     {#each emails as item (item.email)}
-                        <Recipient {item} {removeEmail} {to_focused} />
+                        <Recipient {item} 
+                            {removeEmail} 
+                            {validateEmail} 
+                            {to_focused} />
                     {/each}
-                </div>
 
                 <div class="">
                 <input type="email" class="py-3" 

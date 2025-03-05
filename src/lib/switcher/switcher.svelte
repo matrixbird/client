@@ -47,6 +47,6 @@ class:float={!expanded}>
     top: 5rem;
     bottom: 2rem;
     left: 1rem;
-    z-index: 5;
+    z-index: 1;
 }
 </style>

@@ -92,15 +92,33 @@ let _expanded = $state(false);
 
 $effect(() => {
     if(!_compact && compact && browser) {
+
+
+        let _width;
+        let _height;
+
+
         if(width < 1280 ) {
-            width = 1280
+            _width = 1280
         }
         if(height < 760) {
-            height = 760
+            _height = 760
         }
+
         //position = calcPosition()
         const vw = window.innerWidth;
         const vh = window.innerHeight;
+
+        //make sure we don't make it bigger than viewport
+        if(_width > vw) {
+            _width = vw - 100
+        }
+        if(_height > vh) {
+            _height = vh - 100
+        }
+
+        width = _width 
+        height = _height
 
         const left = (vw - width) / 2;
         const top = (vh - height) / 2;
