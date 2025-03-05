@@ -270,7 +270,7 @@ let bb = $derived.by(() => {
 {#if open}
     <div 
         class="popup"
-        class:decoration={decoration}
+        class:popup-decoration={decoration}
         style="--br: {br}px;--bl: {bl}px;--bt: {bt}px;--bb: {bb}px;"
         bind:this={popupEl}
         role="dialog"
@@ -299,16 +299,6 @@ let bb = $derived.by(() => {
     position: absolute;
     z-index: 10000;
     transform: translate(0, 0);
-}
-
-.decoration {
-    background: var(--popup-background);
-    border: 1px solid var(--popup-border);
-    transform: translate(0, 0);
-    border-radius: 1px;
-    -webkit-box-shadow: 2px 0px 17px 0px var(--popup-shadow);
-    -moz-box-shadow: 2px 0px 17px 0px var(--popup-shadow);
-    box-shadow: 2px 0px 17px 0px var(--popup-shadow);
 }
 
 .popup:hover {

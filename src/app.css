@@ -403,6 +403,14 @@ input::placeholder {
     bottom: 0;
 }
 
+.popup-decoration {
+    background: var(--popup-background);
+    border: 1px solid var(--popup-border);
+    transform: translate(0, 0);
+    border-radius: 1px;
+    box-shadow: 4px 4px 0 theme('colors.bird.600');
+}
+
 
 .icon svg {
 }

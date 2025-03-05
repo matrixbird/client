@@ -64,11 +64,16 @@ let mask = $derived.by(() => {
 })
 
 
-    let opts = $derived.by(() => {
+let offset = $derived.by(() => {
+    if(expanded) return [-6, 6]
+    return [0, 20]
+})
+
+let opts = $derived.by(() => {
     return {
         mask: mask,
         placement: placement,
-        offsetDistance: [0, 20],
+        offsetDistance: offset,
     }
 })
 
@@ -95,7 +100,7 @@ let mask = $derived.by(() => {
     class:w-7={expanded}
     class:h-7={expanded}>
         <div class="font-semibold text-md text-white uppercase"
-            class:text-sm={expanded}>
+            class:text-xs={expanded}>
             {initials} 
         </div>
     </div>
@@ -105,7 +110,6 @@ let mask = $derived.by(() => {
 <style lang="postcss">
 @reference "tailwindcss/theme";
 .active {
-    transition: 0.1s;
     outline: 4px solid theme('colors.bird.300');
 }
 </style>

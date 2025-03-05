@@ -357,7 +357,6 @@ let opts_min = $derived.by(() => {
         disabled: false,
         text: minimized ? "Maximize" : "Minimize",
         placement: 'top-end',
-        classes: 'silk',
         offset: [12, 4]
     }
 })
@@ -367,7 +366,6 @@ let opts_exp = $derived.by(() => {
         disabled: false,
         text: expanded ? "Collapse" : "Expand",
         placement: 'top-end',
-        classes: 'silk',
         offset: [12, 4]
     }
 })
@@ -377,7 +375,6 @@ let opts_close = $derived.by(() => {
         disabled: false,
         text: 'Save & Close',
         placement: 'top-end',
-        classes: 'silk',
         offset: [12, 4]
     }
 })
