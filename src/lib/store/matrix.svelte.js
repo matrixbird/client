@@ -7,8 +7,6 @@ import {
 } from '$env/static/public';
 import { v4 as uuidv4 } from 'uuid';
 
-import { get_messages } from '$lib/appservice/api'
-
 let ready = $state(false);
 let synced = $state(false);
 let session = $state(null);

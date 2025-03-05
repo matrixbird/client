@@ -159,21 +159,24 @@ ondblclick={cycle}>
 
     </div>
 
-    <div class="cursor-pointer flex place-items-center mr-1"
+    <div class="flex place-items-center mr-1"
+        class:cursor-pointer={!minimized}
         class:opacity-50={!expanded && !compact}
     onclick={minimize}
     use:tooltip={opts_min}>
         {@html circle}
     </div>
 
-    <div class="cursor-pointer flex place-items-center mr-1"
+    <div class="flex place-items-center mr-1"
+        class:cursor-pointer={!compact}
         class:opacity-50={compact}
     onclick={expand}
     use:tooltip={opts_compact}>
         {@html expand_vertical}
     </div>
 
-    <div class="cursor-pointer flex place-items-center mr-1"
+    <div class="flex place-items-center mr-1"
+        class:cursor-pointer={!expanded}
         class:opacity-50={expanded}
     onclick={maximize}
     use:tooltip={opts_expanded}>

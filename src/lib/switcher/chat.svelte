@@ -22,11 +22,12 @@ let active = $derived.by(() => {
 let opts = {
     text: "Chat",
     placement: "right",
+    disabled: true,
 }
 
 </script>
 
-<div class="grid place-items-center cursor-pointer mx-1"
+<div class="grid place-items-center cursor-not-allowed mx-1"
 onclick={open} use:tooltip={opts}>
 
     <div class="icon p-1 rounded h-7 w-7" 

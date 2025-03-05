@@ -81,34 +81,45 @@ async function process() {
         thread_id = email.content["m.relates_to"].event_id
     }
 
+        let to = email.sender
+        if(email.type == "matrixbird.email.legacy") {
+            to = email.content.from.address
+        }
+
+        console.log("to", to)
     try {
 
         let room_id = email.room_id
-        console.log("room id", room_id)
+
+        let content = {
+            to: to,
+            from: {
+                name: store.user?.displayName,
+                address: mxid_to_email(store.user?.userId)
+            },
+            subject: subject,
+            body: {
+                text: body.text,
+                html: body.html
+            },
+            "m.relates_to": {
+                "event_id": thread_id,
+                "m.in_reply_to": email.event_id,
+                "rel_type": "m.thread"
+            },
+        }
+
+        if(email?.content?.message_id) {
+            content["m.relates_to"]["matrixbird.in_reply_to"] = email.content.message_id
+        }
 
         const msg = await store.client.sendEvent(
             room_id,
             email.type,
-            {
-                to: email.sender,
-                from: {
-                    name: store.user?.displayName,
-                    address: mxid_to_email(store.user?.userId)
-                },
-                subject: subject,
-                body: {
-                    text: body.text,
-                    html: body.html
-                },
-                "m.relates_to": {
-                    "event_id": thread_id,
-                    "m.in_reply_to": email.event_id,
-                    "rel_type": "m.thread"
-                },
-            },
+            content,
             uuidv4()
         );
-        console.log('msg', msg)
+        console.log('event_id', msg)
         killReply()
 
     } catch(e) {

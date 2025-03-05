@@ -89,12 +89,10 @@ let replying = $derived.by(() => {
 })
 
 function reply() {
-    /*
     if(email.type == "matrixbird.email.legacy") {
         alert("Replying to regular emails is disabled for now.")
         return
     }
-    */
 
     reply_editors[email?.event_id] = {
         email: email,

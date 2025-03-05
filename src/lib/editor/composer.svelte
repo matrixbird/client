@@ -13,6 +13,7 @@ let minimized = $derived(!expanded && !compact)
 let { 
     state,
     updateComposer, 
+    composer_focus,
     isReply
 } = $props();
 
@@ -43,6 +44,12 @@ onMount(() => {
             updateComposer(data);
         },
         onCreate: ({ editor }) => {
+        },
+        onFocus({ editor, event }) {
+            composer_focus(true);
+        },
+        onBlur({ editor, event }) {
+            composer_focus(false);
         }
     });
     if(state) {

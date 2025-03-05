@@ -138,13 +138,12 @@ export const query_code = async (code) => {
 
 }
 
-export const get_messages = async (roomId, token) => {
-  const url = `${PUBLIC_HOMESERVER}/_matrix/client/v3/rooms/${roomId}/messages?limit=100&dir=b`;
+export const valid_email = async (email) => {
+  const url = `${PUBLIC_APPSERVICE}/email/${email}`;
 
   let options = {
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
     },
   }
 

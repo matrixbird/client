@@ -73,7 +73,7 @@ export function tooltip(node, opts = {
 
     tooltipEl.style.visibility = 'visible';
     if(opts?.disabled) {
-      tooltipEl.style.opacity = '0.4';
+      tooltipEl.style.opacity = '0.2';
     } else {
       tooltipEl.style.opacity = '1';
     }

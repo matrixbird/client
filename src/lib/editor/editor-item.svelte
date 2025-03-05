@@ -62,7 +62,6 @@ function expandWindow() {
 
 $effect(() => {
     if(expanded) {
-        console.log('expanded', item.id)
         editorStore.maximizeEditor(item.id)
     }
 })
@@ -219,6 +218,15 @@ async function focusComposer() {
     composer.focus()
 }
 
+let composer_focused = $state(false)
+
+function composer_focus(e) {
+    composer_focused = e
+    if(e) {
+        processEmailField()
+    }
+}
+
 let emails = $state([]);
 
 function processInput(event) {
@@ -231,10 +239,12 @@ function processInput(event) {
     if(event.code == 'Comma' || event.code == 'Space' || event.code == 'Enter') {
         let email_valid = validate(to);
 
-        let exists = emails.find(e => e == to)
+        let exists = emails.find(e => e.email == to)
 
         if(email_valid && !exists) {
-            emails.push(to)
+            emails.push({
+                email: to,
+            })
             to = ''
             event.preventDefault()
         }
@@ -246,25 +256,26 @@ function processInput(event) {
 }
 
 function removeEmail(email) {
-    let i = emails.findIndex(e => e == email)
+    let i = emails.findIndex(e => e.email == email)
     if(i != -1) {
         emails.splice(i, 1)
     }
 }
 
-function handleBlur(event) {
+function processEmailField(event) {
 
     to_focused = false
 
     if(to.length == 0) return;
 
-    let exists = emails.find(e => e == to)
+    let exists = emails.find(e => e.email == to)
 
     let email_valid = validate(to);
     if(email_valid && !exists) {
-        emails.push(to)
+        emails.push({
+            email: to,
+        })
         to = ''
-        event.preventDefault()
     }
 }
 
@@ -281,9 +292,11 @@ function processPaste(event) {
 
     pasted.forEach(email => {
         let email_valid = validate(email);
-        let exists = emails.find(e => e == email)
+        let exists = emails.find(e => e.email == email)
         if(email_valid && !exists) {
-            emails.push(email)
+            emails.push({
+                email: email,
+            })
         }
     })
 }
@@ -360,8 +373,8 @@ let email_placeholder = $derived.by(() => {
 
 
                 <div class="flex gap-2">
-                    {#each emails as email (email)}
-                        <Recipient {email} {removeEmail} {to_focused} />
+                    {#each emails as item (item.email)}
+                        <Recipient {item} {removeEmail} {to_focused} />
                     {/each}
                 </div>
 
@@ -371,7 +384,6 @@ let email_placeholder = $derived.by(() => {
                     bind:value={to}
                     onkeydown={processInput}
                     onfocus={handleFocus}
-                    onblur={handleBlur}
                     onpaste={processPaste}
                     placeholder={email_placeholder}
                 />
@@ -382,12 +394,13 @@ let email_placeholder = $derived.by(() => {
                 <input type="text" class="py-3" 
                     bind:this={subject_input}
                     bind:value={subject}
+                    onfocus={processEmailField}
                     placeholder="Subject"
                 />
             </div>
 
             <div class="">
-                <Composer bind:this={composer} {updateComposer} />
+                <Composer bind:this={composer} {updateComposer} {composer_focus} />
             </div>
 
             <div class="p-3">
