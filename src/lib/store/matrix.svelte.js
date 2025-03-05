@@ -7,9 +7,12 @@ import {
 } from '$env/static/public';
 import { v4 as uuidv4 } from 'uuid';
 import {
-	goto,
+  goto,
 } from '$app/navigation';
 
+import {
+  is_local_room,
+} from '$lib/utils/matrix.js'
 
 let ready = $state(false);
 let synced = $state(false);
@@ -84,15 +87,30 @@ export function createMatrixStore() {
     }
 
     client.on(sdk.RoomEvent.MyMembership, function (room, membership, prev) {
+      if (membership === sdk.KnownMembership.Join) {
+        //console.log("joined", room.roomId)
+      }
       if (membership === sdk.KnownMembership.Invite) {
-        //console.log("got invited", room)
-        console.log("membership", membership)
-        console.log("prev", prev)
-        join_room(room.roomId);
+        let is_local = is_local_room(room.roomId);
+        if(is_local) {
+          console.log("is local room")
+          join_local_room(room.roomId)
+        } else {
+          setTimeout(() => {
+            join_room(room.roomId);
+          }, 2000)
+        }
       }
     });
 
 
+    async function join_local_room(roomId) {
+      console.log("Joining local room:", roomId);
+      let room = await client.joinRoom(roomId, {
+        syncRoom: true,
+      });
+      console.log("Joined local room:", room);
+    }
 
     async function join_room(roomId) {
 
@@ -109,42 +127,29 @@ export function createMatrixStore() {
         let room = await client.joinRoom(roomId, {
           syncRoom: true,
         });
-        console.log("joined room:", room)
 
-        /*
         setTimeout(async () => {
+          const messagesResult = await client.createMessagesRequest(room.roomId, null, 100, 'b', null);
+          const messages = messagesResult.chunk;
+          console.log(`Fetched ${messages.length} messages using createMessagesRequest`);
+          for (const message of messages) {
+            if(message.type == "matrixbird.email.native") {
+              events.set(message.event_id, message);
+            }
+          }
 
+          room = client.getRoom(roomId);
+          let refreshed = await room.refreshLiveTimeline();
+          //console.log("refresh", refreshed)
+          const _events = room.getLiveTimeline().getEvents();
+          //console.log("events are", _events)
+          let roomJoinEvent = _events.find(e => e.event.type == "m.room.member" && e.event.content?.membership == "join");
+          console.log("room join event", roomJoinEvent)
 
+          let read = await client.sendReceipt(roomJoinEvent, "m.read")
+          console.log('read', read)
 
-        await client.scrollback(storedRoom, 50).then((x) => {
-          console.log("Fetched previous messages", x);
-        });
-
-
-        const events = storedRoom.getLiveTimeline().getEvents();
-        console.log(events)
-        if (events.length > 0) {
-          const latestEvent = events[events.length - 1];
-          const read = await client.sendReceipt(latestEvent, "m.read", {thread: "main"});
-          console.log("read", read)
-        }
-
-
-        await client.roomInitialSync(room.roomId, 25).then(() => {
-          console.log("Room initial sync complete");
-        });
-
-
-        const messagesResult = await client.createMessagesRequest(room.roomId, null, 100, 'b', null);
-        const messages = messagesResult.chunk;
-        console.log(`Fetched ${messages.length} messages using createMessagesRequest`);
-
-
-        console.log("Room join and sync complete for:", room.roomId);
-        }, 3000)
-
-        */
-
+        }, 2000)
 
 
       } catch (error) {
@@ -318,55 +323,6 @@ export function createMatrixStore() {
     return client.store.getUser(user_id)
   }
 
-  function findEmailRooms() {
-
-    const stateKey = ''
-    // Get all rooms the client knows about
-    const allRooms = client.getRooms();
-
-    // Filter rooms that have the specific state event
-    const rooms = allRooms.filter(room => {
-      // Check if the room has the state event with the given state key
-      const stateEvent = room.currentState.getStateEvents('matrixbird.room.type', stateKey);
-      if (!stateEvent) return false;
-
-      // Check if the event content matches the filter
-      const content = stateEvent.getContent();
-
-      const contentFilter = {
-        type: 'email'
-      };
-
-      // For each key in contentFilter, check if the content has the same value
-      return Object.entries(contentFilter).every(([key, value]) => 
-        content[key] === value
-      );
-    });
-
-    return rooms;
-  }
-
-  function emailRoomMembers(client, contentFilter = null, stateKey = '', removeDuplicates = true) {
-    // Find rooms matching our criteria
-    const matchingRooms = findEmailRooms();
-
-    // If no rooms match, return an empty array
-    if (matchingRooms.length === 0) {
-      return [];
-    }
-
-    // Get all members from all matching rooms
-    let allMembers = [];
-
-    matchingRooms.forEach(room => {
-      // Get all members from this room
-      const roomMembers = room.getMembers();
-      allMembers = allMembers.concat(roomMembers);
-    });
-
-    return allMembers;
-  }
-
 
   async function doesRoomExist(userIds) {
     // Get all rooms the logged-in user is in
@@ -505,8 +461,6 @@ export function createMatrixStore() {
     createMatrixClient,
     getUser,
     syncOnce,
-    findEmailRooms,
-    emailRoomMembers,
     doesRoomExist,
     emailRoom,
   };
