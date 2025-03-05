@@ -4,7 +4,7 @@ import NewMessage from '$lib/editor/new-message.svelte';
 import ViewToggle from '$lib/components/view_toggle/view_toggle.svelte';
 
 import { ui_state } from '$lib/store/store.svelte.js'
-let compact = $derived(ui_state?.compact)
+let expanded = $derived(ui_state?.expanded)
 
 </script>
 
@@ -19,7 +19,7 @@ let compact = $derived(ui_state?.compact)
 
     <div class="flex justify-end">
         <div class="flex justify-end ">
-            {#if !compact}
+            {#if !expanded}
                 <NewMessage />
             {/if}
         </div>

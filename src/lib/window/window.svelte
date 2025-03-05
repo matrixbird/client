@@ -13,7 +13,6 @@ let window;
 let header;
 
 let expanded = $derived(ui_state?.expanded)
-let compact = $derived(ui_state?.compact)
 
 </script>
 

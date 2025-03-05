@@ -86,48 +86,9 @@ const first_event = $derived.by(() => {
 })
 let new_user = $derived(userState?.new_user)
 
-let _compact = $state(false);
-
 let _expanded = $state(false);
 
 $effect(() => {
-    if(!_compact && compact && browser) {
-
-
-        let _width;
-        let _height;
-
-
-        if(width < 1280 ) {
-            _width = 1280
-        }
-        if(height < 760) {
-            _height = 760
-        }
-
-        //position = calcPosition()
-        const vw = window.innerWidth;
-        const vh = window.innerHeight;
-
-        //make sure we don't make it bigger than viewport
-        if(_width > vw) {
-            _width = vw - 100
-        }
-        if(_height > vh) {
-            _height = vh - 100
-        }
-
-        width = _width 
-        height = _height
-
-        const left = (vw - width) / 2;
-        const top = (vh - height) / 2;
-        position = { x: left, y: top }
-        //localStorage.setItem('window_position', JSON.stringify([left, top]))
-        //localStorage.setItem('window_size', JSON.stringify([width, height]))
-
-        _compact = true
-    }
 
     if(new_user && first_event) {
         //userState.new_user = false
@@ -153,23 +114,8 @@ $effect(() => {
             height = h
         }
         _expanded = false
-        _compact = false
     }
-    if(_compact && !compact && browser) {
-        let offset = localStorage.getItem('window_position')
-        if(offset) {
-            let [x, y] = JSON.parse(offset)
-            position = { x, y }
-        }
-        let size = localStorage.getItem('window_size')
-        if(size) {
-            let [w, h] = JSON.parse(size)
-            width = w
-            height = h
-        }
-        _expanded = false
-        _compact = false
-    }
+
 
     // calculate on startup
     if(browser && position.x == 0 && position.y == 0) {
@@ -183,7 +129,7 @@ $effect(() => {
     }
 
     //set initial window size from localstorage
-    if(!resizing && !_compact) {
+    if(!resizing) {
         let size = localStorage.getItem('window_size')
         if(size) {
             let [w, h] = JSON.parse(size)
@@ -214,7 +160,6 @@ function calcPosition() {
 let mb;
 
 let expanded = $derived(ui_state?.expanded)
-let compact = $derived(ui_state?.compact)
 
 let dragging = $state(false);
 

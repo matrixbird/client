@@ -10,21 +10,18 @@ let event_open = $derived.by(() => {
 
 import { ui_state } from '$lib/store/store.svelte.js'
 let expanded = $derived(ui_state?.expanded)
-let compact = $derived(ui_state?.compact)
 
 </script>
 
 <div class="grid grid-cols-[1fr] w-full h-full overflow-hidden" 
-class:open={expanded || (compact && event_open)}>
+class:open={expanded || event_open}>
 
-    {#if !event_open || expanded || compact}
-        <ListView />
-    {/if}
+    <ListView />
 
     {#if event_open || expanded}
         <div class="overflow-hidden"
-        class:border-l={expanded || compact}
-        class:border-border={expanded || compact}>
+        class:border-l={expanded}
+        class:border-border={expanded}>
             {@render children()}
         </div>
     {/if}

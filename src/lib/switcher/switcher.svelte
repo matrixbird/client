@@ -6,7 +6,6 @@ import Profile from '$lib/profile/profile.svelte'
 import { ui_state } from '$lib/store/store.svelte.js'
 
 let expanded = $derived(ui_state?.expanded)
-let compact = $derived(ui_state?.compact)
 
 import { 
     settings

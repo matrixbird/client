@@ -6,10 +6,6 @@ import { goto } from '$app/navigation';
 
 import Popup from '$lib/components/popup/popup.svelte'
 
-let expanded = $derived(ui_state?.expanded)
-let compact = $derived(ui_state?.compact)
-let minimized = $derived(!expanded && !compact)
-
 let mailbox = $derived.by(() => {
     return $page.params.mailbox
 })

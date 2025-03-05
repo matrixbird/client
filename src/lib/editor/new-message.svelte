@@ -5,8 +5,6 @@ const store = createEditorStore()
 
 import { ui_state } from '$lib/store/store.svelte.js'
 let expanded = $derived(ui_state?.expanded)
-let compact = $derived(ui_state?.compact)
-let minimized = $derived(!expanded && !compact)
 
 function newMessage() {
     store.create()
@@ -17,15 +15,15 @@ function newMessage() {
     <button 
         onclick={newMessage}
         class="flex justify-center items-center py-2 px-3 w-full"
-        class:text-md={!minimized}>
+        class:text-md={expanded}>
 
         <div class="flex">
             <div class="">
                 {@html plus}
             </div>
             <div class="ml-2" 
-            class:mr-1={minimized}
-            class:mr-5={!minimized}>
+            class:mr-1={!expanded}
+            class:mr-5={expanded}>
                 Compose
             </div>
         </div>

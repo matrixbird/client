@@ -10,55 +10,31 @@ import { ui_state } from '$lib/store/store.svelte.js'
 let { dragging, dragStart, dragEnd } = $props();
 
 let expanded = $derived(ui_state?.expanded)
-let compact = $derived(ui_state?.compact)
-let minimized = $derived(!expanded && !compact)
 
 function cycle() {
-    if(!compact && !expanded) {
-        ui_state.compact = true
-        localStorage.setItem('compact', 'true')
+    if(expanded) {
+        ui_state.expanded = false
         localStorage.removeItem('expanded')
         return
     }
 
-    if(compact && !expanded) {
-        ui_state.compact = false
+    if(!expanded) {
         ui_state.expanded = true
-        localStorage.removeItem('compact')
         localStorage.setItem('expanded', 'true')
         return
     }
 
-    if(expanded) {
-        ui_state.expanded = false
-        localStorage.removeItem('expanded')
-        localStorage.removeItem('compact')
-        return
-    }
 }
 
 function minimize(e) {
     e.stopPropagation()
-    console.log("minimizing")
     ui_state.expanded = false
-    ui_state.compact = false
-    localStorage.removeItem('expanded')
-    localStorage.removeItem('compact')
-}
-
-function expand(e) {
-    e.stopPropagation()
-    ui_state.compact = true
-    ui_state.expanded = false
-    localStorage.setItem('compact', 'true')
     localStorage.removeItem('expanded')
 }
 
 function maximize(e) {
     e.stopPropagation()
-    ui_state.compact = false
     ui_state.expanded = true
-    localStorage.removeItem('compact')
     localStorage.setItem('expanded', 'true')
 }
 
@@ -73,18 +49,8 @@ let offset = $derived.by(() => {
 
 let opts_min = $derived.by(() => {
     return {
-        disabled: !expanded && !compact,
+        disabled: !expanded,
         text: "Minimize",
-        placement: placement,
-        classes: 'silk',
-        offset: offset,
-    }
-})
-
-let opts_compact = $derived.by(() => {
-    return {
-        disabled: compact,
-        text: "Expand",
         placement: placement,
         classes: 'silk',
         offset: offset,
@@ -127,25 +93,17 @@ let mailbox_title = $derived.by(() => {
     }
 })
 
-let title = $derived.by(() => {
-    if(expanded || compact) {
-        return `matrixbird`
-    }
-    return mailbox_title
-})
-
 </script>
 
 <div class="flex bg-bird-900 text-white font-medium"
 ondblclick={cycle}>
 
-    {#if !expanded && !compact && minimized}
+    {#if !expanded}
         <Mailbox />
     {/if}
 
-    {#if !minimized}
+    {#if expanded}
         <div class="flex place-items-center silk cursor-pointer text-sm py-1" 
-            class:ml-2={compact}
             class:ml-1={expanded}>
             matrixbird
         </div>
@@ -160,19 +118,11 @@ ondblclick={cycle}>
     </div>
 
     <div class="flex place-items-center mr-1"
-        class:cursor-pointer={!minimized}
-        class:opacity-50={!expanded && !compact}
+        class:cursor-pointer={expanded}
+        class:opacity-50={!expanded}
     onclick={minimize}
     use:tooltip={opts_min}>
         {@html circle}
-    </div>
-
-    <div class="flex place-items-center mr-1"
-        class:cursor-pointer={!compact}
-        class:opacity-50={compact}
-    onclick={expand}
-    use:tooltip={opts_compact}>
-        {@html expand_vertical}
     </div>
 
     <div class="flex place-items-center mr-1"

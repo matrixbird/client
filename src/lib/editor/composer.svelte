@@ -6,8 +6,6 @@ import StarterKit from '@tiptap/starter-kit';
 import { ui_state } from '$lib/store/store.svelte.js'
 
 let expanded = $derived(ui_state?.expanded)
-let compact = $derived(ui_state?.compact)
-let minimized = $derived(!expanded && !compact)
 
 
 let { 
@@ -46,10 +44,14 @@ onMount(() => {
         onCreate: ({ editor }) => {
         },
         onFocus({ editor, event }) {
-            composer_focus(true);
+            if(!isReply) {
+                composer_focus(true);
+            }
         },
         onBlur({ editor, event }) {
-            composer_focus(false);
+            if(!isReply) {
+                composer_focus(false);
+            }
         }
     });
     if(state) {
@@ -75,8 +77,7 @@ export function focus() {
     class:mr-1={isReply}
     class:max-h-[50dvh]={!isReply}
     class:max-h-[30dvh]={isReply && expanded}
-    class:max-h-[15dvh]={isReply && compact}
-    class:max-h-[10dvh]={isReply && minimized}
+    class:max-h-[10dvh]={isReply && !expanded}
     onclick={focus}
     bind:this={element}></div>
 

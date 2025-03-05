@@ -26,8 +26,6 @@ const editorStore = createEditorStore()
 
 import { ui_state } from '$lib/store/store.svelte.js'
 let expanded = $derived(ui_state?.expanded)
-let compact = $derived(ui_state?.compact)
-let minimized = $derived(!expanded && !compact)
 
 import { reply_editors } from '$lib/store/editor.svelte.js'
 
@@ -62,11 +60,7 @@ $effect(() => {
         _mode = 'expanded'
         focusComposer()
     }
-    if(compact && _mode != 'compact') {
-        _mode = 'compact'
-        focusComposer()
-    }
-    if(minimized && _mode != 'minimized') {
+    if(!expanded && _mode != 'minimized') {
         _mode = 'minimized'
         focusComposer()
     }
@@ -156,8 +150,7 @@ async function focusComposer() {
 <div class="editor grid grid-rows-[auto_1fr_auto] 
     select-none">
 
-    <div class="header flex rounded-t-xl border-t border-x border-bird-200
-        sticky top-0">
+    <div class="header flex rounded-t-xl border-t border-x border-bird-200">
 
         <div class="flex py-3 px-4 flex-1 place-items-center text-sm text-light ">
             Re: {subject}
@@ -171,8 +164,8 @@ async function focusComposer() {
     </div>
 
     <div class="content text-sm grid border-x border-bird-300"
-    class:min-h-[10dvh]={minimized}
-    class:min-h-[12dvh]={!minimized}>
+    class:min-h-[10dvh]={!expanded}
+    class:min-h-[12dvh]={expanded}>
 
             <Composer bind:this={composer} 
             isReply={true} {state}
@@ -181,10 +174,9 @@ async function focusComposer() {
 
     <div class="tools px-4 pb-3 border-b border-x border-bird-300 rounded-b-xl">
         <button class="primary text-sm font-medium" 
-            class:py-1={minimized || compact}
+            class:py-1={!expanded}
             class:py-2={expanded}
-            class:px-3={minimized}
-            class:px-4={compact}
+            class:px-3={!expanded}
             class:px-5={expanded}
             onclick={process}>
             Send

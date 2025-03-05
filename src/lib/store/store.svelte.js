@@ -22,7 +22,6 @@ export const userState = $state({
 
 export const ui_state = $state({
     expanded: false,
-    compact: false,
     drag_offset: null,
 });
 
@@ -50,7 +49,6 @@ function getFromLS(item) {
 
 if(browser) {
     ui_state.expanded = getFromLS('expanded')
-    ui_state.compact = getFromLS('compact')
 }
 
 export function createStore() {
