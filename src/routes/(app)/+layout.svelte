@@ -302,12 +302,15 @@ function resize(e) {
 {/if}
 
 {#if !expanded && ready}
-    <Navbar />
     <Switcher />
 {/if}
 
 
 <div class="grid h-screen w-screen overflow-hidden select-none relative" >
+{#if !expanded && ready}
+    <Navbar />
+{/if}
+
 
     <div class="mb grid grid-rows-[auto_1fr_auto] overflow-hidden bg-background
         select-none absolute

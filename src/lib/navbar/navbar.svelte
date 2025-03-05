@@ -30,10 +30,10 @@ let expanded = $derived(ui_state?.expanded)
 @reference "tailwindcss/theme";
 
 .navbar {
-    position: fixed;
-    z-index: 1;
-    top: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
     width: 100%;
+    max-height: 2rem;
 }
 
 </style>

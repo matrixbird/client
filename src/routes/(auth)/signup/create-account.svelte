@@ -180,12 +180,14 @@ async function process() {
         if(bad_invite_code) {
             codeInput.focus();
             busy = false
+        } else if(failed) {
+            busy = false
         } else if(unavailable) {
             usernameInput.focus();
             busy = false
         } else {
             passwordInput.focus();
-            busy = false
+            //busy = false
         }
     }
 }
