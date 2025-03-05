@@ -80,13 +80,15 @@ async function login() {
         }
         console.log('response', response)
 
-        if(response.session_id) {
+        if(response?.session_id && response?.access_token) {
 
             const res = await fetch('/api/auth/session', {
                 method: 'POST',
                 body: JSON.stringify({
                     session_id: response.session_id,
-                    //device_id: response.device_id,
+                    access_token: response.access_token,
+                    device_id: response.device_id,
+                    user_id: response.user_id,
                 }),
             });
 

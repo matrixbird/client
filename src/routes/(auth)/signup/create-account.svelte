@@ -154,7 +154,9 @@ async function process() {
                 method: 'POST',
                 body: JSON.stringify({
                     session_id: response.session_id,
-                    //device_id: response.device_id,
+                    access_token: response.access_token,
+                    device_id: response.device_id,
+                    user_id: response.user_id,
                 }),
             });
             userState.new_user = true

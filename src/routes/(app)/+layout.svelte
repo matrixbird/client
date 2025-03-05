@@ -84,9 +84,13 @@ const events = $derived(matrixStore?.events)
 const first_event = $derived.by(() => {
     return events?.values().next().value
 })
+
 let new_user = $derived(userState?.new_user)
 
 let _expanded = $state(false);
+
+let width = $state(1280);
+let height = $state(800);
 
 $effect(() => {
 
@@ -94,7 +98,6 @@ $effect(() => {
         //userState.new_user = false
         //goto(`/mail/inbox/${first_event.event_id}`)
     }
-
 
     if(browser && expanded) {
         _expanded = true
@@ -115,7 +118,6 @@ $effect(() => {
         }
         _expanded = false
     }
-
 
     // calculate on startup
     if(browser && position.x == 0 && position.y == 0) {
@@ -163,6 +165,12 @@ let expanded = $derived(ui_state?.expanded)
 
 let dragging = $state(false);
 
+let frame = null;
+let _position = $state({
+    x: 0,
+    y: 0
+})
+
 let position = $state({
     x: 0,
     y: 0
@@ -177,15 +185,19 @@ let dragopts = $derived.by(() => {
         legacyTranslate: false, 
         gpuAcceleration: true,
         position: position,
-        //bounds: 'body',
         transform: ({ offsetX, offsetY, node }) => {
             if(!node) return
-            //node.style.translate = `${offsetX + 50}px ${offsetY + 20}px`;
-            //node.style.translate = `${offsetX + 50}px ${offsetY + 20}px`;
         },
         onDrag: ({ offsetX, offsetY, rootNode, currentNode, event }) => {
             dragging = true
-            position = { x: offsetX, y: offsetY }
+            _position = { x: offsetX, y: offsetY }
+            if (!frame) {
+                frame = requestAnimationFrame(() => {
+                    position = { x: offsetX, y: offsetY }
+                    _position = { x: 0, y: 0 }
+                    frame = null;
+                });
+            }
         },
         onDragStart: ({ offsetX, offsetY, rootNode, currentNode, event }) => {
             dragging = true
@@ -201,11 +213,11 @@ let dragopts = $derived.by(() => {
 })
 
 
-function dragStart(e) {
+function dragStart() {
     dragging = true
 }
 
-function dragEnd(e) {
+function dragEnd() {
     dragging = false
 }
 
@@ -228,14 +240,8 @@ let email = $derived.by(() => {
 })
 
 
-let width = $state(700);
-let height = $state(500);
-
-
 function startResize(e) {
     resizing = true
-
-
     document.addEventListener('mousemove', resize)
     document.addEventListener('mouseup', stopResize)
 }
@@ -247,10 +253,30 @@ function stopResize(e) {
     localStorage.setItem('window_size', JSON.stringify([width, height]))
 }
 
+let resize_frame = null;
+let _width = $state(null);
+let _height = $state(null);
+
 function resize(e) {
     if(resizing) {
-        width += e.movementX
-        height += e.movementY
+        _width += e.movementX
+        _height += e.movementY
+
+
+        if(!resize_frame) {
+            resize_frame = requestAnimationFrame(() => {
+
+                const nw = width + _width;
+                const nh = height + _height;
+
+                width = nw
+                height = nh
+
+                _width = null
+                _height = null
+                resize_frame = null
+            })
+        }
     }
 }
 
@@ -289,6 +315,7 @@ function resize(e) {
         style="--width:{width}px; --height:{height}px;--offsetX:{position?.x}px;--offsetY:{position?.y}px;"
         class:drag-shadow={dragging}
         class:boxed={!expanded}
+        class:nexp={!expanded}
         class:expanded={expanded} 
         use:draggable={dragopts}
         bind:this={mb}>
@@ -323,9 +350,9 @@ function resize(e) {
 
     </div>
 
-{#if is_dev_mode}
-    <ThemeToggle />
-{/if}
+    {#if is_dev_mode}
+        <ThemeToggle />
+    {/if}
 
 </div>
 
@@ -345,8 +372,10 @@ function resize(e) {
     z-index: 2;
     width: var(--width);
     height: var(--height);
-    top: var(--offsetY);
-    left: var(--offsetX);
+}
+
+.nexp {
+    transform: translate(var(--offsetX), var(--offsetY));
 }
 
 .expanded {

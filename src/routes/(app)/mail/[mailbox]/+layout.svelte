@@ -19,9 +19,7 @@ class:open={expanded || event_open}>
     <ListView />
 
     {#if event_open || expanded}
-        <div class="overflow-hidden"
-        class:border-l={expanded}
-        class:border-border={expanded}>
+        <div class="overflow-hidden border-l border-border">
             {@render children()}
         </div>
     {/if}

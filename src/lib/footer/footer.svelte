@@ -6,8 +6,14 @@ dayjs.extend(relativeTime);
 
 import { 
     cloud,
-    cloud_off
+    cloud_off,
+    show_sidebar,
+    hide_sidebar
 } from '$lib/assets/icons.js'
+
+import { ui_state, toggleSidebar } from '$lib/store/store.svelte.js'
+
+let sidebar_toggled = $derived(ui_state?.sidebar_toggled)
 
 import { sync } from '$lib/store/matrix.svelte.js'
 
@@ -61,6 +67,15 @@ let text = $derived.by(() => {
 
 let opts = $derived.by(() => {
     return {
+        text: sidebar_toggled ? "Hide sidebar" : "Show sidebar",
+        placement: 'top-start',
+        classes: 'p-4',
+        offset: [10, 6]
+    }
+})
+
+let sync_opts = $derived.by(() => {
+    return {
         text: text,
         placement: 'top-start',
         theme: "dark",
@@ -74,7 +89,18 @@ let opts = $derived.by(() => {
 <div class="flex border-t border-border ">
 
     <div class="flex place-items-center px-2 py-1 cursor-pointer"
-        use:tooltip={opts}>
+        use:tooltip={opts} onclick={toggleSidebar}>
+        {#if sidebar_toggled}
+            {@html hide_sidebar}
+        {:else}
+            {@html show_sidebar}
+        {/if}
+    </div>
+
+
+
+    <div class="flex place-items-center px-2 py-1 cursor-pointer"
+        use:tooltip={sync_opts}>
         {#if connected}
             {@html cloud}
         {:else }

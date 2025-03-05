@@ -7,6 +7,8 @@ import Mailbox from './mailbox.svelte'
 
 import { ui_state } from '$lib/store/store.svelte.js'
 
+let sidebar_toggled = $derived(ui_state?.sidebar_toggled)
+
 let { dragging, dragStart, dragEnd } = $props();
 
 let expanded = $derived(ui_state?.expanded)
@@ -57,10 +59,9 @@ let opts_min = $derived.by(() => {
     }
 })
 
-let opts_expanded = $derived.by(() => {
+let opts = $derived.by(() => {
     return {
-        disabled: expanded,
-        text: "Maximize",
+        text: expanded ? "Minimize" : "Maximize",
         placement: placement,
         classes: 'silk',
         offset: offset,
@@ -98,13 +99,14 @@ let mailbox_title = $derived.by(() => {
 <div class="flex bg-bird-900 text-white font-medium"
 ondblclick={cycle}>
 
-    {#if !expanded}
+    {#if !expanded && !sidebar_toggled}
         <Mailbox />
     {/if}
 
-    {#if expanded}
-        <div class="flex place-items-center silk cursor-pointer text-sm py-1" 
-            class:ml-1={expanded}>
+    {#if expanded || sidebar_toggled}
+        <div class="flex place-items-center silk cursor-pointer text-sm " 
+            class:py-1={expanded}
+            class:ml-1={expanded || sidebar_toggled}>
             matrixbird
         </div>
     {/if}
@@ -117,21 +119,14 @@ ondblclick={cycle}>
 
     </div>
 
-    <div class="flex place-items-center mr-1"
-        class:cursor-pointer={expanded}
-        class:opacity-50={!expanded}
-    onclick={minimize}
-    use:tooltip={opts_min}>
-        {@html circle}
-    </div>
-
-    <div class="flex place-items-center mr-1"
-        class:cursor-pointer={!expanded}
-        class:opacity-50={expanded}
-    onclick={maximize}
-    use:tooltip={opts_expanded}>
-
+    <div class="flex place-items-center mr-1 cursor-pointer"
+    onclick={cycle}
+    use:tooltip={opts}>
+        {#if expanded}
+            {@html collapse}
+        {:else}
             {@html fullscreen}
+        {/if}
     </div>
 
 </div>

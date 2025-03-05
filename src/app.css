@@ -51,7 +51,7 @@
 
     --spinner: hsla(0, 0%, 0%, 1);
 
-    --box-shadow: theme('colors.bird.200');
+    --box-shadow: hsla(0, 0%, 93%, 1);
 
     --button-background: white;
     --button-text: hsla(0, 0%, 0%, 1);
@@ -368,12 +368,11 @@ input::placeholder {
     position: fixed;
     background: var(--tooltip-background);
     border: 1px solid var(--border);
-    box-shadow: 4px 4px 0 theme('colors.bird.700');
+    box-shadow: 4px 4px 0 theme('colors.bird.600');
     color: var(--tooltip-text);
     padding: 0.25rem 0.5rem;
     border-radius: 2px;
     font-size: 14px;
-    font-weight: 500;
     pointer-events: none;
     z-index: 100;
     opacity: 0;

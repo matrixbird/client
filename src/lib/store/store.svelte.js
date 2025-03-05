@@ -22,6 +22,7 @@ export const userState = $state({
 
 export const ui_state = $state({
     expanded: false,
+    sidebar_toggled: false,
     drag_offset: null,
 });
 
@@ -48,7 +49,12 @@ function getFromLS(item) {
 }
 
 if(browser) {
-    ui_state.expanded = getFromLS('expanded')
+    let items = ['expanded', 'sidebar_toggled']
+    items.forEach(item => {
+        if(getFromLS(item)) {
+            ui_state[item] = true
+        }
+    })
 }
 
 export function createStore() {
@@ -70,3 +76,17 @@ export function createStore() {
     updateSession,
   };
 }
+
+export function sidebar_toggled() {
+    return ui_state.sidebar_toggled
+}
+
+export function toggleSidebar() {
+    ui_state.sidebar_toggled = !ui_state.sidebar_toggled
+    if(ui_state.sidebar_toggled) {
+        localStorage.setItem('sidebar_toggled', true)
+    } else {
+        localStorage.removeItem('sidebar_toggled')
+    }
+  }
+

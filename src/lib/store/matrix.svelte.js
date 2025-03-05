@@ -6,6 +6,10 @@ import {
   PUBLIC_HOMESERVER,
 } from '$env/static/public';
 import { v4 as uuidv4 } from 'uuid';
+import {
+	goto,
+} from '$app/navigation';
+
 
 let ready = $state(false);
 let synced = $state(false);
@@ -72,9 +76,10 @@ export function createMatrixStore() {
       const whoami = await client.whoami()
       console.log(whoami);
     } catch(e) {
-      console.log("Error getting whoami", e)
       if(e.errcode === "M_UNKNOWN_TOKEN") {
-        console.log("logging out")
+        console.warn("Invalid access token. Logging out.")
+        goto('/login')
+        return
       }
     }
 

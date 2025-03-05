@@ -5,10 +5,13 @@ import { error, redirect } from "@sveltejs/kit";
 export const handle = async ({ event, resolve }) => {
 
   let session_id = event.cookies.get("session_id");
+  let access_token = event.cookies.get("access_token");
+  let device_id = event.cookies.get("device_id");
+  let user_id = event.cookies.get("user_id");
 
   if(event.route.id === null) {
 
-    if(!session_id) {
+    if(!session_id || !access_token || !device_id || !user_id) {
       redirect(303, `/login`);
     }
 
