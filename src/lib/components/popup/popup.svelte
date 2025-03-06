@@ -22,6 +22,7 @@ let {
         showArrow: false,
         action: "click",
         hoverDelay: 10,
+        hoverOutDelay: 300,
         decoration: true,
     }
 } = $props();
@@ -44,6 +45,9 @@ let action = $derived.by(() => {
 })
 let hoverDelay = $derived.by(() => {
     return opts?.hoverDelay || 10;
+})
+let hoverOutDelay = $derived.by(() => {
+    return opts?.hoverOutDelay || 300;
 })
 let decoration = $derived.by(() => {
     if(opts?.decoration === undefined) {
@@ -184,7 +188,7 @@ function handleMouseLeave() {
         clearTimeout(hoverTimeout);
         hoverTimeout = setTimeout(() => {
             open = false;
-        }, hoverDelay);
+        }, hoverOutDelay);
     }
 }
 
@@ -198,7 +202,7 @@ function handlePopupMouseLeave() {
     if (action === 'hover') {
         hoverTimeout = setTimeout(() => {
             open = false;
-        }, hoverDelay);
+        }, hoverOutDelay);
     }
 }
 

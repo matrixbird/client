@@ -17,10 +17,11 @@ import Editor from '$lib/editor/editor.svelte'
 import EmailContextMenu from '$lib/components/email/context-menu.svelte'
 import ThemeToggle from '$lib/theme/toggle.svelte'
 import Navbar from '$lib/navbar/navbar.svelte';
+import Alert from '$lib/components/alert/alert.svelte'
 
 import { userState, ui_state } from '$lib/store/store.svelte.js'
-import { createStore, dev_mode } from '$lib/store/store.svelte.js'
-const store = createStore()
+import { createAppStore, dev_mode } from '$lib/store/store.svelte.js'
+const store = createAppStore()
 
 import { createMatrixStore } from '$lib/store/matrix.svelte.js'
 const matrixStore = createMatrixStore()
@@ -73,8 +74,9 @@ onDestroy(() => {
 })
 
 function handleResize(e) {
-    //position = calcPosition()
-    //localStorage.setItem('window_position', JSON.stringify([position.x,position.y]))
+    calcSize()
+    position = calcPosition()
+    localStorage.setItem('window_position', JSON.stringify([position.x,position.y]))
 }
 
 let is_dev_mode = $derived(dev_mode?.enabled);
@@ -142,6 +144,19 @@ $effect(() => {
 
 })
 
+function calcSize() {
+    if (!browser && !mb) return;
+
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    if(width > vw) {
+        width = vw - 100
+    }
+    if(height > vh) {
+        height = vh - 100
+    }
+}
 
 function calcPosition() {
     if (!browser && !mb) return;
@@ -358,6 +373,8 @@ function resize(e) {
     {/if}
 
 </div>
+
+<Alert />
 
 
 <style>

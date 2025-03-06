@@ -25,6 +25,8 @@ import {
     close 
 } from '$lib/assets/icons.js'
 
+import { newAlert } from '$lib/store/store.svelte.js'
+
 import { createMatrixStore } from '$lib/store/matrix.svelte.js'
 const store = createMatrixStore()
 
@@ -114,7 +116,12 @@ async function focusSubject() {
 async function process() {
 
     if(emails.length == 0) {
-        to_input.focus()
+        newAlert({
+            title: "No Recipients",
+            message: "Please add at least one recipient",
+        })
+        //await tick()
+        //to_input.focus()
         return
     }
 

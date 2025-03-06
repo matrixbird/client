@@ -2,6 +2,8 @@ import * as sdk from 'matrix-js-sdk';
 import { SvelteMap } from 'svelte/reactivity';
 import { browser } from '$app/environment';
 
+import { updateAppStatus } from '$lib/store/store.svelte.js';
+
 import { 
   PUBLIC_HOMESERVER,
 } from '$env/static/public';
@@ -42,7 +44,6 @@ export let sync = $state({
   last_retry: null,
 });
 
-
 export function createMatrixStore() {
 
   function updateSession(data) {
@@ -64,6 +65,7 @@ export function createMatrixStore() {
     session = opts
 
     console.info("Creating matrix client.", opts)
+    updateAppStatus("Connecting...")
 
     client =  sdk.createClient({
       baseUrl: PUBLIC_HOMESERVER,
@@ -78,6 +80,7 @@ export function createMatrixStore() {
     try {
       const whoami = await client.whoami()
       console.log(whoami);
+      updateAppStatus("Verified user.")
     } catch(e) {
       if(e.errcode === "M_UNKNOWN_TOKEN") {
         console.warn("Invalid access token. Logging out.")
@@ -243,9 +246,11 @@ export function createMatrixStore() {
 
       if (state === "ERROR") {
         sync.last_retry = new Date();
+        updateAppStatus("Failed to sync.")
       }
 
       if (state === "SYNCING") {
+        //updateAppStatus("Syncing...")
       }
 
       if (state === "RECONNECTING") {
@@ -253,6 +258,7 @@ export function createMatrixStore() {
       }
 
       if(state === "PREPARED") {
+        updateAppStatus("Connected.")
 
         sync.last_sync = new Date();
 

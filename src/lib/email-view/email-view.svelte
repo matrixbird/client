@@ -6,6 +6,8 @@ import { mxid_to_email } from '$lib/utils/matrix.js'
 
 import ReplyComposer from '$lib/editor/reply-composer.svelte'
 
+import { newAlert } from '$lib/store/store.svelte.js'
+
 import { createMatrixStore } from '$lib/store/matrix.svelte.js'
 const store = createMatrixStore()
 
@@ -90,7 +92,9 @@ let replying = $derived.by(() => {
 
 function reply() {
     if(email.type == "matrixbird.email.legacy") {
-        alert("Replying to regular emails is disabled for now.")
+        newAlert({
+            message: "Replying to regular emails is disabled for now.",
+        })
         return
     }
 

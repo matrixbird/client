@@ -9,7 +9,8 @@ let session = $state(null);
 
 export const app = $state({
     started_at: new Date().valueOf(),
-    ready: false
+    ready: false,
+    status: null,
 });
 
 export const dev_mode = $state({
@@ -40,6 +41,24 @@ export const count = $state({
     inbox: null
 });
 
+export const alert = $state({
+    active: false,
+    title: null,
+    message: null,
+});
+
+export function newAlert(data) {
+    alert.title = data.title
+    alert.message = data.message
+    alert.active = true
+}
+
+export function killAlert() {
+    alert.active = false
+    alert.title = null
+    alert.message = null
+}
+
 
 function getFromLS(item) {
     if(localStorage.getItem(item)) {
@@ -57,23 +76,29 @@ if(browser) {
     })
 }
 
-export function createStore() {
+export function updateAppStatus(status) {
+  app.status = status;
+}
 
-  function updateSession(data) {
-    session = data
+export function createAppStore() {
+
+  function appIsReady() {
+    app.ready = true;
   }
+
 
   return {
 
-    get session() {
-      return session;
+    get app() {
+      return app;
     },
 
     get ui() {
       return createUIStore();
     },
 
-    updateSession,
+    appIsReady,
+    updateAppStatus
   };
 }
 

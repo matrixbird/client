@@ -11,7 +11,9 @@ import {
     hide_sidebar
 } from '$lib/assets/icons.js'
 
-import { ui_state, toggleSidebar } from '$lib/store/store.svelte.js'
+import { app, ui_state, toggleSidebar } from '$lib/store/store.svelte.js'
+
+let app_status = $derived(app?.status)
 
 let sidebar_toggled = $derived(ui_state?.sidebar_toggled)
 
@@ -110,17 +112,9 @@ let sync_opts = $derived.by(() => {
 
 
 
-    {#if hovered && connected && last_sync}
-        <div class="flex place-items-center text-xs leading-5">
-            Last sync: {last_sync} ({sync.last_sync})
-        </div>
-    {/if}
-
-    {#if hovered && disconnected && last_retry}
-        <div class="flex place-items-center text-xs leading-5">
-            Last retry: {last_retry} ({sync.last_retry})
-        </div>
-    {/if}
+    <div class="status flex place-items-center text-sm ml-2">
+        {app_status}
+    </div>
 
 
 </div>
