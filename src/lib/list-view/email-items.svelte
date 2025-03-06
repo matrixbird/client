@@ -66,7 +66,7 @@ let inbox_emails = $derived.by(() => {
 
 </script>
 
-<div class="flex flex-col overflow-x-hidden">
+<div class="items-container flex flex-col overflow-x-hidden">
     {#if is_inbox && inbox_emails}
         {#each inbox_emails as email (email.event_id)}
             <EmailItem {email} />

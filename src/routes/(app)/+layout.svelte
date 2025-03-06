@@ -327,7 +327,7 @@ function resize(e) {
 {/if}
 
 
-    <div class="mb grid grid-rows-[auto_1fr_auto] overflow-hidden bg-background
+    <div class="mb grid grid-rows-[auto_1fr_auto] bg-background
         select-none absolute
         "
         style="--width:{width}px; --height:{height}px;--offsetX:{position?.x}px;--offsetY:{position?.y}px;"
@@ -359,11 +359,14 @@ function resize(e) {
 
         </div>
 
-        <div class="absolute bottom-0 right-0 h-5 w-5 border-r-2 border-b-2
-            hover:border-bird-600
-            border-bird-400 cursor-nwse-resize"
-            onmousedown={startResize}
-            onmouseup={stopResize}>
+        <div class="group absolute bottom-[-4px] right-[-4px] pr-1 pb-1 cursor-nwse-resize"
+                onmousedown={startResize}
+                onmouseup={stopResize}>
+            <div class="h-4 w-4 border-r-2
+                border-b-2
+                group-hover:border-bird-600
+                border-bird-400">
+            </div>
         </div>
 
     </div>

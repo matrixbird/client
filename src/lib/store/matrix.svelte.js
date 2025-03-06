@@ -260,6 +260,10 @@ export function createMatrixStore() {
       if(state === "PREPARED") {
         updateAppStatus("Connected.")
 
+        setTimeout(() => {
+          updateAppStatus(null)
+        }, 2000)
+
         sync.last_sync = new Date();
 
         nextSyncToken = data.nextSyncToken;

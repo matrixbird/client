@@ -25,7 +25,7 @@ import {
     close 
 } from '$lib/assets/icons.js'
 
-import { newAlert } from '$lib/store/store.svelte.js'
+import { newAlert, updateAppStatus } from '$lib/store/store.svelte.js'
 
 import { createMatrixStore } from '$lib/store/matrix.svelte.js'
 const store = createMatrixStore()
@@ -99,6 +99,8 @@ let subject = $state('');
 let subject_input;
 let body = $state('');
 
+let hidden = $state(false)
+
 onMount(() => {
     focusTo()
 })
@@ -115,24 +117,58 @@ async function focusSubject() {
 
 async function process() {
 
+    if(emails.length == 0 && to.length != 0) {
+
+        let email_valid = validate(to);
+
+        let message = `The address <strong>${to}</strong> is not valid. Please enter a valid email`;
+
+        if(email_valid) {
+            message = `Sending regular emails is disabled for now. Please choose a valid matrix email.`
+        }
+        newAlert({
+            message: message,
+        })
+
+        return
+    }
+
+
     if(emails.length == 0) {
         newAlert({
             title: "No Recipients",
             message: "Please add at least one recipient",
         })
-        //await tick()
-        //to_input.focus()
         return
     }
 
     for(let email of emails) {
         if(!email.valid) {
-            alert(`Sending regular emails is disabled for now. Please choose a valid matrix email address.`)
-            await tick()
-            to_input.focus()
+            newAlert({
+                message: `Sending regular emails is disabled for now. Please
+choose a valid matrix email`,
+            })
             return
         }
     }
+
+    if(emails.length == 0 && to.length != 0) {
+        newAlert({
+            message: `The address <strong>${to}</strong> is not valid. Please enter a valid email
+address.`,
+        })
+        return
+    }
+
+    if(body.text == "" || body.html == "<p></p>") {
+        newAlert({
+            message: `Please enter a message to send. Your email cannot be
+empty.`,
+        })
+        return
+    }
+
+
 
     let mxids = emails.map(e => email_to_mxid(e.email))
 
@@ -150,6 +186,9 @@ async function process() {
 
     if(!subject) {
     }
+
+    hidden = true
+    updateAppStatus("Sending email...")
 
     if(mxids.length == 1 && mxids[0] == store.user?.userId) {
         console.log("this is for me")
@@ -178,6 +217,7 @@ async function process() {
             );
             console.log('msg', msg)
 
+            updateAppStatus(null)
             closeWindow()
         }
 
@@ -223,10 +263,12 @@ async function process() {
         );
         console.log('msg', msg)
 
+        updateAppStatus(null)
         closeWindow()
 
     } catch(e) {
         console.log('error', e)
+        hidden = false
     }
 }
 
@@ -389,6 +431,7 @@ let opts_close = $derived.by(() => {
 </script>
 
 
+{#if !hidden}
 <div class="boxed editor grid grid-rows-[auto_1fr] bg-white
     min-w-[34rem]
     select-none"
@@ -489,6 +532,8 @@ let opts_close = $derived.by(() => {
 {#if expanded}
     <div class="mask bg-mask" onclick={minimizeWindow}>
     </div>
+{/if}
+
 {/if}
 
 <style lang="postcss">

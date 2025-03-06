@@ -33,7 +33,7 @@ function kill(e) {
             {title || 'Error'}
         </div>
         <div class="mt-4 leading-5 text-md">
-            {message}
+            {@html message}
         </div>
         <div class="flex justify-end mt-4">
             <button onclick={killAlert} class="primary px-4 py-2 font-sm ">OK</button>
