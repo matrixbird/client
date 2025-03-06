@@ -201,7 +201,7 @@ empty.`,
 
             const msg = await store.client.sendEvent(
                 room_id,
-                "matrixbird.email.native",
+                "matrixbird.email.matrix",
                 {
                     from: {
                         name: store.user?.displayName,
@@ -247,7 +247,7 @@ empty.`,
 
         const msg = await store.client.sendEvent(
             room_id,
-            "matrixbird.email.native",
+            "matrixbird.email.matrix",
             {
                 from: {
                     name: store.user?.displayName,

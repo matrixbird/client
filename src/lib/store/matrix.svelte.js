@@ -32,6 +32,7 @@ let rooms = $state({});
 let members = $state(new SvelteMap());
 
 let events = $state(new SvelteMap());
+
 export let status = $state({
   events_ready: false,
 });
@@ -42,6 +43,12 @@ export let sync = $state({
   state: null,
   last_sync: null,
   last_retry: null,
+});
+
+export let mailbox_rooms = $state({
+  inbox: null,
+  drafts: null,
+  self: null,
 });
 
 export function createMatrixStore() {
@@ -136,7 +143,7 @@ export function createMatrixStore() {
           const messages = messagesResult.chunk;
           console.log(`Fetched ${messages.length} messages using createMessagesRequest`);
           for (const message of messages) {
-            if(message.type == "matrixbird.email.native") {
+            if(message.type == "matrixbird.email.matrix") {
               events.set(message.event_id, message);
             }
           }
@@ -160,24 +167,19 @@ export function createMatrixStore() {
       }
     }
 
-    client.on(sdk.RoomMemberEvent.Membership, function (event, room, toStartOfTimeline) {
-      //console.log(event)
-    });
-
-    client.on(sdk.UserEvent.DisplayName, function (event, room, toStartOfTimeline) {
-      //console.log(event?.event)
-    });
-
-    client.on(sdk.UserEvent.AvatarUrl, function (event, room, toStartOfTimeline) {
-      //console.log(event?.event)
+    client.on(sdk.RoomStateEvent.Events, function (event, room, toStartOfTimeline) {
+      if(event?.event?.type == "matrixbird.room.type") {
+        //console.log(event.event)
+        //console.log(event.event.state_key)
+      }
     });
 
 
     client.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
       if(event?.event) {
         let event_type = event.event.type;
-        if (event_type === "matrixbird.email.legacy" || 
-          event_type === "matrixbird.email.native") {
+        if (event_type === "matrixbird.email.standard" || 
+          event_type === "matrixbird.email.matrix") {
 
           let isSending = event.isSending();
 
@@ -211,7 +213,7 @@ export function createMatrixStore() {
     client.on(sdk.RoomStateEvent.Events, function (event, room, toStartOfTimeline) {
       if(event?.event) {
         let event_type = event.event.type;
-        if (event_type === "matrixbird.email.native") {
+        if (event_type === "matrixbird.email.matrix") {
           let exists = events.find((e) => e.event_id === event.event.event_id);
           if(!exists) {
             events.push(event.event);
@@ -229,8 +231,8 @@ export function createMatrixStore() {
         const timeline = room.getLiveTimeline();
         timeline.getEvents().forEach((event) => {
           let event_type = event.getType();
-          if (event_type === "matrixbird.email.legacy" || 
-            event_type === "matrixbird.email.native") {
+          if (event_type === "matrixbird.email.standard" || 
+            event_type === "matrixbird.email.matrix") {
             events.set(event.getId(), event.event);
           }
         });
@@ -275,37 +277,17 @@ export function createMatrixStore() {
         user = logged_in_user;
 
 
-        //buildEvents()
-
-
-        /*
-        const items = client.getRooms();
-        items.forEach((room) => {
-          const timeline = room.getLiveTimeline();
-          //console.log(timeline);
-        });
-
-        Object.keys(client.store.rooms).forEach((roomId) => {
-          const room = client.getRoom(roomId);
-          const alias = room.getCanonicalAlias();
-          //console.log(alias);
-          client.getRoom(roomId).timeline.forEach((t) => {
-            //console.log(t.event);
-          });
-        });
-
-        //console.log(client);
-        console.log(rooms);
-        */
-
         Object.keys(client.store.rooms).forEach((roomId) => {
           const room = client.getRoom(roomId);
           rooms[roomId] = room;
         });
 
+        getMailboxRooms();
+
         ready = true
       }
     });
+
 
 
     await client.startClient({
@@ -317,6 +299,21 @@ export function createMatrixStore() {
     });
 
 
+  }
+
+  async function getMailboxRooms() {
+    let inbox = await client.getAccountDataFromServer("matrixbird.room.inbox");
+    if(inbox?.room_id) {
+      mailbox_rooms.inbox = inbox.room_id;
+    }
+    let self = await client.getAccountDataFromServer("matrixbird.room.self");
+    if(self?.room_id) {
+      mailbox_rooms.self = self.room_id;
+    }
+    let drafts = await client.getAccountDataFromServer("matrixbird.room.drafts");
+    if(drafts?.room_id) {
+      mailbox_rooms.drafts = drafts.room_id;
+    }
   }
 
   async function syncOnce(){
@@ -398,7 +395,7 @@ export function createMatrixStore() {
       /*
       power_level_content_override: {
         events: {
-          'matrixbird.email.native': 100,
+          'matrixbird.email.matrix': 100,
         }
       },
       */
@@ -419,7 +416,7 @@ export function createMatrixStore() {
         },
         /*
         {
-          type: 'matrixbird.email.native',
+          type: 'matrixbird.email.matrix',
           state_key: 'initial',
           content: initMsg
         }

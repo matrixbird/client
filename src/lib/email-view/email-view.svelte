@@ -67,7 +67,7 @@ let address = $derived.by(() => {
 })
 
 const native = $derived.by(() => {
-    return email?.type == "matrixbird.email.native"
+    return email?.type == "matrixbird.email.matrix"
 })
 
 let user = $derived.by(() =>{
@@ -91,7 +91,7 @@ let replying = $derived.by(() => {
 })
 
 function reply() {
-    if(email.type == "matrixbird.email.legacy") {
+    if(email.type == "matrixbird.email.standard") {
         newAlert({
             message: "Replying to regular emails is disabled for now.",
         })

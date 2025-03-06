@@ -109,7 +109,7 @@ let address = $derived.by(() => {
 })
 
 const native = $derived.by(() => {
-    return email?.type == "matrixbird.email.native"
+    return email?.type == "matrixbird.email.matrix"
 })
 
 let user = $derived.by(() =>{

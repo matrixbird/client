@@ -18,6 +18,8 @@ import {
     close 
 } from '$lib/assets/icons.js'
 
+import { newAlert, updateAppStatus } from '$lib/store/store.svelte.js'
+
 import { createMatrixStore } from '$lib/store/matrix.svelte.js'
 const store = createMatrixStore()
 
@@ -69,6 +71,15 @@ $effect(() => {
 
 async function process() {
 
+    if(body.text == "" || body.html == "<p></p>") {
+        newAlert({
+            message: `Please enter a message to send. Your email cannot be
+empty.`,
+        })
+        return
+    }
+
+
     let thread_id = email.event_id
 
     if(email?.content?.["m.relates_to"]?.event_id) {
@@ -76,11 +87,12 @@ async function process() {
     }
 
         let to = email.sender
-        if(email.type == "matrixbird.email.legacy") {
+        if(email.type == "matrixbird.email.standard") {
             to = email.content.from.address
         }
 
-        console.log("to", to)
+    updateAppStatus("Sending reply...")
+
     try {
 
         let room_id = email.room_id
@@ -114,6 +126,7 @@ async function process() {
             uuidv4()
         );
         console.log('event_id', msg)
+        updateAppStatus(null)
         killReply()
 
     } catch(e) {
