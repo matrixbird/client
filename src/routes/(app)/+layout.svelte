@@ -362,10 +362,11 @@ function resize(e) {
         <div class="group absolute bottom-[-4px] right-[-4px] pr-1 pb-1 cursor-nwse-resize"
                 onmousedown={startResize}
                 onmouseup={stopResize}>
-            <div class="h-4 w-4 border-r-2
-                border-b-2
-                group-hover:border-bird-600
-                border-bird-400">
+            <div class="grabber h-4 w-4 border-r
+                border-b
+                group-hover:border-bird-900
+                group-hover:bg-bird-900
+                border-bird-700">
             </div>
         </div>
 
@@ -418,5 +419,8 @@ function resize(e) {
 .drag-shadow {
     outline: 2px solid theme('colors.bird.700');
     box-shadow: none;
+}
+.grabber {
+    clip-path: polygon(0 100%,100% 0,100% 100%);
 }
 </style>

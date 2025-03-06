@@ -119,9 +119,17 @@ empty.`,
             content["m.relates_to"]["matrixbird.in_reply_to"] = email.content.message_id
         }
 
+        let replyType = ``
+        if(email.type.includes("matrixbird.email.standard")) {
+            replyType = `matrixbird.email.standard.reply`
+        }
+        if(email.type.includes("matrixbird.email.matrix")) {
+            replyType = `matrixbird.email.matrix.reply`
+        }
+
         const msg = await store.client.sendEvent(
             room_id,
-            email.type,
+            replyType,
             content,
             uuidv4()
         );

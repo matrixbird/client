@@ -143,7 +143,7 @@ export function createMatrixStore() {
           const messages = messagesResult.chunk;
           console.log(`Fetched ${messages.length} messages using createMessagesRequest`);
           for (const message of messages) {
-            if(message.type == "matrixbird.email.matrix") {
+            if (message.type.includes("matrixbird.email")) {
               events.set(message.event_id, message);
             }
           }
@@ -178,8 +178,7 @@ export function createMatrixStore() {
     client.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
       if(event?.event) {
         let event_type = event.event.type;
-        if (event_type === "matrixbird.email.standard" || 
-          event_type === "matrixbird.email.matrix") {
+        if (event_type.includes("matrixbird.email")) {
 
           let isSending = event.isSending();
 
@@ -231,8 +230,7 @@ export function createMatrixStore() {
         const timeline = room.getLiveTimeline();
         timeline.getEvents().forEach((event) => {
           let event_type = event.getType();
-          if (event_type === "matrixbird.email.standard" || 
-            event_type === "matrixbird.email.matrix") {
+          if (event_type.includes("matrixbird.email")) {
             events.set(event.getId(), event.event);
           }
         });
