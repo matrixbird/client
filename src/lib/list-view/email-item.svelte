@@ -135,14 +135,14 @@ let is_matrixbird = $derived.by(() => {
 
 function open(e) {
     if(e.ctrlKey) {
-        console.log(events.get(email.event_id))
+        //console.log(events.get(email.event_id))
         console.log($state.snapshot(email))
         return
     }
     const mailbox = $page.params.mailbox
 
 
-    goto(`/mail/${mailbox}/${last_email_in_thread.event_id}`)
+    goto(`/mail/${mailbox}/${email.event_id}`)
 }
 
 function log(e) {
@@ -169,9 +169,6 @@ function selectEmail(e) {
 }
 
 const active = $derived.by(() => {
-    if(thread_events.length > 0) {
-        return thread_events.find(event => event.event_id == $page.params.event) ? true : false
-    }
     return $page.params.event === email.event_id
 })
 

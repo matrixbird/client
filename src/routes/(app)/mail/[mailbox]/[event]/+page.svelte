@@ -7,16 +7,30 @@ import { goto } from '$app/navigation';
 
 import { close } from '$lib/assets/icons.js'
 
-import { createMatrixStore } from '$lib/store/matrix.svelte.js'
+import { createMatrixStore, status } from '$lib/store/matrix.svelte.js'
 const store = createMatrixStore()
 
 const events = $derived(store?.events)
+const threads = $derived(store?.threads)
+const thread_events = $derived(store?.thread_events)
 
 
 function buildEmails() {
-    if(events && $page.params.event) {
-        let email = events.get($page.params.event)
+    if(threads && thread_events && $page.params.event) {
+        let email = threads.get($page.params.event)
 
+        let emails = [email]
+
+        let replies = thread_events.get(email.event_id)
+
+        if(replies) {
+            for (const event of replies.values()) {
+                emails.push(event)
+            }
+        }
+
+        return emails
+        /*
         if(email?.content?.["m.relates_to"]?.event_id) {
             let thread_root = events.get(email.content["m.relates_to"].event_id)
 
@@ -43,11 +57,13 @@ function buildEmails() {
             }
             return emails
         }
+        */
 
     }
 }
 
 let emails = $derived.by(() => {
+    if(!status.thread_events_ready) return 
     return buildEmails(events, $page.params.event)
 })
 

@@ -9,6 +9,9 @@ import { count } from '$lib/store/store.svelte.js'
 const store = createMatrixStore()
 const events = $derived(store?.events)
 
+const threads = $derived(store?.threads)
+const thread_events = $derived(store?.thread_events)
+
 let user = $derived(store?.user)
 
 let mailbox = $derived.by(() => {
@@ -34,24 +37,35 @@ $effect(() => {
 })
 
 function process(email) {
-    for (const event of events.values()) {
-        if(event.content["m.relates_to"]?.event_id == email.event_id && event.sender != user?.userId) {
-            return true
+    let _thread_events = thread_events.get(email.event_id)
+    if(_thread_events) {
+        for (const event of _thread_events.values()) {
+            if(event.sender != user?.userId) {
+                return true
+            }
         }
     }
+
+    let latest_event = email?.unsigned?.["m.relations"]?.["m.thread"]?.latest_event;
+    if(latest_event.type == "matrixbird.thread.marker" &&
+    latest_event.sender == user?.userId) {
+        return false
+    }
+
+    if(latest_event.sender != user?.userId) {
+        return true
+    }
+
     return email.sender != user?.userId
 }
 
-function buildInboxEmails(events) {
-    if(events && user) {
-        let sorted = [...events.values()].sort((a, b) => 
+function buildInboxEmails(threads) {
+    if(threads && user) {
+        let sorted = [...threads.values()].sort((a, b) => 
             b.origin_server_ts - a.origin_server_ts
         );
-        let filtered = sorted.filter((email) => {
-            return email.content?.["m.relates_to"] == undefined
-        })
 
-        filtered = filtered.filter((email) => {
+        let filtered = sorted.filter((email) => {
             return process(email)
         })
         return filtered
@@ -59,14 +73,15 @@ function buildInboxEmails(events) {
 }
 
 let inbox_emails = $derived.by(() => {
-    if(is_inbox) {
-        return buildInboxEmails(events)
+    if(is_inbox && status.threads_ready && status.thread_events_ready) {
+        return buildInboxEmails(threads)
     }
 })
 
 </script>
 
 <div class="items-container flex flex-col overflow-x-hidden">
+
     {#if is_inbox && inbox_emails}
         {#each inbox_emails as email (email.event_id)}
             <EmailItem {email} />

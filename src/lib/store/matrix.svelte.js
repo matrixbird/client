@@ -33,10 +33,15 @@ let members = $state(new SvelteMap());
 
 let threads = $state(new SvelteMap());
 let thread_events = $state(new SvelteMap());
+
 let events = $state(new SvelteMap());
+
+let joined_rooms = $state([]);
 
 export let status = $state({
   events_ready: false,
+  threads_ready: false,
+  thread_events_ready: false,
 });
 
 let created_rooms = $state({});
@@ -100,14 +105,18 @@ export function createMatrixStore() {
     }
 
     client.on(sdk.RoomEvent.MyMembership, function (room, membership, prev) {
+
       if (membership === sdk.KnownMembership.Join) {
         //console.log("joined", room.roomId)
+        joined_rooms.push(room.roomId)
       }
+
       if (membership === sdk.KnownMembership.Invite) {
         let is_local = is_local_room(room.roomId);
         if(is_local) {
-          console.log("is local room")
-          join_local_room(room.roomId)
+          setTimeout(() => {
+            join_local_room(room.roomId)
+          }, 1000)
         } else {
           setTimeout(() => {
             join_room(room.roomId);
@@ -118,7 +127,13 @@ export function createMatrixStore() {
 
 
     async function join_local_room(roomId) {
+
+      let exists = joined_rooms.find(r => r === roomId);
+      if(exists) {
+        return;
+      }
       console.log("Joining local room:", roomId);
+
       let room = await client.joinRoom(roomId, {
         syncRoom: true,
       });
@@ -127,9 +142,8 @@ export function createMatrixStore() {
 
     async function join_room(roomId) {
 
-      let exists = rooms[roomId];
+      let exists = joined_rooms.find(r => r === roomId);
       if(exists) {
-        console.log("Already joined room:", roomId);
         return;
       }
 
@@ -264,30 +278,48 @@ export function createMatrixStore() {
 
     }
 
-    async function buildThreadEvents(roomId, events) {
+    async function buildThreadEvents(roomEventsMap) {
 
-      events = events.filter(event => {
-        let latest_event = event?.unsigned?.["m.relations"]?.["m.thread"]?.latest_event;
-        return latest_event.type != "matrixbird.thread.marker"
-      })
+      const eventPairs = [];
 
-      const threadPromises = events.map(event => get_thread_events(roomId, event.event_id));
+      for (const [roomId, events] of Object.entries(roomEventsMap)) {
+        const filteredEvents = events.filter(event => {
+          let latest_event = event?.unsigned?.["m.relations"]?.["m.thread"]?.latest_event;
+          return latest_event.type != "matrixbird.thread.marker";
+        });
+
+        filteredEvents.forEach(event => {
+          eventPairs.push([roomId, event.event_id]);
+        });
+      }
+
+      const threadPromises = eventPairs.map(([roomId, eventId]) => 
+        get_thread_events(roomId, eventId));
       const allEvents = await Promise.allSettled(threadPromises);
 
-      allEvents.forEach((items, index) => {
+      const updates = new Map();
 
-        let thread_root = items.value.chunk[0]?.content?.["m.relates_to"]?.event_id;
+      allEvents.forEach((result) => {
+        if (result.status === 'fulfilled') {
+          const items = result.value;
+          let thread_root = items.chunk[0]?.content?.["m.relates_to"]?.event_id;
 
-        let filtered = items.value.chunk.filter(event => {
-          return event.type != "matrixbird.thread.marker"
-        })
+          if (thread_root) {
+            let filtered = items.chunk.filter(event => {
+              return event.type != "matrixbird.thread.marker";
+            });
 
-        thread_events.set(thread_root, filtered);
-
-        //console.log(`Events for thread ${events[index].event_id}:`, items.value.chunk);
+            updates.set(thread_root, filtered);
+          }
+        }
       });
-      console.log("thread_events", thread_events)
+
+      updates.forEach((value, key) => {
+        thread_events.set(key, value);
+      });
+
     }
+
 
     async function buildThreads() {
       let rooms = client.getRooms();
@@ -300,16 +332,29 @@ export function createMatrixStore() {
       const threadPromises = rooms.map(room => get_threads(room.roomId));
       const allThreads = await Promise.allSettled(threadPromises);
 
-      allThreads.forEach((items, index) => {
+      const roomEventsMap = {};
+      const threadUpdates = new Map();
 
-        for (const thread of items.value.chunk) {
-          threads.set(thread.event_id, thread);
+      allThreads.forEach((result, index) => {
+        if (result.status === 'fulfilled') {
+          const roomId = rooms[index].roomId;
+          roomEventsMap[roomId] = result.value.chunk;
+
+          result.value.chunk.forEach(thread => {
+            threadUpdates.set(thread.event_id, thread);
+          });
         }
-
-        buildThreadEvents(rooms[index].roomId, items.value.chunk);
       });
-      console.log("threads", threads)
-    
+
+      threadUpdates.forEach((value, key) => {
+        threads.set(key, value);
+      });
+
+      await buildThreadEvents(roomEventsMap);
+
+      status.threads_ready = true;
+      status.thread_events_ready = true;
+
 
 
       for (const room of rooms) {
@@ -392,7 +437,7 @@ export function createMatrixStore() {
 
     await client.startClient({
       initialSyncLimit: 1000,
-      lazyLoadMembers: false,
+      lazyLoadMembers: true,
       disablePresence: true,
       //threadSupport: true,
       resolveInvitesToProfiles: true,
@@ -554,6 +599,14 @@ export function createMatrixStore() {
 
     get events() {
       return events;
+    },
+
+    get threads() {
+      return threads;
+    },
+
+    get thread_events() {
+      return thread_events;
     },
 
     get rooms() {
