@@ -14,9 +14,9 @@ function setupKeyListener() {
         }
 
         if (event.shiftKey && event.key.toLowerCase() === 'n') {
-            event.preventDefault();
-            console.log('Ctrl+N was pressed!');
-            return false;
+            //event.preventDefault();
+            //console.log('Ctrl+N was pressed!');
+            //return false;
         }
     });
 }

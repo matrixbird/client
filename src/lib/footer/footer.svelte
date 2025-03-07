@@ -11,47 +11,47 @@ import {
     hide_sidebar
 } from '$lib/assets/icons.js'
 
-import { app, ui_state, toggleSidebar } from '$lib/store/store.svelte.js'
+import { app, ui_state, toggleSidebar } from '$lib/store/app.svelte.js'
 
 let app_status = $derived(app?.status)
 
 let sidebar_toggled = $derived(ui_state?.sidebar_toggled)
 
-import { sync } from '$lib/store/matrix.svelte.js'
+import { sync_state } from '$lib/store/matrix.svelte.js'
 
 let connected = $derived.by(() => {
-    return sync.state == "PREPARED" || sync.state == "SYNCING"
+    return sync_state.state == "PREPARED" || sync_state.state == "SYNCING"
 })
 
 let disconnected = $derived.by(() => {
-    return sync.state == "ERROR" || sync.state == "RECONNECTING"
+    return sync_state.state == "ERROR" || sync_state.state == "RECONNECTING"
 })
 
 let reconnecting = $derived.by(() => {
-    return sync.state == "RECONNECTING"
+    return sync_state.state == "RECONNECTING"
 })
 
 let syncing = $derived.by(() => {
-    return sync.state == "SYNCING"
+    return sync_state.state == "SYNCING"
 })
 
 let status = $derived.by(() => {
-    if(sync.state == "PREPARED" || sync.state == "SYNCING") {
+    if(sync_state.state == "PREPARED" || sync_state.state == "SYNCING") {
         return "Connected"
-    } else if(sync.state == "RECONNECTING") {
+    } else if(sync_state.state == "RECONNECTING") {
         return "Trying to reconnect..."
-    } else if(sync.state == "ERROR") {
+    } else if(sync_state.state == "ERROR") {
         return "Disconnected"
     }
-    return sync.state
+    return sync_state.state
 })
 
 let last_sync = $derived.by(() => {
-    return dayjs(sync.last_sync).fromNow()
+    return dayjs(sync_state.last_sync).fromNow()
 })
 
 let last_retry = $derived.by(() => {
-    return dayjs(sync.last_retry).fromNow()
+    return dayjs(sync_state.last_retry).fromNow()
 })
 
 let hovered = $state(false);

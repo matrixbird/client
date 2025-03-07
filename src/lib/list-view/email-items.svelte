@@ -1,10 +1,10 @@
 <script>
-import { createMatrixStore, status } from '$lib/store/matrix.svelte.js'
+import { createMatrixStore, status, inbox_mail } from '$lib/store/matrix.svelte.js'
 import EmailItem from './email-item.svelte'
 import { goto } from '$app/navigation';
 import { page } from '$app/stores';
 
-import { count } from '$lib/store/store.svelte.js'
+import { count } from '$lib/store/app.svelte.js'
 
 const store = createMatrixStore()
 const events = $derived(store?.events)
@@ -59,22 +59,17 @@ function process(email) {
     return email.sender != user?.userId
 }
 
-function buildInboxEmails(threads) {
-    if(threads && user) {
-        let sorted = [...threads.values()].sort((a, b) => 
-            b.origin_server_ts - a.origin_server_ts
-        );
+function buildInboxEmails(items) {
+    let sorted = [...items.values()].sort((a, b) => 
+        b.origin_server_ts - a.origin_server_ts
+    );
 
-        let filtered = sorted.filter((email) => {
-            return process(email)
-        })
-        return filtered
-    }
+    return sorted
 }
 
 let inbox_emails = $derived.by(() => {
-    if(is_inbox && status.threads_ready && status.thread_events_ready) {
-        return buildInboxEmails(threads)
+    if(is_inbox && status.inbox_ready) {
+        return buildInboxEmails(inbox_mail)
     }
 })
 

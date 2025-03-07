@@ -5,7 +5,7 @@ import { tooltip } from '$lib/components/tooltip/tooltip'
 
 import Mailbox from './mailbox.svelte'
 
-import { ui_state } from '$lib/store/store.svelte.js'
+import { ui_state } from '$lib/store/app.svelte.js'
 
 let sidebar_toggled = $derived(ui_state?.sidebar_toggled)
 

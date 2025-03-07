@@ -8,7 +8,7 @@ let event_open = $derived.by(() => {
     return $page.params.event !== undefined
 })
 
-import { ui_state } from '$lib/store/store.svelte.js'
+import { ui_state } from '$lib/store/app.svelte.js'
 let expanded = $derived(ui_state?.expanded)
 
 </script>

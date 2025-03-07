@@ -1,6 +1,6 @@
 <script>
 import { page } from '$app/stores';
-import { ui_state } from '$lib/store/store.svelte.js'
+import { ui_state } from '$lib/store/app.svelte.js'
 import { inbox, sent, drafts, down, dot } from '$lib/assets/icons.js'
 import { goto } from '$app/navigation';
 

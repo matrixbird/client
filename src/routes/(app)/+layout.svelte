@@ -19,8 +19,8 @@ import ThemeToggle from '$lib/theme/toggle.svelte'
 import Navbar from '$lib/navbar/navbar.svelte';
 import Alert from '$lib/components/alert/alert.svelte'
 
-import { userState, ui_state } from '$lib/store/store.svelte.js'
-import { createAppStore, dev_mode } from '$lib/store/store.svelte.js'
+import { userState, ui_state } from '$lib/store/app.svelte.js'
+import { createAppStore, dev_mode } from '$lib/store/app.svelte.js'
 const store = createAppStore()
 
 import { createMatrixStore } from '$lib/store/matrix.svelte.js'
@@ -195,7 +195,7 @@ let resizing = $state(false);
 
 let dragopts = $derived.by(() => {
     return {
-        handle: '.header',
+        handle: '.window-header',
         disabled: expanded || resizing,
         legacyTranslate: false, 
         gpuAcceleration: true,
@@ -338,7 +338,7 @@ function resize(e) {
         use:draggable={dragopts}
         bind:this={mb}>
 
-        <div class="header">
+        <div class="window-header">
             <Header {dragging} {dragStart} {dragEnd} />
         </div>
 
@@ -365,7 +365,7 @@ function resize(e) {
             <div class="grabber h-4 w-4 border-r
                 border-b
                 group-hover:border-bird-900
-                group-hover:bg-bird-900
+                group-hover:bg-bird-200
                 border-bird-700">
             </div>
         </div>

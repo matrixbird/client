@@ -19,11 +19,11 @@ import {
 import { 
     route_state,
     email_context_menu
-} from '$lib/store/store.svelte.js'
+} from '$lib/store/app.svelte.js'
 
 import { createMatrixStore } from '$lib/store/matrix.svelte.js'
 
-import { app } from '$lib/store/store.svelte.js'
+import { app } from '$lib/store/app.svelte.js'
 
 const store = createMatrixStore()
 const events = $derived(store?.events)
@@ -101,11 +101,11 @@ let which_email = $derived.by(() => {
 let subject = $derived(email?.content?.subject || "no subject")
 
 let name = $derived.by(() => {
-    return which_email?.content?.from?.name
+    return email?.content?.from?.name
 })
 
 let address = $derived.by(() => {
-    return which_email?.content?.from?.address
+    return email?.content?.from?.address
 })
 
 const native = $derived.by(() => {
@@ -113,10 +113,10 @@ const native = $derived.by(() => {
 })
 
 let user = $derived.by(() =>{
-    if(!which_email?.room_id) return
+    if(!email?.room_id) return
 
     let users = store.client.getUsers()
-    let user = users.find(user => user.userId == which_email.sender)
+    let user = users.find(user => user.userId == email.sender)
 
     if(user) {
         return {
@@ -128,7 +128,7 @@ let user = $derived.by(() =>{
 })
 
 let is_matrixbird = $derived.by(() => {
-    return get_localpart(which_email.sender) == "matrixbird"
+    return get_localpart(email?.sender) == "matrixbird"
 })
 
 

@@ -1,5 +1,5 @@
 <script>
-import { alert, killAlert } from '$lib/store/store.svelte.js'
+import { alert, killAlert } from '$lib/store/app.svelte.js'
 
 let active = $derived.by(() => {
     return alert?.active && alert?.message

@@ -2,7 +2,7 @@ import * as sdk from 'matrix-js-sdk';
 import { SvelteMap } from 'svelte/reactivity';
 import { browser } from '$app/environment';
 
-import { updateAppStatus } from '$lib/store/store.svelte.js';
+import { updateAppStatus } from '$lib/store/app.svelte.js';
 
 import { 
   PUBLIC_HOMESERVER,
@@ -34,6 +34,9 @@ let members = $state(new SvelteMap());
 let threads = $state(new SvelteMap());
 let thread_events = $state(new SvelteMap());
 
+export let inbox_mail = $state(new SvelteMap());
+export let sent_mail = $state(new SvelteMap());
+
 let events = $state(new SvelteMap());
 
 let joined_rooms = $state([]);
@@ -41,12 +44,15 @@ let joined_rooms = $state([]);
 export let status = $state({
   events_ready: false,
   threads_ready: false,
+  inbox_ready: false,
+  sent_ready: false,
   thread_events_ready: false,
 });
 
 let created_rooms = $state({});
 
-export let sync = $state({
+export let sync_state = $state({
+  synced: false,
   state: null,
   last_sync: null,
   last_retry: null,
@@ -161,7 +167,7 @@ export function createMatrixStore() {
           console.log(`Fetched ${messages.length} messages using createMessagesRequest`);
           for (const message of messages) {
             if (message.type.includes("matrixbird.email")) {
-              events.set(message.event_id, message);
+              //events.set(message.event_id, message);
             }
           }
 
@@ -201,12 +207,12 @@ export function createMatrixStore() {
 
           if(isSending) {
             setTimeout(() => {
-              events.set(event.event.event_id, event.event);
+              //events.set(event.event.event_id, event.event);
             }, 1000)
           }
 
           if(!isSending) {
-            events.set(event.event.event_id, event.event);
+            //events.set(event.event.event_id, event.event);
           }
 
         }
@@ -222,6 +228,10 @@ export function createMatrixStore() {
 
         }
 
+      }
+
+      if(event.event.type == "matrixbird.thread.marker") {
+        //console.log("new thread marker, pull it in")
       }
     });
 
@@ -278,6 +288,72 @@ export function createMatrixStore() {
 
     }
 
+    function hasNoUserEvents(threadEvents) {
+      return !threadEvents.some(event => event.sender === session.user_id);
+    }
+
+    function findLastNonUserEvent(threadEvents) {
+      const nonUserEvents = threadEvents.filter(event => event.sender !== session.user_id);
+
+      if (nonUserEvents.length === 0) return null;
+
+      return nonUserEvents.reduce((latest, current) => 
+        current.origin_server_ts < latest.origin_server_ts ? current : latest, 
+        nonUserEvents[0]);
+    }
+
+    async function buildSentMail() {
+      //console.log("building sent mail with threads")
+      for (const [threadId, thread] of threads) {
+        let children = thread_events.get(threadId);
+        // if thread root is sent by this user, add to sent
+        if(thread.sender == user.userId) {
+          sent_mail.set(threadId, thread);
+        }
+        // add any child event sent by this user
+        if(children) {
+          for (const child of children) {
+            if(child.sender == user.userId) {
+              sent_mail.set(child.event_id, child);
+            }
+          }
+        }
+      }
+      //console.log("sent mail built", sent_mail)
+      status.sent_ready = true;
+    }
+
+
+    async function buildInbox() {
+      //console.log("building inbox with threads")
+      for (const [threadId, thread] of threads) {
+        let children = thread_events.get(threadId);
+        // this thread has event relations, we'll need to process 
+        // them to find the latest reply from another sender
+        if(children) {
+          let nonUserReply = findLastNonUserEvent(children);
+          if(nonUserReply) {
+            inbox_mail.set(nonUserReply.event_id, nonUserReply);
+          } else {
+            // this may be an email chain started by another user but 
+            // all child events are sent by this user, so we'll 
+            // return the original thread event
+            inbox_mail.set(threadId, thread);
+          }
+        }
+        // this thread has no event relations, so this is either
+        // an email sent by this user or recieved from another user
+        // add to inbox if it's not sent by this user
+        if(!children) {
+          if(thread.sender != user.userId) {
+            inbox_mail.set(threadId, thread);
+          }
+        }
+      }
+      //console.log("inbox built", inbox_mail)
+      status.inbox_ready = true;
+    }
+
     async function buildThreadEvents(roomEventsMap) {
 
       const eventPairs = [];
@@ -302,6 +378,12 @@ export function createMatrixStore() {
       allEvents.forEach((result) => {
         if (result.status === 'fulfilled') {
           const items = result.value;
+
+          // add all events to events map
+          for (const event of items.chunk) {
+            events.set(event.event_id, event);
+          }
+
           let thread_root = items.chunk[0]?.content?.["m.relates_to"]?.event_id;
 
           if (thread_root) {
@@ -347,6 +429,7 @@ export function createMatrixStore() {
       });
 
       threadUpdates.forEach((value, key) => {
+        events.set(key, value);
         threads.set(key, value);
       });
 
@@ -354,6 +437,9 @@ export function createMatrixStore() {
 
       status.threads_ready = true;
       status.thread_events_ready = true;
+
+      await buildInbox();
+      await buildSentMail();
 
 
 
@@ -389,7 +475,7 @@ export function createMatrixStore() {
 
     client.on("sync", (state, prevState, data) => {
 
-      sync.state = state;
+      sync_state.state = state;
 
       if (state === "ERROR") {
         sync.last_retry = new Date();
@@ -401,7 +487,7 @@ export function createMatrixStore() {
       }
 
       if (state === "RECONNECTING") {
-        sync.last_retry = new Date();
+        sync_state.last_retry = new Date();
       }
 
       if(state === "PREPARED") {
@@ -412,7 +498,7 @@ export function createMatrixStore() {
           updateAppStatus(null)
         }, 2000)
 
-        sync.last_sync = new Date();
+        sync_state.last_sync = new Date();
 
         nextSyncToken = data.nextSyncToken;
 

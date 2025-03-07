@@ -1,196 +1,168 @@
 <script>
+import EmailItemView from "$lib/email-view/email-item-view.svelte";
+import Divider from "$lib/components/email/divider.svelte";
+
 import { page } from '$app/stores';
-import DOMPurify from "dompurify";
-import { mxid_to_email } from '$lib/utils/matrix.js'
+import { goto } from '$app/navigation';
 
+import { close } from '$lib/assets/icons.js'
 
-import ReplyComposer from '$lib/editor/reply-composer.svelte'
-
-import { newAlert } from '$lib/store/store.svelte.js'
-
-import { createMatrixStore } from '$lib/store/matrix.svelte.js'
+import { createMatrixStore, status, inbox_mail } from '$lib/store/matrix.svelte.js'
 const store = createMatrixStore()
 
-import { reply_editors } from '$lib/store/editor.svelte.js'
+const events = $derived(store?.events)
+const threads = $derived(store?.threads)
+const thread_events = $derived(store?.thread_events)
 
-let { email, last } = $props();
 
+function buildEmails(event_id) {
 
-let active = $derived.by(() => {
-    return email?.event_id == $page.params.event
-})
+    const event = events.get(event_id)
+    const thread_id = event?.content["m.relates_to"]?.event_id
 
-let thread_root = $derived.by(() => {
-    return email?.content?.["m.relates_to"] == undefined 
-})
+    // it it doesn't have a thread root, it's likely the first email 
+    // in a thread - return it (with it's children)
+    if(!thread_id) {
+        let items = [event]
 
-const body = $derived.by(() => {
-    return email?.content?.body?.html ? email?.content?.body?.html :
-        email?.content?.body?.text
-})
-
-const is_html = $derived.by(() => {
-    return email?.content?.body?.html
-})
-
-let subject = $derived(email?.content?.subject || `(no subject)`)
-
-let clean = $state(null);
-
-$effect(() => {
-    if(email) {
-        DOMPurify.addHook('afterSanitizeAttributes', node => {
-          if (node.tagName === 'A') {
-            node.setAttribute('target', '_blank');
-            node.setAttribute('rel', 'noopener noreferrer');
-          }
-        });
-
-        clean = DOMPurify.sanitize(body, {
-            ADD_ATTR: ['target'],
-        })
-    }
-
-    if(active && element) {
-        setTimeout(() => {
-            element.scrollIntoView({block: "center", inline: "nearest"})
-        }, 10)
-    }
-})
-
-let name = $derived.by(() => {
-    return email?.content?.from?.name
-})
-
-let address = $derived.by(() => {
-    return email?.content?.from?.address
-})
-
-const native = $derived.by(() => {
-    return email?.type == "matrixbird.email.matrix"
-})
-
-let user = $derived.by(() =>{
-    if(!email?.room_id) return
-    const room = store.rooms[email?.room_id]
-    if(room) {
-        const member = room.getMember(email.sender)
-        //console.log(member)
-        if(member) {
-            return {
-                name: member?.name || member?.rawDisplayName,
-                address: mxid_to_email(member.userId)
+        const thread_children = thread_events.get(event_id)
+        if(thread_children) {
+            for (const event of thread_children.values()) {
+                items.push(event)
             }
         }
-    }
-})
-
-
-let replying = $derived.by(() => {
-    return reply_editors[email?.event_id] ? true : false
-})
-
-function reply() {
-    if(email.type == "matrixbird.email.standard") {
-        newAlert({
-            message: "Replying to regular emails is disabled for now.",
+        let sorted = items.sort((a, b) => {
+            return a.origin_server_ts - b.origin_server_ts
         })
-        return
+
+        return sorted
     }
 
-    reply_editors[email?.event_id] = {
-        email: email,
-        state: null,
+    // this is a reply, get the thread root
+    const thread_event = threads.get(thread_id)
+
+    // start with the thread root at top
+    let items = [thread_event]
+
+    // include children, if any
+    const thread_children = thread_events.get(thread_id)
+    if(thread_children) {
+        for (const event of thread_children.values()) {
+            items.push(event)
+        }
     }
+
+    let sorted = items.sort((a, b) => {
+        return a.origin_server_ts - b.origin_server_ts
+    })
+
+    return sorted
 }
 
-function killReply() {
-    delete reply_editors[email?.event_id]
-}
+let emails = $derived.by(() => {
+    if(!status.thread_events_ready) return 
+    return buildEmails($page.params.event)
+})
 
-let element;
-
-function debug(e) {
-    if(e.ctrlKey) {
-        console.log($state.snapshot(email))
+let split = $derived.by(() => {
+    if(!emails) {
+        return 
     }
+
+    if(emails?.length < 5) {
+        return 
+    }
+
+    let first = emails.slice(0, 1);
+    let middle = emails.slice(1, emails.length - 2);
+    let last_two = emails.slice(-2);
+
+    return [first, middle, last_two];
+})
+
+let collapsed = $state(true);
+
+function showEmails() {
+    collapsed = false
 }
 
-let debug_mode = $state(false);
+$effect(() => {
+    if($page.params.event) {
+        collapsed = true
+    }
+})
+
+
+function killEmailItemView() {
+    goto('/mail/inbox')
+}
 
 </script>
 
-<div class="email-view" bind:this={element}
-    onclick={debug}>
+<div class="thread-container h-full grid grid-rows-[auto_1fr] overflow-hidden">
 
-    <div class="meta p-4 flex flex-col">
-        {#if thread_root}
-
-            <div class="flex place-items-center mb-3">
-                <div class="flex-1 text font-semibold leading-1">
-                    {subject}
-                </div>
-            </div>
-
-        {/if}
-
-        {#if native && user}
-            <div class="text-sm">
-                <span class="font-medium">{user?.name}</span>
-                <span class="text-xs text-bird-800">&lt;{user?.address}&gt;</span>
-            </div>
-        {/if}
-
-        {#if !native}
-            <div class="">
-                {#if name}
-                    <span>{name}</span>
-                {/if}
-                    <span>{address}</span>
-            </div>
-        {/if}
-        <div class="text-xs text-bird-800">
-            {email?.sender ? email.sender : ''}
+    <div class="">
+        <div class="flex place-items-center cursor-pointer" 
+        onclick={killEmailItemView}>
+            {@html close}
         </div>
-
     </div>
 
+<div class="email-thread h-full overflow-x-auto overflow-y-auto select-text">
 
-        {#if is_html && clean}
-            <div class="body p-4 [&>p]:pb-2 leading-5">
-                {@html clean}
-            </div>
-        {/if}
-        {#if !is_html}
-            <div class="p-4 leading-5" style="white-space: pre-wrap;">
-                {body}
-            </div>
-        {/if}
+    {#if emails}
 
-
-    {#if last}
-    <div class="px-4 mb-4">
-
-        {#if !replying}
-            <button class="text-sm font-medium px-4 py-1"
-            onclick={reply}>
-                Reply
-            </button>
+        {#if emails.length <= 4}
+            {#each emails as email, i (email.event_id)}
+                <div class="email-item">
+                    <EmailItemView {email} last={i == emails.length - 1} />
+                </div>
+            {/each}
         {/if}
 
-        {#if replying}
-            <div class="reply-container border-[6px] border-bird-100 rounded-2xl">
-                <ReplyComposer {email} {killReply}/>
-            </div>
+
+        {#if emails.length >= 5 && split}
+            {#each split[0] as email, i (email.event_id)}
+                <div class="email-item">
+                    <EmailItemView {email} last={i == emails.length - 1} />
+                </div>
+            {/each}
+
+            {#if !collapsed}
+                {#each split[1] as email, i (email.event_id)}
+                    <div class="email-item">
+                        <EmailItemView {email} last={i == emails.length - 1} />
+                    </div>
+                {/each}
+            {:else}
+                <Divider emails={split[1]} {showEmails} />
+            {/if}
+
+
+
+            {#each split[2] as email, i (email.event_id)}
+                <div class="email-item">
+                    <EmailItemView {email} last={i == split[2].length - 1} />
+                </div>
+            {/each}
+
         {/if}
-    </div>
+
+
+    {:else}
+        no email
     {/if}
 
+</div>
 </div>
 
 <style lang="postcss">
 @reference "tailwindcss/theme";
-button {
-    border-radius: 500px;
+.email-thread .email-item {
+    border-bottom: 1px solid var(--bird-200);
+}
+.email-thread .email-item:last-child {
+    border-bottom: none;
 }
 </style>
+

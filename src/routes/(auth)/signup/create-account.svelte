@@ -17,7 +17,7 @@ import { page } from '$app/state';
 import { createMatrixStore } from '$lib/store/matrix.svelte.js'
 const store = createMatrixStore()
 
-import { userState } from '$lib/store/store.svelte.js'
+import { userState } from '$lib/store/app.svelte.js'
 
 import { 
     debounce

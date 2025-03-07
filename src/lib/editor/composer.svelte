@@ -3,7 +3,7 @@ import { onMount, onDestroy } from 'svelte';
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 
-import { ui_state } from '$lib/store/store.svelte.js'
+import { ui_state } from '$lib/store/app.svelte.js'
 
 let expanded = $derived(ui_state?.expanded)
 

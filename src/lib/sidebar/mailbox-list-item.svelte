@@ -3,7 +3,7 @@ import { page } from '$app/stores';
 import { goto } from '$app/navigation';
 
 import { createMatrixStore } from '$lib/store/matrix.svelte.js'
-import { count } from '$lib/store/store.svelte.js'
+import { count } from '$lib/store/app.svelte.js'
 
 const store = createMatrixStore()
 const events = $derived(store?.events)

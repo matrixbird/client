@@ -3,7 +3,7 @@ import { plus } from '$lib/assets/icons.js'
 import { createEditorStore } from '$lib/store/editor.svelte.js'
 const store = createEditorStore()
 
-import { ui_state } from '$lib/store/store.svelte.js'
+import { ui_state } from '$lib/store/app.svelte.js'
 let expanded = $derived(ui_state?.expanded)
 
 function newMessage() {

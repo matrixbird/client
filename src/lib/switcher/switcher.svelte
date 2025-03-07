@@ -3,7 +3,7 @@ import { page } from '$app/stores';
 import { goto } from '$app/navigation';
 import Profile from '$lib/profile/profile.svelte'
 
-import { ui_state } from '$lib/store/store.svelte.js'
+import { ui_state } from '$lib/store/app.svelte.js'
 
 let expanded = $derived(ui_state?.expanded)
 

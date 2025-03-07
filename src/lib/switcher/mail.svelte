@@ -4,7 +4,7 @@ import { goto } from '$app/navigation';
 
 import { tooltip } from '$lib/components/tooltip/tooltip'
 
-import { route_state } from '$lib/store/store.svelte.js'
+import { route_state } from '$lib/store/app.svelte.js'
 
 let {expanded} = $props();
 

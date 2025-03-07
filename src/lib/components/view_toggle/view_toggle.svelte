@@ -3,7 +3,7 @@ import { page } from '$app/stores';
 import { expand_vertical, collapse, inbox, fullscreen } from '$lib/assets/icons.js'
 import { tooltip } from '$lib/components/tooltip/tooltip'
 
-import { ui_state } from '$lib/store/store.svelte.js'
+import { ui_state } from '$lib/store/app.svelte.js'
 </script>
 
 <div class="grid gric-cols-[auto_auto_auto]">

@@ -1,4 +1,3 @@
-import { createUIStore } from './ui.svelte.js';
 import { browser } from '$app/environment';
 
 import { 
@@ -93,9 +92,6 @@ export function createAppStore() {
       return app;
     },
 
-    get ui() {
-      return createUIStore();
-    },
 
     appIsReady,
     updateAppStatus

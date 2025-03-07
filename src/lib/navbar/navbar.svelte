@@ -3,7 +3,7 @@ import Profile from '$lib/profile/profile.svelte'
 import NewMessage from '$lib/editor/new-message.svelte';
 import ViewToggle from '$lib/components/view_toggle/view_toggle.svelte';
 
-import { ui_state } from '$lib/store/store.svelte.js'
+import { ui_state } from '$lib/store/app.svelte.js'
 let expanded = $derived(ui_state?.expanded)
 let sidebar_toggled = $derived(ui_state?.sidebar_toggled)
 

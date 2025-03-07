@@ -18,7 +18,7 @@ import {
     close 
 } from '$lib/assets/icons.js'
 
-import { newAlert, updateAppStatus } from '$lib/store/store.svelte.js'
+import { newAlert, updateAppStatus } from '$lib/store/app.svelte.js'
 
 import { createMatrixStore } from '$lib/store/matrix.svelte.js'
 const store = createMatrixStore()
@@ -26,7 +26,7 @@ const store = createMatrixStore()
 import { createEditorStore } from '$lib/store/editor.svelte.js'
 const editorStore = createEditorStore()
 
-import { ui_state } from '$lib/store/store.svelte.js'
+import { ui_state } from '$lib/store/app.svelte.js'
 let expanded = $derived(ui_state?.expanded)
 
 import { reply_editors } from '$lib/store/editor.svelte.js'
@@ -172,7 +172,7 @@ async function focusComposer() {
 <div class="editor grid grid-rows-[auto_1fr_auto] 
     select-none">
 
-    <div class="header flex rounded-t-xl border-t border-x border-bird-200">
+    <div class="editor-header flex rounded-t-xl border-t border-x border-bird-200">
 
         <div class="flex py-3 px-4 flex-1 place-items-center text-sm text-light ">
             Re: {subject}
