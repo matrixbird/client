@@ -31,6 +31,8 @@ let loaded = $state(false);
 let rooms = $state({});
 let members = $state(new SvelteMap());
 
+let threads = $state(new SvelteMap());
+let thread_events = $state(new SvelteMap());
 let events = $state(new SvelteMap());
 
 export let status = $state({
@@ -225,7 +227,7 @@ export function createMatrixStore() {
     */
 
     const get_threads = async (roomId) => {
-      const url = `${PUBLIC_HOMESERVER}/_matrix/client/v1/rooms/${roomId}/threads`;
+      const url = `${PUBLIC_HOMESERVER}/_matrix/client/v1/rooms/${roomId}/threads?limit=50`;
 
       let options = {
         headers: {
@@ -243,11 +245,76 @@ export function createMatrixStore() {
 
     }
 
-    async function buildEvents() {
+    const get_thread_events = async (roomId, eventId) => {
+      const url = `${PUBLIC_HOMESERVER}/_matrix/client/v1/rooms/${roomId}/relations/${eventId}/m.thread?limit=50`;
+
+      let options = {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+      }
+
+      try {
+        const response = await fetch(url, options)
+        return response.json();
+      } catch (error) {
+        throw error
+      }
+
+    }
+
+    async function buildThreadEvents(roomId, events) {
+
+      events = events.filter(event => {
+        let latest_event = event?.unsigned?.["m.relations"]?.["m.thread"]?.latest_event;
+        return latest_event.type != "matrixbird.thread.marker"
+      })
+
+      const threadPromises = events.map(event => get_thread_events(roomId, event.event_id));
+      const allEvents = await Promise.allSettled(threadPromises);
+
+      allEvents.forEach((items, index) => {
+
+        let thread_root = items.value.chunk[0]?.content?.["m.relates_to"]?.event_id;
+
+        let filtered = items.value.chunk.filter(event => {
+          return event.type != "matrixbird.thread.marker"
+        })
+
+        thread_events.set(thread_root, filtered);
+
+        //console.log(`Events for thread ${events[index].event_id}:`, items.value.chunk);
+      });
+      console.log("thread_events", thread_events)
+    }
+
+    async function buildThreads() {
       let rooms = client.getRooms();
+
+      rooms = rooms.filter(room => {
+        let roomType = room.currentState.getStateEvents("matrixbird.room.type")[0]?.event?.state_key;
+        return roomType == "INBOX" || roomType == "EMAIL"
+      })
+
+      const threadPromises = rooms.map(room => get_threads(room.roomId));
+      const allThreads = await Promise.allSettled(threadPromises);
+
+      allThreads.forEach((items, index) => {
+
+        for (const thread of items.value.chunk) {
+          threads.set(thread.event_id, thread);
+        }
+
+        buildThreadEvents(rooms[index].roomId, items.value.chunk);
+      });
+      console.log("threads", threads)
+    
+
 
       for (const room of rooms) {
 
+        /*
         let roomType = room.currentState.getStateEvents("matrixbird.room.type")[0];
         console.log(roomType)
 
@@ -259,9 +326,11 @@ export function createMatrixStore() {
             }
           }
         })
+        */
 
-        const threads = await get_threads(room.roomId);
-        console.log(threads)
+
+        //const threads = await get_threads(room.roomId);
+        //console.log(threads)
 
         //const messagesResult = await client.createMessagesRequest(room.roomId, null, 100, 'b', filter);
         //const messages = messagesResult.chunk;
@@ -291,7 +360,7 @@ export function createMatrixStore() {
       }
 
       if(state === "PREPARED") {
-        buildEvents()
+        buildThreads()
         updateAppStatus("Connected.")
 
         setTimeout(() => {
