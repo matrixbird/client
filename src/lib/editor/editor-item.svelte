@@ -262,6 +262,20 @@ empty.`,
             uuidv4()
         );
         console.log('msg', msg)
+        const thr = await store.client.sendEvent(
+            room_id,
+            "matrixbird.thread.marker",
+            {
+                msgtype: "thread_marker",
+                "m.relates_to": {
+                    "event_id": msg.event_id,
+                    "m.in_reply_to": msg.event_id,
+                    "rel_type": "m.thread"
+                },
+            },
+            uuidv4()
+        );
+        console.log('thread marker event', thr)
 
         updateAppStatus(null)
         closeWindow()

@@ -9,6 +9,7 @@ export const handle = async ({ event, resolve }) => {
   let device_id = event.cookies.get("device_id");
   let user_id = event.cookies.get("user_id");
 
+  console.log(event.route)
   if(event.route.id === null) {
 
     if(!session_id || !access_token || !device_id || !user_id) {

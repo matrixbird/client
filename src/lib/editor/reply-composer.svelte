@@ -130,6 +130,7 @@ empty.`,
         const msg = await store.client.sendEvent(
             room_id,
             replyType,
+            //email.type,
             content,
             uuidv4()
         );

@@ -55,6 +55,7 @@ export function createMatrixStore() {
 
   function updateSession(data) {
     session = data
+    console.log("Updated session", data)
   }
 
   async function createMatrixClient(opts) {
@@ -223,20 +224,52 @@ export function createMatrixStore() {
     });
     */
 
+    const get_threads = async (roomId) => {
+      const url = `${PUBLIC_HOMESERVER}/_matrix/client/v1/rooms/${roomId}/threads`;
 
-    function buildEvents() {
+      let options = {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+      }
+
+      try {
+        const response = await fetch(url, options)
+        return response.json();
+      } catch (error) {
+        throw error
+      }
+
+    }
+
+    async function buildEvents() {
       let rooms = client.getRooms();
-      rooms.forEach((room) => {
-        const timeline = room.getLiveTimeline();
-        timeline.getEvents().forEach((event) => {
-          let event_type = event.getType();
-          if (event_type.includes("matrixbird.email")) {
-            events.set(event.getId(), event.event);
+
+      for (const room of rooms) {
+
+        let roomType = room.currentState.getStateEvents("matrixbird.room.type")[0];
+        console.log(roomType)
+
+        let filter = sdk.Filter.fromJson(null, "test", {
+          room: {
+            timeline: {
+              types: ['matrixbird.email.matrix'],
+              limit: 100,
+            }
           }
-        });
-      });
-      //status.events_ready = true;
-      //ready = true
+        })
+
+        const threads = await get_threads(room.roomId);
+        console.log(threads)
+
+        //const messagesResult = await client.createMessagesRequest(room.roomId, null, 100, 'b', filter);
+        //const messages = messagesResult.chunk;
+        //console.log(`Fetched ${messages.length} messages using createMessagesRequest`);
+      }
+
+      ready = true
+
     }
 
 
@@ -258,6 +291,7 @@ export function createMatrixStore() {
       }
 
       if(state === "PREPARED") {
+        buildEvents()
         updateAppStatus("Connected.")
 
         setTimeout(() => {
@@ -282,7 +316,6 @@ export function createMatrixStore() {
 
         getMailboxRooms();
 
-        ready = true
       }
     });
 
@@ -407,7 +440,7 @@ export function createMatrixStore() {
         },
         {
           type: 'matrixbird.room.type',
-          state_key: '',
+          state_key: 'EMAIL',
           content: {
             type: 'EMAIL'
           }

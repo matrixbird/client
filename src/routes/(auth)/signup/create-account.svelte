@@ -161,13 +161,16 @@ async function process() {
             });
             userState.new_user = true
 
+            /*
             store.createMatrixClient({
                 user_id: response.user_id,
                 access_token: response.access_token,
                 device_id: response.device_id,
             })
+            */
 
-            goto('/mail/inbox')
+            //goto('/mail/inbox')
+            goto('/signup/profile')
         }
 
 
