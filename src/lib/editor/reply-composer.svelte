@@ -105,7 +105,7 @@ empty.`,
             },
             subject: subject,
             body: {
-                text: body.text,
+                //text: body.text,
                 html: body.html
             },
             "m.relates_to": {
@@ -129,7 +129,8 @@ empty.`,
 
         const msg = await store.client.sendEvent(
             room_id,
-            replyType,
+            "matrixbird.email.reply",
+            //replyType,
             //email.type,
             content,
             uuidv4()

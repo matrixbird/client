@@ -521,8 +521,19 @@ export function createMatrixStore() {
 
 
 
+    let filter = sdk.Filter.fromJson(null, "test", {
+      room: {
+        timeline: {
+          unread_thread_notifications: true,
+          limit: 1,
+        }
+      }
+    })
+
     await client.startClient({
-      initialSyncLimit: 1000,
+      //filter: filter,
+      //fullState: true,
+      //initialSyncLimit: 1000,
       lazyLoadMembers: true,
       disablePresence: true,
       //threadSupport: true,

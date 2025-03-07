@@ -15,10 +15,14 @@
     font-display: swap;
 }
 
-
 @font-face {
     font-family: 'Silkscreen';
     src: url('/fonts/silkscreen.woff2');
+}
+
+@font-face {
+    font-family: 'Twemoji';
+    src: url('/fonts/twemoji-colr.woff2');
 }
 
 

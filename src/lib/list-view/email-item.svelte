@@ -98,7 +98,17 @@ let which_email = $derived.by(() => {
 })
 
 
-let subject = $derived(email?.content?.subject || "no subject")
+let is_thread_child = $derived.by(() => {
+    return email?.content?.["m.relates_to"]?.["rel_type"] == "m.thread"
+})
+
+//let subject = $derived(email?.content?.subject || "no subject")
+let subject = $derived.by(() => {
+    if(is_thread_child && email?.content?.subject) {
+        return `Re: ${email?.content?.subject}`
+    }
+    return email?.content?.subject || "no subject"
+})
 
 let name = $derived.by(() => {
     return email?.content?.from?.name

@@ -8,7 +8,7 @@ const attachments = $derived.by(() => {
 
 </script>
 
-<div class="flex ml-20 gap-1 mb-2">
+<div class="attachments ml-4 flex gap-1 mb-2">
     {#each attachments as attachment}
         <AttachmentItem {attachment} />
     {/each}

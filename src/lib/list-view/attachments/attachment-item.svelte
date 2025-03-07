@@ -12,7 +12,7 @@ function open(e) {
 
 </script>
 
-<div class="flex text-sm rounded px-1 bg-bird-100 border border-bird-200
+<div class="flex text-xs rounded px-1 bg-bird-100 border border-bird-200
     cursor-pointer hover:bg-bird-200"
 onclick={open}>
 
