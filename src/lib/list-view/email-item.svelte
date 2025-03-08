@@ -7,6 +7,10 @@ import {
     get_localpart
 } from '$lib/utils/matrix.js'
 
+import { 
+    get_first_line
+} from '$lib/utils/string.js'
+
 import Date from '$lib/components/date/date.svelte'
 import AttchmentItems from './attachments/attachment-items.svelte'
 
@@ -27,6 +31,8 @@ import { app } from '$lib/store/app.svelte.js'
 
 const store = createMatrixStore()
 const events = $derived(store?.events)
+const threads = $derived(store?.threads)
+const thread_events = $derived(store?.thread_events)
 
 let { email } = $props();
 
@@ -51,29 +57,6 @@ let replies = $derived.by(() => {
     return count
 })
 
-let thread_events = $derived.by(() => {
-    let emails = []
-    for (const event of events.values()) {
-        if(event.content["m.relates_to"]?.event_id == email.event_id) {
-            emails.push(event)
-        }
-    }
-    return emails
-})
-
-let thread_users = $derived.by(() => {
-    if(thread_events.length == 0) {
-        return email.sender
-    }
-
-    let users = []
-    for (const event of thread_events) {
-        if(!users.includes(event.sender)) {
-            users.push(event.sender)
-        }
-    }
-    return users
-})
 
 let last_email_in_thread = $derived.by(() => {
     let emails = []
@@ -142,6 +125,10 @@ let is_matrixbird = $derived.by(() => {
 })
 
 
+let first_line = $derived.by(() => {
+    return get_first_line(email?.content?.body?.html)
+})
+
 
 function open(e) {
     if(e.ctrlKey) {
@@ -179,6 +166,26 @@ function selectEmail(e) {
 }
 
 const active = $derived.by(() => {
+    // mark active if this is a root thread and the params event_id 
+    // matches this event's event_id
+    let is_root_thread = email?.content?.["m.relates_to"] === undefined
+    if(is_root_thread) {
+        return $page.params.event === email.event_id
+    }
+
+    // if this is a thread event, we'll see if any sibling events 
+    // match the params event_id
+    let is_thread_child = email?.content?.["m.relates_to"]?.["rel_type"] ==
+        "m.thread"
+
+    if(is_thread_child) {
+        let thread_id = email?.content?.["m.relates_to"]?.["event_id"]
+        let children = thread_events.get(thread_id)
+        if(children) {
+            return children.some(event => event.event_id == $page.params.event)
+        }
+    }
+
     return $page.params.event === email.event_id
 })
 
@@ -229,8 +236,16 @@ let el;
     <div class="flex p-2 ml-2 overflow-x-hidden">
 
         <div class="flex flex-col flex-1 overflow-x-hidden">
-            <div class=" text-md leading-normal whitespace-nowrap overflow-hidden text-ellipsis">
-                {subject}
+            <div class="flex place-items-center leading-normal">
+
+                <div class="text-md whitespace-nowrap">
+                    {subject}
+                </div>
+                <div class="ml-2 text-sm text-light whitespace-nowrap overflow-hidden text-ellipsis">
+                    {#if first_line}
+                        {first_line}
+                    {/if}
+                </div>
             </div>
             <div class="mt-1">
 
@@ -257,6 +272,7 @@ let el;
                             <span class="text-xs text-bird-800">&lt;{address}&gt;</span>
                     </div>
                 {/if}
+
 
 
 

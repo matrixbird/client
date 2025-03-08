@@ -52,6 +52,7 @@ export let status = $state({
 let created_rooms = $state({});
 
 export let sync_state = $state({
+  started: 0,
   synced: false,
   state: null,
   last_sync: null,
@@ -109,6 +110,9 @@ export function createMatrixStore() {
         return
       }
     }
+
+    sync_state.started = Date.now();
+
 
     client.on(sdk.RoomEvent.MyMembership, function (room, membership, prev) {
 
@@ -197,10 +201,71 @@ export function createMatrixStore() {
       }
     });
 
+    client.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
+      if (event.event.type == "matrixbird.email.reply") {
+        let origin_server_ts = event.event.origin_server_ts
+        if(origin_server_ts > sync_state.started) {
+          console.log("new email reply, add it to the right place", event.event)
+          let thread_id = event.event.content?.["m.relates_to"]?.event_id;
+          let children = thread_events.get(thread_id);
+          //console.log("children", children)
+          if(children) {
+            thread_events.set(thread_id, [...children, event.event]);
+          } else {
+            thread_events.set(thread_id, [event.event]);
+          }
+          events.set(event.event.event_id, event.event);
+        }
+      }
+    });
 
     client.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
+      if(event.event.type == "matrixbird.thread.marker") {
+        let origin_server_ts = event.event.origin_server_ts
+        if(origin_server_ts > sync_state.started) {
+          console.log("new thread marker, pull it in")
+          let thread_id = event.event.content?.["m.relates_to"]?.event_id;
+          get_new_thread(event.event.room_id, thread_id)
+        }
+      }
+    });
+
+
+    async function get_new_thread(room_id, thread_id) {
+      let thread = await get_thread_root_event(room_id, thread_id);
+      console.log("found thread root event", thread)
+      events.set(thread_id, thread);
+      threads.set(thread_id, thread);
+
+      let thread_children = await get_thread_events(room_id, thread_id);
+      let _events = thread_children.chunk;
+      if(_events) {
+        console.log("found thread events", _events)
+
+        let filtered = _events?.filter(event => {
+          return event.type != "matrixbird.thread.marker";
+        })
+
+        if(filtered.length > 0) {
+          thread_events.set(thread_id, filtered);
+          for (const child of filtered) {
+            events.set(child.event_id, child);
+          }
+        }
+      } else {
+        thread_events.set(thread_id, []);
+      }
+      //await buildInbox();
+    }
+
+
+    /*
+    client.on(sdk.RoomEvent.Timeline, async function (event, room, toStartOfTimeline) {
       if(event?.event) {
+        //console.log(event.event.origin_server_ts > sync_state.started, event.event)
+
         let event_type = event.event.type;
+
         if (event_type.includes("matrixbird.email")) {
 
           let isSending = event.isSending();
@@ -234,6 +299,7 @@ export function createMatrixStore() {
         //console.log("new thread marker, pull it in")
       }
     });
+    */
 
     /*
     client.on(sdk.RoomStateEvent.Events, function (event, room, toStartOfTimeline) {
@@ -252,6 +318,25 @@ export function createMatrixStore() {
 
     const get_threads = async (roomId) => {
       const url = `${PUBLIC_HOMESERVER}/_matrix/client/v1/rooms/${roomId}/threads?limit=50`;
+
+      let options = {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+      }
+
+      try {
+        const response = await fetch(url, options)
+        return response.json();
+      } catch (error) {
+        throw error
+      }
+
+    }
+
+    const get_thread_root_event = async (roomId, eventId) => {
+      const url = `${PUBLIC_HOMESERVER}/_matrix/client/v3/rooms/${roomId}/event/${eventId}`;
 
       let options = {
         headers: {
@@ -298,7 +383,7 @@ export function createMatrixStore() {
       if (nonUserEvents.length === 0) return null;
 
       return nonUserEvents.reduce((latest, current) => 
-        current.origin_server_ts < latest.origin_server_ts ? current : latest, 
+        current.origin_server_ts > latest.origin_server_ts ? current : latest, 
         nonUserEvents[0]);
     }
 
@@ -350,7 +435,7 @@ export function createMatrixStore() {
           }
         }
       }
-      //console.log("inbox built", inbox_mail)
+      console.log("inbox built", inbox_mail)
       status.inbox_ready = true;
     }
 
@@ -438,8 +523,8 @@ export function createMatrixStore() {
       status.threads_ready = true;
       status.thread_events_ready = true;
 
-      await buildInbox();
-      await buildSentMail();
+      //await buildInbox();
+      //await buildSentMail();
 
 
 

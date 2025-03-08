@@ -1,4 +1,5 @@
 <script>
+import { SvelteMap } from 'svelte/reactivity';
 import { createMatrixStore, status, inbox_mail } from '$lib/store/matrix.svelte.js'
 import EmailItem from './email-item.svelte'
 import { goto } from '$app/navigation';
@@ -36,40 +37,56 @@ $effect(() => {
     }
 })
 
-function process(email) {
-    let _thread_events = thread_events.get(email.event_id)
-    if(_thread_events) {
-        for (const event of _thread_events.values()) {
-            if(event.sender != user?.userId) {
-                return true
+function findLastNonUserEvent(threadEvents) {
+    const nonUserEvents = threadEvents.filter(event => event.sender !== user.userId);
+
+    if (nonUserEvents.length === 0) return null;
+
+    return nonUserEvents.reduce((latest, current) => 
+        current.origin_server_ts > latest.origin_server_ts ? current : latest, 
+        nonUserEvents[0]);
+}
+
+function buildInboxEmails(_threads) {
+
+    let emails = {};
+
+    for (const [threadId, thread] of _threads) {
+        let children = thread_events.get(threadId);
+        // this thread has event relations, we'll need to process 
+        // them to find the latest reply from another sender
+        if(children) {
+            let nonUserReply = findLastNonUserEvent(children);
+            if(nonUserReply) {
+                emails[nonUserReply.event_id] = nonUserReply;
+            } else {
+                // this may be an email chain started by another user but 
+                // all child events are sent by this user, so we'll 
+                // return the original thread event
+                emails[threadId] = thread;
+            }
+        }
+        // this thread has no event relations, so this is either
+        // an email sent by this user or recieved from another user
+        // add to inbox if it's not sent by this user
+        if(!children) {
+            if(thread.sender != user.userId) {
+                emails[threadId] = thread;
             }
         }
     }
+    //console.log("inbox built", emails)
 
-    let latest_event = email?.unsigned?.["m.relations"]?.["m.thread"]?.latest_event;
-    if(latest_event.type == "matrixbird.thread.marker" &&
-    latest_event.sender == user?.userId) {
-        return false
-    }
-
-    if(latest_event.sender != user?.userId) {
-        return true
-    }
-
-    return email.sender != user?.userId
-}
-
-function buildInboxEmails(items) {
-    let sorted = [...items.values()].sort((a, b) => 
-        b.origin_server_ts - a.origin_server_ts
-    );
+    let sorted = Object.values(emails).sort((a, b) => {
+        return b.origin_server_ts - a.origin_server_ts
+    })
 
     return sorted
 }
 
 let inbox_emails = $derived.by(() => {
-    if(is_inbox && status.inbox_ready) {
-        return buildInboxEmails(inbox_mail)
+    if(is_inbox && status.threads_ready && status.thread_events_ready) {
+        return buildInboxEmails(threads)
     }
 })
 
