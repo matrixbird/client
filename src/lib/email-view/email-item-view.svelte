@@ -87,7 +87,7 @@ let user = $derived.by(() =>{
 
 
 let replying = $derived.by(() => {
-    return reply_editors[email?.event_id] ? true : false
+    return reply_editors.get(email?.event_id) != undefined
 })
 
 function reply() {
@@ -98,14 +98,19 @@ function reply() {
         return
     }
 
-    reply_editors[email?.event_id] = {
+    reply_editors.set(email?.event_id,  {
         email: email,
         state: null,
-    }
+    })
+
+    let exists = reply_editors[email?.event_id]
+    console.log("exists", exists)
+
+    console.log("replying", email.event_id, replying)
 }
 
 function killReply() {
-    delete reply_editors[email?.event_id]
+    reply_editors.delete(email?.event_id)
 }
 
 let element;

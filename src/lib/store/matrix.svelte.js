@@ -111,6 +111,13 @@ export function createMatrixStore() {
       }
     }
 
+    try {
+      const rooms = await client.getJoinedRooms();
+      joined_rooms = rooms.joined_rooms;
+    } catch(e) {
+    }
+
+
     sync_state.started = Date.now();
 
 
@@ -118,7 +125,7 @@ export function createMatrixStore() {
 
       if (membership === sdk.KnownMembership.Join) {
         //console.log("joined", room.roomId)
-        joined_rooms.push(room.roomId)
+        //joined_rooms.push(room.roomId)
       }
 
       if (membership === sdk.KnownMembership.Invite) {
@@ -126,7 +133,7 @@ export function createMatrixStore() {
         if(is_local) {
           setTimeout(() => {
             join_local_room(room.roomId)
-          }, 1000)
+          }, 100)
         } else {
           setTimeout(() => {
             join_room(room.roomId);
@@ -147,7 +154,32 @@ export function createMatrixStore() {
       let room = await client.joinRoom(roomId, {
         syncRoom: true,
       });
+
       console.log("Joined local room:", room);
+      joined_rooms.push(roomId);
+      buildThreads()
+
+      /*
+      setTimeout(async () => {
+        let refreshed = await room.refreshLiveTimeline();
+        //console.log("refresh", refreshed)
+        const _events = room.getLiveTimeline().getEvents();
+        console.log("events are", _events)
+        let roomJoinEvent = _events.find(e => e.event.type == "m.room.member" && e.event.content?.membership == "join");
+        console.log("room join event", roomJoinEvent)
+
+        let read = await client.sendReceipt(roomJoinEvent, "m.read")
+        console.log('read', read)
+
+        let dummy_event = await client.sendEvent(room.roomId, "matrixbird.dummy.event", {
+          msgtype: "matrixbird.dummy.event"
+        })
+        console.log("dummy event", dummy_event)
+
+
+      }, 1000)
+      */
+
     }
 
     async function join_room(roomId) {
@@ -315,6 +347,7 @@ export function createMatrixStore() {
       }
     });
     */
+
 
     const get_threads = async (roomId) => {
       const url = `${PUBLIC_HOMESERVER}/_matrix/client/v1/rooms/${roomId}/threads?limit=50`;
@@ -489,14 +522,16 @@ export function createMatrixStore() {
 
 
     async function buildThreads() {
-      let rooms = client.getRooms();
-
+      let rooms = joined_rooms;
+      /*
       rooms = rooms.filter(room => {
         let roomType = room.currentState.getStateEvents("matrixbird.room.type")[0]?.event?.state_key;
+        console.log(roomType, room)
         return roomType == "INBOX" || roomType == "EMAIL"
       })
+      */
 
-      const threadPromises = rooms.map(room => get_threads(room.roomId));
+      const threadPromises = rooms.map(room => get_threads(room));
       const allThreads = await Promise.allSettled(threadPromises);
 
       const roomEventsMap = {};
@@ -504,7 +539,7 @@ export function createMatrixStore() {
 
       allThreads.forEach((result, index) => {
         if (result.status === 'fulfilled') {
-          const roomId = rooms[index].roomId;
+          const roomId = rooms[index];
           roomEventsMap[roomId] = result.value.chunk;
 
           result.value.chunk.forEach(thread => {

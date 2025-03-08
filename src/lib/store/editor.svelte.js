@@ -1,3 +1,4 @@
+import { SvelteMap } from 'svelte/reactivity';
 import { v4 as uuidv4 } from 'uuid';
 
 export let editor = $state({
@@ -6,7 +7,7 @@ export let editor = $state({
 
 let maximized = $state(null);
 
-export const reply_editors = $state({});
+export let reply_editors = $state(new SvelteMap());
 
 
 export function createEditorStore() {
