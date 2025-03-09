@@ -27,7 +27,7 @@ import {
 
 import { newAlert, updateAppStatus } from '$lib/store/app.svelte.js'
 
-import { createMatrixStore } from '$lib/store/matrix.svelte.js'
+import { createMatrixStore, mailbox_rooms } from '$lib/store/matrix.svelte.js'
 const store = createMatrixStore()
 
 import { createEditorStore } from '$lib/store/editor.svelte.js'
@@ -229,20 +229,15 @@ empty.`,
         //const resp = await store.testRooms()
         //console.log("dm rooms", resp)
 
-        let initMsg = {
-            from: {
-                name: store.user?.displayName,
-                address: mxid_to_email(store.user?.userId)
-            },
+        let preview = {
             subject: subject,
             body: {
-                text: body.text,
+                //text: body.text,
                 html: body.html
             }
         }
 
-
-        let room_id = await store.emailRoom(mxids)
+        let room_id = await store.emailRoom(mxids, preview)
         console.log("room id", room_id)
 
         const msg = await store.client.sendEvent(
@@ -276,6 +271,28 @@ empty.`,
             uuidv4()
         );
         console.log('thread marker event', thr)
+
+        /*
+        let outbox_room_id = mailbox_rooms["OUTBOX"]
+        if(outbox_room_id) {
+            let rev = await store.client.sendEvent(
+                outbox_room_id,
+                "matrixbird.email.review",
+                {
+                    from: store.user?.userId,
+                    to: mxids,
+                    subject: subject,
+                    body: {
+                        text: body.text,
+                        html: body.html
+                    },
+                    invite_room_id: room_id,
+                },
+                uuidv4()
+            );
+            console.log('review event', rev)
+        }
+        */
 
         updateAppStatus(null)
         closeWindow()

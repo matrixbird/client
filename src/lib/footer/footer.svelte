@@ -13,6 +13,8 @@ import {
 
 import { app, ui_state, toggleSidebar } from '$lib/store/app.svelte.js'
 
+let expanded = $derived(ui_state?.expanded)
+
 let app_status = $derived(app?.status)
 
 let sidebar_toggled = $derived(ui_state?.sidebar_toggled)
@@ -90,6 +92,7 @@ let sync_opts = $derived.by(() => {
 
 <div class="flex border-t border-border ">
 
+    {#if !expanded}
     <div class="flex place-items-center px-2 py-1 cursor-pointer"
         use:tooltip={opts} onclick={toggleSidebar}>
         {#if sidebar_toggled}
@@ -98,6 +101,7 @@ let sync_opts = $derived.by(() => {
             {@html show_sidebar}
         {/if}
     </div>
+    {/if}
 
 
 

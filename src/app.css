@@ -65,7 +65,7 @@
     --button-border: theme('colors.bird.400');
     --button-box-shadow: theme('colors.bird.100');
 
-    --button-primary-background: theme('colors.bird.900');
+    --button-primary-background: theme('colors.bird.800');
     --button-primary-text: hsla(0, 0%, 100%, 1);
     --button-primary-hover: theme('colors.bird.800');
     --button-primary-focus: theme('colors.bird.900');

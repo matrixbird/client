@@ -13,6 +13,7 @@ import {
 
 import Mail from './mail.svelte'
 import Chat from './chat.svelte'
+import Video from './video.svelte'
 
 import Settings from './settings.svelte'
 
@@ -31,7 +32,9 @@ class:float={!expanded}>
 
     <Mail {expanded} />
 
-    <Chat {expanded} />
+    <Chat {expanded} disabled={true} />
+
+    <Video {expanded} disabled={true} />
 
     <div class="flex-1 grid place-items-center">
     </div>

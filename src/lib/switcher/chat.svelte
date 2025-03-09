@@ -3,11 +3,10 @@ import { page } from '$app/stores';
 import { goto } from '$app/navigation';
 import { tooltip } from '$lib/components/tooltip/tooltip'
 import { 
-    chat_outline, 
     chat_solid, 
 } from '$lib/assets/icons'
 
-let {expanded} = $props();
+let { expanded, disabled } = $props();
 
 function open() {
     if(!active) {
@@ -22,7 +21,7 @@ let active = $derived.by(() => {
 let opts = {
     text: "Chat",
     placement: "right",
-    disabled: true,
+    disabled: disabled
 }
 
 </script>
@@ -33,6 +32,7 @@ onclick={open} use:tooltip={opts}>
     <div class="icon p-1 rounded h-7 w-7" 
         class:h-8={!expanded}
         class:w-8={!expanded}
+        class:opacity-60={disabled}
         class:active={active}>
         {@html chat_solid}
     </div>

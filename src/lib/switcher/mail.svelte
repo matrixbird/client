@@ -50,8 +50,7 @@ onclick={open} use:tooltip={opts}>
 <style lang="postcss">
 @reference "tailwindcss/theme";
 .active {
-    fill: white;
-    background-color: theme('colors.bird.200');
+    background-color: theme('colors.bird.50');
 }
 .icon {
     fill: theme('colors.bird.700');
@@ -60,6 +59,6 @@ onclick={open} use:tooltip={opts}>
     background-color: theme('colors.bird.100');
 }
 .active:hover {
-    background-color: theme('colors.bird.200');
+    background-color: theme('colors.bird.50');
 }
 </style>

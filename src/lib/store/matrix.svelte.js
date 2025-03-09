@@ -37,6 +37,8 @@ let thread_events = $state(new SvelteMap());
 export let inbox_mail = $state(new SvelteMap());
 export let sent_mail = $state(new SvelteMap());
 
+export let email_requests = $state([]);
+
 let events = $state(new SvelteMap());
 
 let joined_rooms = $state([]);
@@ -59,11 +61,7 @@ export let sync_state = $state({
   last_retry: null,
 });
 
-export let mailbox_rooms = $state({
-  inbox: null,
-  drafts: null,
-  self: null,
-});
+export let mailbox_rooms = $state({});
 
 export function createMatrixStore() {
 
@@ -119,7 +117,12 @@ export function createMatrixStore() {
 
     try {
       const mailboxes = await client.getAccountDataFromServer("matrixbird.mailbox.rooms");
-      console.log("mailboxes", mailboxes)
+      if(mailboxes) {
+        for (const [key, value] of Object.entries(mailboxes)) {
+          mailbox_rooms[key] = value;
+        }
+      }
+      console.log("mailbox rooms", mailbox_rooms)
 
     } catch(e) {
     }
@@ -136,6 +139,16 @@ export function createMatrixStore() {
       }
 
       if (membership === sdk.KnownMembership.Invite) {
+
+        let exists = joined_rooms.find(r => r === room.roomId);
+        if(exists) {
+          return;
+        }
+
+        console.log("Invited to room:", room.roomId);
+        create_email_request(room)
+
+        /*
         let is_local = is_local_room(room.roomId);
         if(is_local) {
           setTimeout(() => {
@@ -146,8 +159,38 @@ export function createMatrixStore() {
             join_room(room.roomId);
           }, 2000)
         }
+        */
       }
     });
+
+    async function create_email_request(room) {
+
+      let state = room.getLiveTimeline().getState(sdk.EventTimeline.FORWARDS)
+      let preview = state.getStateEvents("m.room.topic")[0]?.event?.content?.preview;
+      let from = state.getMembersExcept([session.user_id])[0];
+      console.log(state.getMembersExcept([session.user_id]))
+
+      let profile = await client.getProfileInfo(from.userId);
+      console.log("profile", profile)
+
+      let request = {
+        room_id: room.roomId,
+        preview: preview,
+        user: {
+          user_id: from?.userId,
+          name: from?.name,
+          displayName: profile?.displayname || from?.rawDisplayName,
+        },
+      }
+
+      email_requests.push(request)
+      console.log(email_requests)
+
+      setTimeout(async () => {
+        //let leave = await client.leave(room.roomId);
+        //console.log("leave", leave)
+      }, 1000)
+    }
 
 
     async function join_local_room(roomId) {
@@ -259,7 +302,11 @@ export function createMatrixStore() {
     });
 
     client.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
-      if(event.event.type == "matrixbird.thread.marker") {
+      let exists = joined_rooms.find(r => r === room.roomId);
+      if(!exists) {
+        return;
+      }
+      if(event.event.type === "matrixbird.thread.marker") {
         let origin_server_ts = event.event.origin_server_ts
         if(origin_server_ts > sync_state.started) {
           console.log("new thread marker, pull it in")
@@ -666,7 +713,7 @@ export function createMatrixStore() {
       //filter: filter,
       //fullState: true,
       //initialSyncLimit: 1000,
-      lazyLoadMembers: true,
+      lazyLoadMembers: false,
       disablePresence: true,
       //threadSupport: true,
       resolveInvitesToProfiles: true,
@@ -724,15 +771,19 @@ export function createMatrixStore() {
       const joinedMembers = room.getJoinedMembers();
       const joinedUserIds = joinedMembers.map(member => member.userId);
 
+      console.log("joined members are", joinedMembers)
+
       // Get all invited members in the room
       const invitedMembers = [];
       const memberEvents = room.currentState.getStateEvents("m.room.member");
 
       for (const event of memberEvents) {
-        if (event.getContent().membership === "invite") {
-          invitedMembers.push({ userId: event.getStateKey() });
+        if (event.event.content.membership === "invite") {
+          console.log("event", event)
+          invitedMembers.push({ userId: event.event.state_key });
         }
       }
+      console.log("inivted members are", invitedMembers)
 
       const invitedUserIds = invitedMembers.map(member => member.userId);
 
@@ -750,7 +801,7 @@ export function createMatrixStore() {
     return null;
   }
 
-  const emailRoom = async (userIds) => {
+  const emailRoom = async (userIds, preview) => {
 
     const existingRoomId = await doesRoomExist(userIds);
 
@@ -766,13 +817,6 @@ export function createMatrixStore() {
       preset: 'private_chat',
       invite: userIds,
       visibility: 'private',
-      /*
-      power_level_content_override: {
-        events: {
-          'matrixbird.email.matrix': 100,
-        }
-      },
-      */
       initial_state: [
         {
           type: 'm.room.guest_access',
@@ -782,19 +826,20 @@ export function createMatrixStore() {
           }
         },
         {
+          type: 'm.room.topic',
+          state_key: '',
+          content: {
+            topic: 'screen',
+            preview: preview
+          }
+        },
+        {
           type: 'matrixbird.room.type',
           state_key: 'EMAIL',
           content: {
             type: 'EMAIL'
           }
         },
-        /*
-        {
-          type: 'matrixbird.email.matrix',
-          state_key: 'initial',
-          content: initMsg
-        }
-        */
       ]
     });
 

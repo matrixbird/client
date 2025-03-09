@@ -22,7 +22,8 @@ let mailboxes = [
 ]
 </script>
 
-<div class="mt-4">
+<div class="mt-2">
+
     {#each mailboxes as mailbox}
         <MailboxListItem {mailbox} />
     {/each}
