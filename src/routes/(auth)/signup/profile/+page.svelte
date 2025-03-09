@@ -22,7 +22,7 @@ onMount(() => {
         //store.updateSession(data)
         setTimeout(() => {
             store.createMatrixClient(data)
-        }, 3000)
+        }, 1000)
     }
 });
 

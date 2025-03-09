@@ -27,7 +27,7 @@ let email = $derived.by(() => {
 
 <div class="menu grid grid-rows-[auto_1fr]">
 
-    <div class="flex flex-col p-3 border-b border-border">
+    <div class="flex flex-col p-3 border-b border-border select-text">
 
         <div class="flex place-items-center text-base font-medium">
             {#if displayName}

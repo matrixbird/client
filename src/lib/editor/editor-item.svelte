@@ -378,7 +378,6 @@ function processPaste(event) {
     let clipboardData, pastedData;
 
     event.stopPropagation();
-    event.preventDefault();
 
     clipboardData = event.clipboardData || window.clipboardData;
     pastedData = clipboardData.getData('Text');
@@ -389,6 +388,7 @@ function processPaste(event) {
         let email_valid = validate(email);
         let exists = emails.find(e => e.email == email)
         if(email_valid && !exists) {
+            event.preventDefault();
             emails.push({
                 email: email,
                 valid: false,

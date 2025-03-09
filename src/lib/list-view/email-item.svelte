@@ -180,6 +180,11 @@ const active = $derived.by(() => {
 
     if(is_thread_child) {
         let thread_id = email?.content?.["m.relates_to"]?.["event_id"]
+
+        if(thread_id == $page.params.event) {
+            return true
+        }
+
         let children = thread_events.get(thread_id)
         if(children) {
             return children.some(event => event.event_id == $page.params.event)
@@ -198,10 +203,10 @@ $effect(() => {
         route_state.mail = $page.url.pathname
     }
 
-    if(active) {
+    if(email) {
         let user = store.user;
         let room = store.client.getRoom(email.room_id)
-        //let read = room.getReadReceiptForUserId(user.userId)
+        let read = room.getReadReceiptForUserId(user.userId)
         //console.log('read', read)
 
         //let sendread = store.client.sendReadReceipt(email.room_id,

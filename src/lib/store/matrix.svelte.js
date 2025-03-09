@@ -117,6 +117,13 @@ export function createMatrixStore() {
     } catch(e) {
     }
 
+    try {
+      const mailboxes = await client.getAccountDataFromServer("matrixbird.mailbox.rooms");
+      console.log("mailboxes", mailboxes)
+
+    } catch(e) {
+    }
+
 
     sync_state.started = Date.now();
 
@@ -157,7 +164,7 @@ export function createMatrixStore() {
 
       console.log("Joined local room:", room);
       joined_rooms.push(roomId);
-      buildThreads()
+      buildThreadForJoinedRoom(roomId)
 
       /*
       setTimeout(async () => {
@@ -470,6 +477,11 @@ export function createMatrixStore() {
       }
       console.log("inbox built", inbox_mail)
       status.inbox_ready = true;
+    }
+
+    async function buildThreadForJoinedRoom(roomId) {
+      let thread = await get_threads(roomId);
+      console.log("found threads", thread)
     }
 
     async function buildThreadEvents(roomEventsMap) {
