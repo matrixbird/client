@@ -1,12 +1,26 @@
 <script>
 import ListHeader from './list-header.svelte'
 import EmailItems from './email-items.svelte'
+import EmailRequests from './email-requests.svelte';
+
+import { page } from '$app/stores';
+
+let is_email_requests = $derived.by(() => {
+    return $page.params.mailbox == "requests";
+})
 </script>
 
 <div class="grid grid-rows-[auto_1fr] overflow-hidden">
     <ListHeader />
+
     <div class="items h-full overflow-y-auto overflow-x-hidden">
-        <EmailItems />
+
+        {#if is_email_requests}
+            <EmailRequests />
+        {:else}
+            <EmailItems />
+        {/if}
+
     </div>
 </div>
 

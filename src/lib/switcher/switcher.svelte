@@ -5,17 +5,26 @@ import Profile from '$lib/profile/profile.svelte'
 
 import { ui_state } from '$lib/store/app.svelte.js'
 
+import { email_requests } from '$lib/store/matrix.svelte.js'
+
 let expanded = $derived(ui_state?.expanded)
 
 import { 
     settings
 } from '$lib/assets/icons'
 
+import Requests from './requests.svelte';
+
 import Mail from './mail.svelte'
 import Chat from './chat.svelte'
 import Video from './video.svelte'
 
 import Settings from './settings.svelte'
+
+
+let show_requests = $derived.by(() => {
+    return email_requests.length > 0
+})
 
 
 </script>
@@ -28,6 +37,10 @@ class:float={!expanded}>
 
     {#if expanded}
         <Profile />
+    {/if}
+
+    {#if show_requests}
+        <Requests {expanded} />
     {/if}
 
     <Mail {expanded} />

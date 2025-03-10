@@ -31,7 +31,8 @@ let opts = {
 <div class="grid place-items-center cursor-pointer mx-1"
 onclick={open} use:tooltip={opts}>
 
-    <div class="icon p-1 rounded" class:active={active}>
+    <div class="icon rounded p-1 h-8 w-8 hover:bg-bird-400" 
+        class:active={active}>
         {@html settings}
     </div>
 </div>
@@ -39,14 +40,7 @@ onclick={open} use:tooltip={opts}>
 <style lang="postcss">
 @reference "tailwindcss/theme";
 .active {
-    fill: white;
     background-color: theme('colors.bird.200');
-}
-.icon {
-    fill: theme('colors.bird.700');
-}
-.icon:hover {
-    background-color: theme('colors.bird.100');
 }
 .active:hover {
     background-color: theme('colors.bird.200');

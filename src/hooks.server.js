@@ -1,4 +1,4 @@
-import { PUBLIC_APPSERVICE } from '$env/static/public';
+import { PUBLIC_HOMESERVER } from '$env/static/public';
 import { error, redirect } from "@sveltejs/kit";
 
 /** @type {import('@sveltejs/kit').Handle} */
@@ -23,3 +23,13 @@ export const handle = async ({ event, resolve }) => {
 
   return response;
 };
+
+
+/** @type {import('@sveltejs/kit').HandleFetch} */
+export async function handleFetch({ request, fetch, event: { cookies } }) {
+  let access_token = cookies.get("access_token");
+  if (access_token && request.url.startsWith(PUBLIC_HOMESERVER)) {
+    request.headers.set('Authorization', `Bearer ${access_token}`);
+  }
+  return fetch(request);
+}

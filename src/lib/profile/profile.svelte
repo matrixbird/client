@@ -97,8 +97,8 @@ let opts = $derived.by(() => {
     class:active={popup_active}
     class:w-10={!expanded}
     class:h-10={!expanded}
-    class:w-7={expanded}
-    class:h-7={expanded}>
+    class:w-8={expanded}
+    class:h-8={expanded}>
         <div class="font-semibold text-md text-white uppercase"
             class:text-xs={expanded}>
             {initials} 

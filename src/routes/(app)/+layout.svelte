@@ -130,17 +130,17 @@ $effect(() => {
         } else {
             position = calcPosition()
         }
+        if(!resizing) {
+            let size = localStorage.getItem('window_size')
+            if(size) {
+                let [w, h] = JSON.parse(size)
+                width = w
+                height = h
+            }
+        }
     }
 
     //set initial window size from localstorage
-    if(!resizing) {
-        let size = localStorage.getItem('window_size')
-        if(size) {
-            let [w, h] = JSON.parse(size)
-            width = w
-            height = h
-        }
-    }
 
 })
 
@@ -247,6 +247,8 @@ let title = $derived.by(() => {
         return "Sent Mail"
     } else if(mailbox == "drafts") {
         return "Drafts"
+    } else if(mailbox == "requests") {
+        return "Email Requests"
     }
 })
 

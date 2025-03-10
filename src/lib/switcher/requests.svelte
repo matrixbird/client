@@ -8,42 +8,50 @@ import { route_state } from '$lib/store/app.svelte.js'
 
 let {expanded} = $props();
 
+import { email_requests } from '$lib/store/matrix.svelte.js'
+
+let count = $derived(email_requests?.length)
+
 import { 
-    envelope_outline, 
-    envelope_solid,
+    inbox_arrow,
 } from '$lib/assets/icons'
 
 function open() {
     if(!active) {
-
-        if(route_state.mail != null) {
-            goto(route_state.mail)
-            return
-        }
-
-        goto(`/mail/inbox`)
+        goto(`/mail/requests`)
     }
 }
 
 let active = $derived.by(() => {
-    return $page.params.mailbox == `inbox`
+    return $page.params.mailbox == `requests`
 })
 
+let text = count == 1 ? `email request` : `email requests`
+
 let opts = {
-    text: "Mail",
+    text: `${count} ${text}`,
     placement: "right",
 }
 
 </script>
 
-<div class="grid place-items-center cursor-pointer"
+<div class="grid place-items-center cursor-pointer mb-2 relative"
+    class:mt-2={expanded}
 onclick={open} use:tooltip={opts}>
 
-    <div class="icon rounded p-1 h-8 w-8 hover:bg-bird-400" 
+    <div class="icon rounded p-1 h-8 w-8 " 
         class:active={active}
         class:icon-active={active}>
-        {@html envelope_solid}
+        {@html inbox_arrow}
     </div>
+
+    <div class="flex place-items-center absolute top-[-10px] right-[9px] bg-red-700 rounded 
+        rounded-[50%] h-5 w-5 text-white">
+        <div class="w-full text-center font-bold text-xs">
+        {count}
+        </div>
+    </div>
+
 </div>
 
 <style lang="postcss">

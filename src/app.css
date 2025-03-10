@@ -37,8 +37,12 @@
     --logo-background: hsla(0, 0%, 10%, 1);
     --logo-fill: hsla(0, 0%, 100%, 1);
     --logo-fill-inactive: hsla(0, 100%, 41.6%, 1);
-    --icon: hsla(0, 0%, 25%, 1);
-    --icon-hover: hsla(0, 0%, 45%, 1);
+
+    --icon-fill: theme('colors.bird.800');
+    --icon-hover-fill: theme('colors.bird.800');
+    --icon-active-fill: theme('colors.bird.800');
+    --icon-active-hover-fill: theme('colors.bird.800');
+
     --pattern: blue;
 
     --bird-50: oklch(0.985 0 0);
@@ -109,8 +113,12 @@
     --logo-background: hsla(0, 0%, 10%, 1);
     --logo-fill: hsla(0, 99%, 44%, 1);
     --logo-fill-inactive: hsla(0, 100%, 41.6%, 1);
-    --icon: hsla(0, 0%, 25%, 1);
-    --icon-hover: hsla(0, 0%, 45%, 1);
+
+    --icon-fill: hsla(0, 0%, 25%, 1);
+    --icon-hover-fill: hsla(0, 0%, 45%, 1);
+    --icon-active-fill: hsla(0, 0%, 25%, 1);
+    --icon-active-hover-fill: pink;
+
     --pattern: red;
 
     --bird-50: oklch(0.185 0 0);
@@ -415,6 +423,18 @@ input::placeholder {
     box-shadow: 4px 4px 0 theme('colors.bird.600');
 }
 
-
 .icon svg {
+    fill: var(--icon-fill, currentColor);
+}
+
+.icon:hover svg {
+    fill: var(--icon-hover-fill, currentColor);
+}
+
+.icon.icon-active svg {
+    fill: var(--icon-active-fill, currentColor);
+}
+
+.icon.icon-active:hover svg {
+    fill: var(--icon-active-hover-fill, currentColor);
 }

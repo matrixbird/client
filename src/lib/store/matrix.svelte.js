@@ -13,8 +13,9 @@ import {
 } from '$app/navigation';
 
 import {
-  is_local_room,
-} from '$lib/utils/matrix.js'
+  getEvent,
+  getStateEvent,
+} from '$lib/matrix/api.js'
 
 let ready = $state(false);
 let synced = $state(false);
@@ -61,7 +62,13 @@ export let sync_state = $state({
   last_retry: null,
 });
 
+let requests = $derived(() =>{
+
+})
+
 export let mailbox_rooms = $state({});
+
+export let pending = $state({});
 
 export function createMatrixStore() {
 
@@ -127,6 +134,47 @@ export function createMatrixStore() {
     } catch(e) {
     }
 
+    if(mailbox_rooms["INBOX"]) {
+      try {
+        let room_id = mailbox_rooms["INBOX"];
+        const pending = await getStateEvent(
+          session.access_token, 
+          room_id,
+          "matrixbird.email.pending", 
+          ""
+        );
+        if(pending?.pending?.length > 0) {
+          console.log("found pending emails", pending.pending)
+          pending.emails = pending.pending;
+
+          /*
+          for (const email of pending.pending) {
+            let event = await getEvent(
+              session.access_token, 
+              room_id,
+              email.event_id
+            );
+
+            if(event) {
+
+              let request = {
+                type: "matrixbird.email.standard",
+                event_id: event.event_id,
+                preview: event.content,
+                event: event,
+                state: email.state,
+              }
+              email_requests.push(request)
+            }
+          }
+          */
+        }
+      } catch(e) {
+      }
+    } else {
+      console.log("no inbox room")
+    }
+
 
     sync_state.started = Date.now();
 
@@ -173,8 +221,12 @@ export function createMatrixStore() {
       let profile = await client.getProfileInfo(from.userId);
       console.log("profile", profile)
 
+      let event_id = uuidv4();
+
       let request = {
+        type: "matrixbird.email.matrix",
         room_id: room.roomId,
+        event_id: event_id,
         preview: preview,
         user: {
           user_id: from?.userId,
