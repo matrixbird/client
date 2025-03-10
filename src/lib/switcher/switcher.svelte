@@ -5,7 +5,10 @@ import Profile from '$lib/profile/profile.svelte'
 
 import { ui_state } from '$lib/store/app.svelte.js'
 
-import { email_requests } from '$lib/store/matrix.svelte.js'
+import { createMatrixStore } from '$lib/store/matrix.svelte.js'
+const store = createMatrixStore()
+
+let requests = $derived(store.requests)
 
 let expanded = $derived(ui_state?.expanded)
 
@@ -23,7 +26,7 @@ import Settings from './settings.svelte'
 
 
 let show_requests = $derived.by(() => {
-    return email_requests.length > 0
+    return requests?.length > 0
 })
 
 

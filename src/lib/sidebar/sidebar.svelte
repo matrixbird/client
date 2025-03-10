@@ -3,7 +3,10 @@ import MailboxList from './mailbox-list.svelte'
 import NewMessage from '$lib/editor/new-message.svelte'
 import EmailRequests from './email-requests.svelte';
 
-import { email_requests } from '$lib/store/matrix.svelte.js'
+import { createMatrixStore } from '$lib/store/matrix.svelte.js'
+const store = createMatrixStore()
+
+let requests = $derived(store.requests)
 </script>
 
 <div class="flex flex-col w-full  p-2">
@@ -13,7 +16,7 @@ import { email_requests } from '$lib/store/matrix.svelte.js'
         <NewMessage />
     </div>
 
-    {#if email_requests.length > 0}
+    {#if requests.length > 0}
         <EmailRequests />
     {/if}
 

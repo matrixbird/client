@@ -41,3 +41,43 @@ export const getEvent = async (token, roomId, eventId) => {
 
 }
 
+export const syncOnce = async (token) => {
+
+  let filter = {
+    account_data: {
+      types: ["matrixbird.mailbox.rooms"],
+      limit: 1,
+    },
+    room: {
+      timeline: {
+        unread_thread_notifications: true,
+        limit: 0,
+      },
+      state: {
+        types: ["matrixbird.email.pending"],
+        limit: 1,
+      },
+      include_leave: true,
+    }
+  }
+
+  let encoded = encodeURIComponent(JSON.stringify(filter));
+
+  let url = `${PUBLIC_HOMESERVER}/_matrix/client/v3/sync?filter=${encoded}`;
+
+  let options = {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  }
+
+  try {
+    const response = await fetch(url, options)
+    return response.json();
+  } catch (error) {
+    throw error
+  }
+
+}
+

@@ -8,9 +8,12 @@ import { route_state } from '$lib/store/app.svelte.js'
 
 let {expanded} = $props();
 
-import { email_requests } from '$lib/store/matrix.svelte.js'
+import { createMatrixStore } from '$lib/store/matrix.svelte.js'
+const store = createMatrixStore()
 
-let count = $derived(email_requests?.length)
+let requests = $derived(store.requests)
+
+let count = $derived(requests?.length)
 
 import { 
     inbox_arrow,

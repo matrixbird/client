@@ -15,6 +15,7 @@ import {
 import {
   getEvent,
   getStateEvent,
+  syncOnce,
 } from '$lib/matrix/api.js'
 
 let ready = $state(false);
@@ -40,6 +41,7 @@ export let sent_mail = $state(new SvelteMap());
 
 export let email_requests = $state([]);
 
+
 let events = $state(new SvelteMap());
 
 let joined_rooms = $state([]);
@@ -63,12 +65,12 @@ export let sync_state = $state({
 });
 
 let requests = $derived(() =>{
-
+  return email_requests;
 })
 
 export let mailbox_rooms = $state({});
 
-export let pending = $state({});
+let pending_emails_event = $state(null);
 
 export function createMatrixStore() {
 
@@ -123,6 +125,30 @@ export function createMatrixStore() {
     }
 
     try {
+      const init_sync = await syncOnce(session.access_token);
+      console.log(init_sync);
+
+      let mb_rooms = init_sync.account_data?.events?.find(e => e.type == "matrixbird.mailbox.rooms");
+      if(mb_rooms) {
+        for (const [key, value] of Object.entries(mb_rooms.content)) {
+          mailbox_rooms[key] = value;
+        }
+      }
+
+      for (const [room_id, room] of Object.entries(init_sync.rooms.join)) {
+        let pending_event = room.state?.events?.find(e => e.type == "matrixbird.email.pending");
+        if(pending_event) {
+          pending_emails_event = pending_event;
+        }
+      } 
+
+
+    } catch(e) {
+      console.error("Failed to sync", e)
+    }
+
+    /*
+    try {
       const mailboxes = await client.getAccountDataFromServer("matrixbird.mailbox.rooms");
       if(mailboxes) {
         for (const [key, value] of Object.entries(mailboxes)) {
@@ -147,7 +173,6 @@ export function createMatrixStore() {
           console.log("found pending emails", pending.pending)
           pending.emails = pending.pending;
 
-          /*
           for (const email of pending.pending) {
             let event = await getEvent(
               session.access_token, 
@@ -167,13 +192,13 @@ export function createMatrixStore() {
               email_requests.push(request)
             }
           }
-          */
         }
       } catch(e) {
       }
     } else {
       console.log("no inbox room")
     }
+    */
 
 
     sync_state.started = Date.now();
@@ -215,6 +240,10 @@ export function createMatrixStore() {
 
       let state = room.getLiveTimeline().getState(sdk.EventTimeline.FORWARDS)
       let preview = state.getStateEvents("m.room.topic")[0]?.event?.content?.preview;
+      let member_events = state.getStateEvents("m.room.member")
+
+      let invite_event = member_events.find(e => e.event.content?.membership == "invite");
+
       let from = state.getMembersExcept([session.user_id])[0];
       console.log(state.getMembersExcept([session.user_id]))
 
@@ -226,7 +255,7 @@ export function createMatrixStore() {
       let request = {
         type: "matrixbird.email.matrix",
         room_id: room.roomId,
-        event_id: event_id,
+        event_id: invite_event.event.event_id,
         preview: preview,
         user: {
           user_id: from?.userId,
@@ -327,6 +356,16 @@ export function createMatrixStore() {
         console.error("Error joining room:", roomId, error);
       }
     }
+
+    client.on(sdk.RoomStateEvent.Events, function (event, room, toStartOfTimeline) {
+      if(event?.event?.type == "matrixbird.email.pending") {
+        if(pending_emails_event?.origin_server_ts < event.event.origin_server_ts) {
+          pending_emails_event = event.event;
+          console.log("updated pending emails", pending_emails_event)
+        }
+      }
+    });
+
 
     client.on(sdk.RoomStateEvent.Events, function (event, room, toStartOfTimeline) {
       if(event?.event?.type == "matrixbird.room.type") {
@@ -764,7 +803,7 @@ export function createMatrixStore() {
     await client.startClient({
       //filter: filter,
       //fullState: true,
-      //initialSyncLimit: 1000,
+      initialSyncLimit: 0,
       lazyLoadMembers: false,
       disablePresence: true,
       //threadSupport: true,
@@ -787,14 +826,6 @@ export function createMatrixStore() {
     if(drafts?.room_id) {
       mailbox_rooms.drafts = drafts.room_id;
     }
-  }
-
-  async function syncOnce(){
-    await client.once(sdk.ClientEvent.sync, function (state, prevState, res) {
-      if (state === "PREPARED") {
-        console.log("prepared");
-      }
-    });
   }
 
 
@@ -943,10 +974,13 @@ export function createMatrixStore() {
       return user;
     },
 
+    get requests() {
+      return requests();
+    },
+
     updateSession,
     createMatrixClient,
     getUser,
-    syncOnce,
     doesRoomExist,
     emailRoom,
   };

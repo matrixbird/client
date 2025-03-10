@@ -9,9 +9,10 @@ import { page } from '$app/stores';
 
 import { count } from '$lib/store/app.svelte.js'
 
-import { email_requests } from '$lib/store/matrix.svelte.js'
 
 const store = createMatrixStore()
+
+let requests = $derived(store.requests)
 
 const events = $derived(store?.events)
 
@@ -99,8 +100,8 @@ let inbox_emails = $derived.by(() => {
 
 <div class="items-container flex flex-col overflow-x-hidden h-full">
 
-    {#if email_requests?.length > 0}
-        {#each email_requests as item (item.event_id)}
+    {#if requests?.length > 0}
+        {#each requests as item (item.event_id)}
             <EmailRequestItem {item} />
         {/each}
     {/if}
