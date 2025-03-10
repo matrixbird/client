@@ -203,6 +203,7 @@ empty.`,
                 room_id,
                 "matrixbird.email.matrix",
                 {
+                    recipients: mxids,
                     from: {
                         name: store.user?.displayName,
                         address: mxid_to_email(store.user?.userId)
@@ -244,6 +245,7 @@ empty.`,
             room_id,
             "matrixbird.email.matrix",
             {
+                recipients: mxids,
                 from: {
                     name: store.user?.displayName,
                     address: mxid_to_email(store.user?.userId)

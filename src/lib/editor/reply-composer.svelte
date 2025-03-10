@@ -86,10 +86,10 @@ empty.`,
         thread_id = email.content["m.relates_to"].event_id
     }
 
-        let to = email.sender
-        if(email.type == "matrixbird.email.standard") {
-            to = email.content.from.address
-        }
+    let to = email.sender
+    if(email.type == "matrixbird.email.standard") {
+        to = email.content.from.address
+    }
 
     updateAppStatus("Sending reply...")
 
@@ -98,7 +98,7 @@ empty.`,
         let room_id = email.room_id
 
         let content = {
-            to: to,
+            recipients: [to],
             from: {
                 name: store.user?.displayName,
                 address: mxid_to_email(store.user?.userId)

@@ -380,12 +380,29 @@ export function createMatrixStore() {
       }
     });
 
+    client.on(sdk.RoomStateEvent.Events, function (event, room, toStartOfTimeline) {
+      if(event?.event?.type == "matrixbird.room.type") {
+        let origin_server_ts = event.event.origin_server_ts
+        if(origin_server_ts > sync_state.started) {
+          //console.log("created a new room", event.event.state_key)
+        }
+      }
+    });
+
+
     client.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
       if (event.event.type == "matrixbird.email.reply") {
         let origin_server_ts = event.event.origin_server_ts
         if(origin_server_ts > sync_state.started) {
           console.log("new email reply, add it to the right place", event.event)
           let thread_id = event.event.content?.["m.relates_to"]?.event_id;
+
+          let exists = threads.get(thread_id);
+          if(!exists) {
+            get_new_thread(event.event.room_id, thread_id)
+            return
+          }
+
           let children = thread_events.get(thread_id);
           //console.log("children", children)
           if(children) {

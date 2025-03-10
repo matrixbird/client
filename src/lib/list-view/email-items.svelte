@@ -35,7 +35,21 @@ $effect(() => {
     if(inbox_emails) {
         count.inbox = inbox_emails.length
     }
+    if($page.params.mailbox && status.threads_ready &&
+        status.thread_events_ready) {
+        console.log("Building mailbox email list.")
+    }
 })
+
+function findLastUserEvent(threadEvents) {
+    const userEvents = threadEvents.filter(event => event.sender === user.userId);
+
+    if (userEvents.length === 0) return null;
+
+    return userEvents.reduce((latest, current) => 
+        current.origin_server_ts > latest.origin_server_ts ? current : latest, 
+        userEvents[0]);
+}
 
 function findLastNonUserEvent(threadEvents) {
     const nonUserEvents = threadEvents.filter(event => event.sender !== user.userId);
@@ -90,12 +104,63 @@ let inbox_emails = $derived.by(() => {
     }
 })
 
+function buildSentEmails(_threads) {
+
+    let emails = {};
+
+    for (const [threadId, thread] of _threads) {
+        let children = thread_events.get(threadId);
+        // this thread has event relations, we'll need to process 
+        // them to find the latest reply from this user
+        if(children) {
+            let userReply = findLastUserEvent(children);
+            if(userReply) {
+                emails[userReply.event_id] = userReply;
+            } else {
+                // this may be an email chain started by this user and
+                // all child events are sent by this user, so we'll 
+                // return the original thread event
+                if(thread.sender == user.userId) {
+                    emails[threadId] = thread;
+                }
+            }
+        }
+        // this thread has no event relations, so this is either
+        // an email sent by this user or recieved from another user
+        // add to inbox if it's sent by this user
+        if(!children) {
+            if(thread.sender == user.userId) {
+                emails[threadId] = thread;
+            }
+        }
+    }
+    //console.log("inbox built", emails)
+
+    let sorted = Object.values(emails).sort((a, b) => {
+        return b.origin_server_ts - a.origin_server_ts
+    })
+
+    return sorted
+}
+
+let sent_emails = $derived.by(() => {
+    if(is_sent && status.threads_ready && status.thread_events_ready) {
+        return buildSentEmails(threads)
+    }
+})
+
 </script>
 
 <div class="items-container flex flex-col overflow-x-hidden">
 
     {#if is_inbox && inbox_emails}
         {#each inbox_emails as email (email.event_id)}
+            <EmailItem {email} />
+        {/each}
+    {/if}
+
+    {#if is_sent && sent_emails}
+        {#each sent_emails as email (email.event_id)}
             <EmailItem {email} />
         {/each}
     {/if}

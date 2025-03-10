@@ -14,6 +14,9 @@ const events = $derived(store?.events)
 const threads = $derived(store?.threads)
 const thread_events = $derived(store?.thread_events)
 
+let ready = $derived(() => {
+    return emails?.length > 0
+})
 
 function buildEmails(event_id) {
 
@@ -94,11 +97,13 @@ $effect(() => {
 
 
 function killEmailItemView() {
-    goto('/mail/inbox')
+    let mailbox = $page.params.mailbox
+    goto(`/mail/${mailbox}`)
 }
 
 </script>
 
+{#if ready}
 <div class="thread-container h-full grid grid-rows-[auto_1fr] overflow-hidden">
 
     <div class="">
@@ -110,10 +115,10 @@ function killEmailItemView() {
 
 <div class="email-thread h-full overflow-x-auto overflow-y-auto select-text">
 
-    {#if emails}
+    {#if emails?.length > 0}
 
-        {#if emails.length <= 4}
-            {#each emails as email, i (email.event_id)}
+        {#if emails?.length <= 4}
+            {#each emails as email, i (email?.event_id)}
                 <div class="email-item">
                     <EmailItemView {email} last={i == emails.length - 1} />
                 </div>
@@ -121,15 +126,15 @@ function killEmailItemView() {
         {/if}
 
 
-        {#if emails.length >= 5 && split}
-            {#each split[0] as email, i (email.event_id)}
+        {#if emails?.length >= 5 && split}
+            {#each split[0] as email, i (email?.event_id)}
                 <div class="email-item">
                     <EmailItemView {email} last={i == emails.length - 1} />
                 </div>
             {/each}
 
             {#if !collapsed}
-                {#each split[1] as email, i (email.event_id)}
+                {#each split[1] as email, i (email?.event_id)}
                     <div class="email-item">
                         <EmailItemView {email} last={i == emails.length - 1} />
                     </div>
@@ -140,7 +145,7 @@ function killEmailItemView() {
 
 
 
-            {#each split[2] as email, i (email.event_id)}
+            {#each split[2] as email, i (email?.event_id)}
                 <div class="email-item">
                     <EmailItemView {email} last={i == split[2].length - 1} />
                 </div>
@@ -155,6 +160,14 @@ function killEmailItemView() {
 
 </div>
 </div>
+{/if}
+
+{#if !ready}
+    <div class="flex justify-center items-center h-full">
+        <div class="spinner"></div>
+    </div>
+{/if}
+
 
 <style lang="postcss">
 @reference "tailwindcss/theme";
