@@ -1,7 +1,10 @@
 <script>
 import { onMount, onDestroy } from 'svelte';
 import { close_small } from '$lib/assets/icons'
-import { valid_email } from '$lib/appservice/api'
+import { valid_email, valid_domain } from '$lib/appservice/api'
+import {
+    get_email_domain
+} from '$lib/utils/matrix.js'
 
 import { createMatrixStore } from '$lib/store/matrix.svelte';
 
@@ -11,6 +14,7 @@ let {
     item,
     to_focused,
     validateEmail,
+    validateEmailDomain,
     removeEmail
 } = $props();
 
@@ -40,13 +44,32 @@ onDestroy(() => {
     document.removeEventListener('keydown', handleBackspace)
 })
 
+let profile = $state(null);
+
+let display_name = $derived.by(() => {
+    if(profile?.displayname) {
+        return `${profile.displayname} (${item.email})`
+    }
+    return item.email
+})
+
 onMount(async() => {
     let resp = await valid_email(item.email);
-    console.log(resp)
     if(resp?.valid && resp?.mxid) {
         validateEmail(item.email)
-        let profile = await store.client.getProfileInfo(resp.mxid)
-        console.log(profile)
+        let pr = await store.client.getProfileInfo(resp.mxid)
+        if(pr) {
+            console.log(pr)
+            profile = pr
+        }
+    }
+
+    if(!resp?.valid) {
+        let domain = get_email_domain(item.email)
+        resp = await valid_domain(domain);
+        if(resp?.valid) {
+            validateEmailDomain(item.email)
+        }
     }
 })
 
@@ -57,17 +80,30 @@ function remove(e) {
 </script>
 
 <div bind:this={el}
-    class="flex place-items-center my-2 px-2 mr-2
-    hover:border-bird-500 duration-100
+    class="flex place-items-center my-2 pl-1 mr-1
+    hover:border-bird-900 duration-100
     border border-bird-400
-    bg-bird-50 rounded cursor-pointer"
+    bg-bird-50 hover:bg-bird-100 rounded-[500px] cursor-default"
     class:border-bird-800={valid}
-    class:outline={highlight}
-    onclick={remove}>
-    <div class="">
-        {item.email}
+    class:border-bird-900={highlight}
+    class:border-[2px]={highlight}
+    class:bg-bird-200={highlight}>
+
+    {#if valid && profile}
+        <div class="flex place-items-center">
+            <div class="grid place-items-center text-xs bg-bird-700 w-4 h-4 
+                rounded-[50%]">
+                <div class="font-semibold text-white uppercase">
+                </div>
+            </div>
+        </div>
+    {/if}
+
+    <div class="ml-1">
+        {display_name}
     </div>
-    <div class="cursor-pointer font-semibold ml-1">
+    <div class="cursor-pointer font-semibold pl-1 pr-2"
+    onclick={remove}>
         {@html close_small}
     </div>
 </div>

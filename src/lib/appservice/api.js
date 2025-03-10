@@ -138,6 +138,24 @@ export const query_code = async (code) => {
 
 }
 
+export const valid_domain = async (domain) => {
+  const url = `${PUBLIC_APPSERVICE}/domain/${domain}`;
+
+  let options = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }
+
+  try {
+    const response = await fetch(url, options)
+    return response.json();
+  } catch (error) {
+    throw error
+  }
+
+}
+
 export const valid_email = async (email) => {
   const url = `${PUBLIC_APPSERVICE}/email/${email}`;
 

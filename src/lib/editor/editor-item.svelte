@@ -143,6 +143,12 @@ async function process() {
     }
 
     for(let email of emails) {
+        if(!email.valid && email?.domain_valid) {
+            newAlert({
+                message: `The email address <strong>${email.email}</strong> does not exist. Please choose a valid matrix email`,
+            })
+            return
+        }
         if(!email.valid) {
             newAlert({
                 message: `Sending regular emails is disabled for now. Please
@@ -369,6 +375,13 @@ function validateEmail(email) {
     }
 }
 
+function validateEmailDomain(email) {
+    let i = emails.findIndex(e => e.email == email)
+    if(i != -1) {
+        emails[i].domain_valid = true
+    }
+}
+
 function processEmailField(event) {
     if(emails?.length > 0) {
         emails[emails.length - 1].highlight = false
@@ -525,18 +538,19 @@ let opts_close = $derived.by(() => {
                         <Recipient {item} 
                             {removeEmail} 
                             {validateEmail} 
+                            {validateEmailDomain} 
                             {to_focused} />
                     {/each}
 
-                <div class="">
-                <input type="email" class="py-3" 
-                    bind:this={to_input}
-                    bind:value={to}
-                    onkeydown={processInput}
-                    onfocus={handleFocus}
-                    onpaste={processPaste}
-                    placeholder={email_placeholder}
-                />
+                <div class="flex-1">
+                    <input type="email" class="py-3" 
+                        bind:this={to_input}
+                        bind:value={to}
+                        onkeydown={processInput}
+                        onfocus={handleFocus}
+                        onpaste={processPaste}
+                        placeholder={email_placeholder}
+                    />
                 </div>
             </div>
 

@@ -68,7 +68,7 @@ export let sync_state = $state({
   last_retry: null,
 });
 
-let requests = $derived(() =>{
+let requests = $derived.by(() =>{
   return email_requests;
 })
 
@@ -1002,7 +1002,7 @@ export function createMatrixStore() {
     },
 
     get requests() {
-      return requests();
+      return requests;
     },
 
     updateSession,

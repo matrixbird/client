@@ -31,6 +31,13 @@ export function get_localpart(matrixId) {
   return match ? match[1] : null;
 }
 
+export function get_email_domain(email) {
+  if (!email || typeof email !== 'string' || !email.includes('@')) {
+    return null;
+  }
+  return email.split('@')[1];
+}
+
 export function get_domain(matrixId) {
   if (typeof matrixId !== 'string' || !matrixId.startsWith('@')) {
     return null;
