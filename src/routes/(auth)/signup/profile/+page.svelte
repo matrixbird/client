@@ -53,6 +53,16 @@ async function save() {
     goto('/mail/inbox')
 }
 
+function handleKeydown(event) {
+    if(name == '') {
+        nameInput.focus();
+        return;
+    }
+    if(event.key === 'Enter') {
+        save()
+    }
+}
+
 </script>
 
 <div class="box w-full flex flex-col" 
@@ -77,6 +87,7 @@ async function save() {
                 bind:this={nameInput} 
                 bind:value={name} 
                 disabled={busy}
+                onkeydown={handleKeydown}
                 type="text" 
                 placeholder="Choose a name" />
         </div>

@@ -348,7 +348,8 @@ function resize(e) {
         <div class="overflow-hidden 
             grid"
             class:grid-cols-[3rem_1fr]={expanded}
-            class:boxed-content={!expanded}>
+            class:boxed-content={!expanded && !dragging}
+            class:boxed-alt={!expanded && dragging}>
 
             {#if expanded}
                 <Switcher />
@@ -421,6 +422,12 @@ function resize(e) {
 .drag-shadow {
     outline: 2px solid theme('colors.bird.700');
     box-shadow: none;
+}
+
+.boxed-alt {
+    border-left: 1px solid theme('colors.bird.700');
+    border-right: 1px solid theme('colors.bird.700');
+    border-bottom: 1px solid theme('colors.bird.700');
 }
 .grabber {
     clip-path: polygon(0 100%,100% 0,100% 100%);

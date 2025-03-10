@@ -18,6 +18,10 @@ import {
   syncOnce,
 } from '$lib/matrix/api.js'
 
+import {
+  is_local_room
+} from '$lib/utils/matrix.js'
+
 let ready = $state(false);
 let synced = $state(false);
 let session = $state(null);
@@ -146,6 +150,18 @@ export function createMatrixStore() {
         for (const [room_id, room] of Object.entries(init_sync.rooms.invite)) {
           let joined = await client.joinRoom(room_id);
           joined_rooms.push(joined.roomId)
+          let is_local = is_local_room(joined.roomId);
+          if(!is_local) {
+
+            const messagesResult = await client.createMessagesRequest(joined.roomId, null, 100, 'b', null);
+            const messages = messagesResult.chunk;
+            console.log(`Fetched ${messages.length} messages using createMessagesRequest`);
+            for (const message of messages) {
+              if (message.type.includes("matrixbird.email")) {
+                //events.set(message.event_id, message);
+              }
+            }
+          }
         } 
       } 
 
@@ -225,10 +241,9 @@ export function createMatrixStore() {
           return;
         }
 
-        console.log("Invited to room:", room.roomId);
-        create_email_request(room)
+        //console.log("Invited to room:", room.roomId);
+        //create_email_request(room)
 
-        /*
         let is_local = is_local_room(room.roomId);
         if(is_local) {
           setTimeout(() => {
@@ -237,9 +252,8 @@ export function createMatrixStore() {
         } else {
           setTimeout(() => {
             join_room(room.roomId);
-          }, 2000)
+          }, 1000)
         }
-        */
       }
     });
 
@@ -329,7 +343,6 @@ export function createMatrixStore() {
 
       try {
 
-        // Join the room since we're not already in it
         console.log("Joining room:", roomId);
         let room = await client.joinRoom(roomId, {
           syncRoom: true,
@@ -339,24 +352,10 @@ export function createMatrixStore() {
           const messagesResult = await client.createMessagesRequest(room.roomId, null, 100, 'b', null);
           const messages = messagesResult.chunk;
           console.log(`Fetched ${messages.length} messages using createMessagesRequest`);
-          for (const message of messages) {
-            if (message.type.includes("matrixbird.email")) {
-              //events.set(message.event_id, message);
-            }
-          }
+          joined_rooms.push(roomId);
+          buildThreadForJoinedRoom(roomId)
 
-          room = client.getRoom(roomId);
-          let refreshed = await room.refreshLiveTimeline();
-          //console.log("refresh", refreshed)
-          const _events = room.getLiveTimeline().getEvents();
-          //console.log("events are", _events)
-          let roomJoinEvent = _events.find(e => e.event.type == "m.room.member" && e.event.content?.membership == "join");
-          console.log("room join event", roomJoinEvent)
-
-          let read = await client.sendReceipt(roomJoinEvent, "m.read")
-          console.log('read', read)
-
-        }, 2000)
+        }, 1000)
 
 
       } catch (error) {
@@ -627,6 +626,13 @@ export function createMatrixStore() {
     async function buildThreadForJoinedRoom(roomId) {
       let thread = await get_threads(roomId);
       console.log("found threads", thread)
+
+      if(thread.chunk.length > 0) {
+        for (const event of thread.chunk) {
+          //threads.set(event.event_id, event);
+          get_new_thread(event.room_id, event.event_id)
+        }
+      }
     }
 
     async function buildThreadEvents(roomEventsMap) {
@@ -861,8 +867,6 @@ export function createMatrixStore() {
       const joinedMembers = room.getJoinedMembers();
       const joinedUserIds = joinedMembers.map(member => member.userId);
 
-      console.log("joined members are", joinedMembers)
-
       // Get all invited members in the room
       const invitedMembers = [];
       const memberEvents = room.currentState.getStateEvents("m.room.member");
@@ -873,7 +877,6 @@ export function createMatrixStore() {
           invitedMembers.push({ userId: event.event.state_key });
         }
       }
-      console.log("inivted members are", invitedMembers)
 
       const invitedUserIds = invitedMembers.map(member => member.userId);
 
