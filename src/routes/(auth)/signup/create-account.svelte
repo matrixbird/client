@@ -9,7 +9,7 @@ import {
 } from '$lib/appservice/api.js';
 
 import {
-	goto,
+    goto,
 } from '$app/navigation';
 
 import { page } from '$app/state';
@@ -67,7 +67,7 @@ let code = $state(code_in_url || '');
 let busy = $state(false);
 let unavailable = $state(false);
 
-function focusPassword(event) {
+function handleKeydown(event) {
     if(event.key === 'Enter') {
         passwordInput.focus();
     }
@@ -76,7 +76,7 @@ function focusPassword(event) {
 
     const regex = /^[a-zA-Z0-9]$/;
     if (!regex.test(event.key)) {
-      event.preventDefault();
+        event.preventDefault();
     }
 
     if(username.length === 0) {
@@ -126,7 +126,7 @@ async function process() {
 
     try {
         let response = await signup({
-            username: username,
+            username: username.toLowerCase(),
             password: password,
             session: session?.session || uuidv4(),
             client_secret: session?.client_secret || uuidv4(),
@@ -241,7 +241,7 @@ let focused = $state(false);
             type="text" 
             disabled={busy}
             oninput={checkUsername}
-            onkeydown={focusPassword}
+            onkeydown={handleKeydown}
             maxlength="30"
             onfocus={() => focused = true}
             onblur={() => focused = false}
@@ -250,7 +250,7 @@ let focused = $state(false);
         <div class:focus={focused} 
             onclick={() => usernameInput.focus()}
             class="server pointer-events-none
-select-none flex items-center px-3 ml-[-1px] border border-bird-900">
+            select-none flex items-center px-3 ml-[-1px] border border-bird-900">
             @{PUBLIC_HOMESERVER_NAME}
         </div>
 
@@ -268,26 +268,26 @@ select-none flex items-center px-3 ml-[-1px] border border-bird-900">
     </div>
 
     {#if code_valid && invite_code_email}
-    <div class="mt-3">
-        <input 
-            class="py-3 px-3"
-            type="email" 
-            disabled
-            value={invite_code_email} />
-    </div>
+        <div class="mt-3">
+            <input 
+                class="py-3 px-3"
+                type="email" 
+                disabled
+                value={invite_code_email} />
+        </div>
     {/if}
 
     {#if require_invite_code}
-    <div class="mt-3">
-        <input 
-            class="py-3 px-3"
-            bind:this={codeInput} 
-            bind:value={code} 
-            type="text" 
-            disabled={busy || lock_code_input}
-            onkeydown={codeEnter}
-            placeholder="Invite Code" />
-    </div>
+        <div class="mt-3">
+            <input 
+                class="py-3 px-3"
+                bind:this={codeInput} 
+                bind:value={code} 
+                type="text" 
+                disabled={busy || lock_code_input}
+                onkeydown={codeEnter}
+                placeholder="Invite Code" />
+        </div>
     {/if}
 
 
@@ -320,10 +320,10 @@ select-none flex items-center px-3 ml-[-1px] border border-bird-900">
     </div>
 
     {#if !code_valid && !invite_code_email}
-    <div class="mt-4">
-        <a href="/request/invite" class="text-bird-900 text-sm
-            hover:underline">Need an invite code?</a>
-    </div>
+        <div class="mt-4">
+            <a href="/request/invite" class="text-bird-900 text-sm
+                hover:underline">Need an invite code?</a>
+        </div>
     {/if}
 </div>
 

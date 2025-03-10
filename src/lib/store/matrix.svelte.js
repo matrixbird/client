@@ -142,6 +142,13 @@ export function createMatrixStore() {
         }
       } 
 
+      if(init_sync.rooms.invite) {
+        for (const [room_id, room] of Object.entries(init_sync.rooms.invite)) {
+          let joined = await client.joinRoom(room_id);
+          joined_rooms.push(joined.roomId)
+        } 
+      } 
+
 
     } catch(e) {
       console.error("Failed to sync", e)
