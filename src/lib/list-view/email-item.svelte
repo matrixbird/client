@@ -277,7 +277,7 @@ let el;
     <div class="flex p-2 overflow-x-hidden">
 
         <div class="flex mr-3 mt-1">
-            <UserAvatar {email} />
+            <UserAvatar user_id={email.sender} />
         </div>
 
         <div class="flex flex-col flex-1 overflow-x-hidden">

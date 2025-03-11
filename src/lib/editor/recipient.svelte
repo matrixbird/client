@@ -2,6 +2,9 @@
 import { onMount, onDestroy } from 'svelte';
 import { close_small } from '$lib/assets/icons'
 import { valid_email, valid_domain } from '$lib/appservice/api'
+
+import UserAvatar from '$lib/user/avatar.svelte'
+
 import {
     get_email_domain
 } from '$lib/utils/matrix.js'
@@ -53,9 +56,12 @@ let display_name = $derived.by(() => {
     return item.email
 })
 
+let mxid = $state(null)
+
 onMount(async() => {
     let resp = await valid_email(item.email);
     if(resp?.valid && resp?.mxid) {
+        mxid = resp.mxid
         validateEmail(item.email)
         let pr = await store.client.getProfileInfo(resp.mxid)
         if(pr) {
@@ -89,14 +95,8 @@ function remove(e) {
     class:border-[2px]={highlight}
     class:bg-bird-200={highlight}>
 
-    {#if valid && profile}
-        <div class="flex place-items-center">
-            <div class="grid place-items-center text-xs bg-bird-700 w-4 h-4 
-                rounded-[50%]">
-                <div class="font-semibold text-white uppercase">
-                </div>
-            </div>
-        </div>
+    {#if valid && profile && mxid}
+        <UserAvatar user_id={mxid} small={true} />
     {/if}
 
     <div class="ml-1">

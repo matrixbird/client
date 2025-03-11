@@ -14,11 +14,9 @@ let expanded = $derived(ui_state?.expanded)
 </script>
 
 <div class="grid grid-cols-[1fr] w-full h-full overflow-hidden" 
-class:open={expanded}>
+class:open={expanded || event_open}>
 
-    {#if !event_open || expanded}
-        <ListView />
-    {/if}
+    <ListView />
 
     {#if event_open || expanded}
         <div class="overflow-hidden border-l border-border">

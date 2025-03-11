@@ -119,6 +119,26 @@ export const downloadContent = async (token, mxcid ) => {
   } catch (error) {
     throw error
   }
+}
 
+export const getThumbnail = async (token, mxcid ) => {
+
+  let stripped = mxcid.replace('mxc://', '');
+
+  let url = `${PUBLIC_HOMESERVER}/_matrix/client/v1/media/thumbnail/${stripped}?height=96&width=96&method=scale`;
+
+  let options = {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  }
+
+  try {
+    const response = await fetch(url, options)
+    return response?.url;
+  } catch (error) {
+    throw error
+  }
 }
 

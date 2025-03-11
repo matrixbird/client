@@ -6,6 +6,10 @@ import Menu from './menu.svelte'
 
 const store = createMatrixStore()
 
+import {
+    getThumbnail,
+} from '$lib/matrix/api.js'
+
 import { ui_state } from '$lib/store/app.svelte.js'
 let expanded = $derived(ui_state?.expanded)
 
@@ -39,6 +43,27 @@ let initials = $derived.by(() => {
         return local_part[0]
     }
 })
+
+let avatar = $derived.by(() => {
+    if (user?.avatarUrl) {
+        return user?.avatarUrl
+    }
+})
+
+$effect(() => {
+    if(avatar) {
+        getAvatar()
+    }
+})
+
+let url = $state(null);
+
+async function getAvatar() {
+    let con = await getThumbnail(store.session.access_token, avatar)
+    if(con) {
+        url = con
+    }
+}
 
 
 let popup;
@@ -101,7 +126,12 @@ let opts = $derived.by(() => {
     class:h-8={expanded}>
         <div class="font-semibold text-md text-white uppercase"
             class:text-xs={expanded}>
-            {initials} 
+            {#if !avatar}
+                {initials} 
+            {/if}
+            {#if avatar && url}
+                <img src={url} class="" />
+            {/if}
         </div>
     </div>
 </div>
@@ -111,5 +141,9 @@ let opts = $derived.by(() => {
 @reference "tailwindcss/theme";
 .active {
     outline: 4px solid theme('colors.bird.300');
+}
+
+img {
+    border-radius: 50%;
 }
 </style>
