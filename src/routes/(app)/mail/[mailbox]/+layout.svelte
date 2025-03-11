@@ -27,7 +27,7 @@ class:open={expanded || event_open}>
 
 <style>
 .open {
-    grid-template-columns: 50% 50%;
+    grid-template-columns: 40% 60%;
 }
 </style>
 

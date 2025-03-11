@@ -838,12 +838,12 @@ export function createMatrixStore() {
     })
 
     await client.startClient({
-      //filter: filter,
+      filter: filter,
       //fullState: true,
-      initialSyncLimit: 0,
+      initialSyncLimit: 1,
       lazyLoadMembers: false,
-      disablePresence: true,
-      //threadSupport: true,
+      //disablePresence: true,
+      threadSupport: true,
       resolveInvitesToProfiles: true,
     });
 

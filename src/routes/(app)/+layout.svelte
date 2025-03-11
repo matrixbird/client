@@ -430,6 +430,7 @@ function resize(e) {
     border-right: 1px solid theme('colors.bird.700');
     border-bottom: 1px solid theme('colors.bird.700');
 }
+
 .grabber {
     height: 20px;
     width: 20px;

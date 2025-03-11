@@ -478,16 +478,17 @@ let opts_close = $derived.by(() => {
 
 
 {#if !hidden}
-<div class="boxed editor grid grid-rows-[auto_1fr] bg-white
+<div class="border-x-[7px] border-t-[7px] border-bird-200 editor grid grid-rows-[auto_1fr]
+        bg-white rounded-t-3xl
     min-w-[34rem]
     select-none"
     class:base={!expanded}
     class:expand={expanded}>
 
-    <div class="editor-header flex bg-bird-900 text-white font-medium"
+    <div class="editor-header rounded-t-2xl flex bg-bird-900 text-white font-medium py-1"
     >
 
-        <div class="flex px-2 flex-1 place-items-center cursor-pointer text-sm ml-1 tracking-wide"
+        <div class="flex px-3 flex-1 place-items-center cursor-pointer text-sm ml-1 tracking-wide"
             onclick={toggleMinimize}>
             {subject ? subject : `New Message`}
         </div>
@@ -513,7 +514,7 @@ let opts_close = $derived.by(() => {
             {/if}
         </div>
 
-        <div class="cursor-pointer flex place-items-center mr-1"
+        <div class="cursor-pointer flex place-items-center mr-2"
         use:tooltip={opts_close}
             onclick={closeWindow}>
             {@html close}
@@ -521,7 +522,7 @@ let opts_close = $derived.by(() => {
     </div>
 
     {#if !minimized}
-        <div class="boxed-content content text-sm grid grid-rows-[auto_auto_1fr_auto]"
+        <div class="content text-sm grid grid-rows-[auto_auto_1fr_auto]"
         class:max={expanded}>
 
             <div class="recipients border-b border-bird-300 mx-4 flex flex-wrap cursor-text"

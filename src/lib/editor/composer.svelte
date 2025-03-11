@@ -11,6 +11,7 @@ let expanded = $derived(ui_state?.expanded)
 let { 
     state,
     updateComposer, 
+    updateScroll,
     composer_focus,
     isReply
 } = $props();
@@ -59,12 +60,22 @@ onMount(() => {
     }
     element.scrollIntoView({ block: "start", inline: "nearest"
     });
+
+    window.addEventListener('keydown', handleScrollDown);
 });
+
+function handleScrollDown(event) {
+    if (editor.isFocused && event.key === 'Enter') {
+        //event.preventDefault();
+        updateScroll();
+    }
+}
 
 onDestroy(() => {
     if (editor) {
         editor.destroy();
     }
+    window.removeEventListener('keydown', handleScrollDown);
 });
 
 export function focus() {
@@ -72,12 +83,9 @@ export function focus() {
 }
 </script>
 
-<div class="composer px-4" 
+<div class="composer px-4 max-h-[50dvh] overflow-auto" 
     class:pt-4={!isReply}
     class:mr-1={isReply}
-    class:max-h-[50dvh]={!isReply}
-    class:max-h-[30dvh]={isReply && expanded}
-    class:max-h-[10dvh]={isReply && !expanded}
     onclick={focus}
     bind:this={element}></div>
 

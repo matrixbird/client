@@ -168,6 +168,14 @@ async function focusComposer() {
     composer.focus()
 }
 
+function updateScroll() {
+    console.log("updating")
+    let el = document.querySelector('.email-thread')
+    if(el) {
+        el.scrollTop = el.scrollHeight
+    }
+}
+
 </script>
 
 <div class="editor grid grid-rows-[auto_1fr_auto] 
@@ -191,7 +199,7 @@ async function focusComposer() {
     class:min-h-[12dvh]={expanded}>
 
             <Composer bind:this={composer} 
-            isReply={true} {state}
+            isReply={true} {state} {updateScroll}
                 {updateComposer} />
     </div>
 

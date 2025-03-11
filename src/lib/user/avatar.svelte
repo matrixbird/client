@@ -28,7 +28,7 @@ let user = $derived.by(() =>{
 })
 
 let initials = $derived.by(() => {
-    return user?.name ? user?.name[0] : ``
+    return user?.name ? user?.name[0] : user?.localpart[0]
 })
 
 let avatar = $derived.by(() => {

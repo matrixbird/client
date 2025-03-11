@@ -9,7 +9,8 @@ import {
 } from '$lib/utils/matrix.js'
 
 import { 
-    downloadContent
+    downloadContent,
+    sendReadReceipt
 } from '$lib/matrix/api.js'
 
 import { 
@@ -107,7 +108,8 @@ let address = $derived.by(() => {
 })
 
 const native = $derived.by(() => {
-    return email?.type == "matrixbird.email.matrix"
+    return email?.type == "matrixbird.email.matrix" ||
+        email?.type == "matrixbird.email.reply"
 })
 
 let user = $derived.by(() =>{
@@ -212,11 +214,11 @@ $effect(() => {
         route_state.mail = $page.url.pathname
     }
 
-    if(email) {
+    if(email && active) {
         let user = store.user;
         let room = store.client.getRoom(email.room_id)
-        //let read = room?.getReadReceiptForUserId(user.userId)
-        //console.log('read', read)
+        let read = room?.getReadReceiptForUserId(user.userId)
+        console.log('read', read)
 
         //let sendread = store.client.sendReadReceipt(email.room_id,
         //email.event_id)
@@ -226,12 +228,40 @@ $effect(() => {
 
 })
 
-async function markRead() {
-    let room = store.client.getRoom(email.room_id)
-    let event = room.getLiveTimeline().getEvents().find(event => event.event.event_id == email.event_id)
+let thread_id = $derived.by(() => {
+    let relation = email?.content?.["m.relates_to"]?.["event_id"]
+    if(relation) {
+        return relation
+    }
+    if(email?.unsigned?.["m.relations"]?.["m.thread"]) {
+        return email?.event_id
+    }
+    return email?.event_id
+})
 
-    let read = await store.client.sendReceipt(event, "m.read")
+let event_to_read = $derived.by(() => {
+    let relation = email?.content?.["m.relates_to"]?.["event_id"]
+    if(relation) {
+        return email.event_id
+    }
+    if(email?.unsigned?.["m.relations"]?.["m.thread"]) {
+        return email?.event_id
+    }
+    return email?.event_id
+})
+
+async function markRead() {
+
+    let read = await sendReadReceipt(
+        store.session.access_token, 
+        email.room_id, 
+        event_to_read,
+        {
+            thread_id: thread_id
+        }
+    )
     console.log('read', read)
+
 }
 
 let is_large = $derived.by(() => {
@@ -274,7 +304,7 @@ let el;
     class:inactive={!active}
     onclick={open}>
 
-    <div class="flex p-2 overflow-x-hidden">
+    <div class="flex p-2 overflow-x-hidden mr-2">
 
         <div class="flex mr-3 mt-1">
             <UserAvatar user_id={email.sender} />
@@ -283,16 +313,18 @@ let el;
         <div class="flex flex-col flex-1 overflow-x-hidden">
             <div class="flex place-items-center leading-normal">
 
-                <div class="text-md whitespace-nowrap">
+                <div class="subject whitespace-nowrap overflow-hidden text-ellipsis flex-1">
                     {subject}
                 </div>
-                <div class="ml-2 text-sm text-light whitespace-nowrap overflow-hidden text-ellipsis">
-                    {#if first_line}
-                        {first_line}
-                    {/if}
+
+                <div class="flex flex-col ml-2">
+                    <div class="text-[12px] text-bird-800">
+                        <Date event={email} />
+                    </div>
                 </div>
+
             </div>
-            <div class="mt-1">
+            <div class="flex mt-1">
 
                 {#if native && is_matrixbird}
                     <div class="text-xs font-medium flex place-items-center">
@@ -300,12 +332,11 @@ let el;
                             rounded-[3px]">
                             Matrixbird
                         </span>
-                        {@html check_small}
                     </div>
+
                 {:else if native && user}
                     <div class="text-sm flex place-items-center">
                         <span class="mr-2">{user?.name}</span>
-                        {@html check_small}
                     </div>
                 {/if}
 
@@ -318,6 +349,11 @@ let el;
                     </div>
                 {/if}
 
+                <div class="flex-1 ml-2 text-sm text-light whitespace-nowrap overflow-hidden text-ellipsis">
+                    {#if first_line}
+                        {first_line}
+                    {/if}
+                </div>
 
 
 
@@ -331,12 +367,6 @@ let el;
             {/if}
 
 
-        <div class="flex flex-col ml-4">
-            <div class="text-[12px] text-bird-800">
-                <Date event={email} />
-            </div>
-
-        </div>
 
     </div>
 

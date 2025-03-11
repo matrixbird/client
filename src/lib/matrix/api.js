@@ -49,12 +49,17 @@ export const syncOnce = async (token) => {
       limit: 1,
     },
     room: {
+      ephemeral: {
+        types: ["m.receipt"],
+        limit: 100,
+        unread_thread_notifications: true,
+      },
       timeline: {
         unread_thread_notifications: true,
         limit: 0,
       },
       state: {
-        types: ["matrixbird.room.type","matrixbird.email.pending"],
+        types: ["matrixbird.room.type", "matrixbird.email.pending"],
         limit: 2,
       },
       include_leave: true,
@@ -99,6 +104,31 @@ export const getRoomState = async (token, roomId ) => {
   }
 
 }
+
+export const sendReadReceipt = async (token, roomId, eventId, body ) => {
+  let url = `${PUBLIC_HOMESERVER}/_matrix/client/v3/rooms/${roomId}/receipt/m.read/${eventId}`;
+
+  let options = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  }
+
+  if (body) {
+    options.body = JSON.stringify(body);
+  }
+
+  try {
+    const response = await fetch(url, options)
+    return response.json();
+  } catch (error) {
+    throw error
+  }
+
+}
+
 
 export const downloadContent = async (token, mxcid ) => {
 

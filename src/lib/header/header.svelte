@@ -96,20 +96,9 @@ let mailbox_title = $derived.by(() => {
 
 </script>
 
-<div class="grid grid-cols-[auto_1fr_auto_1fr_auto] bg-bird-900 pr-2 text-white font-medium h-8"
+<div class="flex bg-bird-900 pr-2 text-white font-medium h-8"
         class:rounded-t-2xl={!expanded}
 ondblclick={cycle}>
-
-    <div class="flex place-items-center mr-1 cursor-pointer">
-    </div>
-
-    <div class="flex-1 flex place-items-center ml-3"
-        onmousedown={start}
-        onmouseup={end}
-    class:cursor-grab={!expanded}
-    class:cursor-grabbing={(dragging || mousedown) && !expanded}>
-    </div>
-
 
     {#if !expanded && !sidebar_toggled}
         <Mailbox />
@@ -118,7 +107,8 @@ ondblclick={cycle}>
     {#if expanded || sidebar_toggled}
         <div class="flex place-items-center silk cursor-pointer text-sm " 
             class:py-1={expanded}
-            class:ml-1={expanded || sidebar_toggled}>
+            class:ml-2={expanded}
+            class:ml-3={!expanded && sidebar_toggled}>
             matrixbird
         </div>
     {/if}
@@ -128,6 +118,7 @@ ondblclick={cycle}>
         onmouseup={end}
     class:cursor-grab={!expanded}
     class:cursor-grabbing={(dragging || mousedown) && !expanded}>
+
     </div>
 
     <div class="flex place-items-center mr-1 cursor-pointer"

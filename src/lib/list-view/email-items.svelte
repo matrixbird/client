@@ -37,7 +37,7 @@ $effect(() => {
     }
     if($page.params.mailbox && status.threads_ready &&
         status.thread_events_ready) {
-        console.log("Building mailbox email list.")
+        //console.log("Building mailbox email list.")
     }
 })
 
