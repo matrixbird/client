@@ -123,7 +123,7 @@ function open(path) {
 
 {#snippet trigger()}
 
-<div class="flex">
+<div class="mailbox-select flex h-full">
     <div class="flex place-items-center mx-2 py-1">
         {#if is_inbox}
             {@html inbox}

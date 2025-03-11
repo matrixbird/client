@@ -16,6 +16,7 @@ import {
   getEvent,
   getStateEvent,
   syncOnce,
+  getRoomState,
 } from '$lib/matrix/api.js'
 
 import {
@@ -152,7 +153,8 @@ export function createMatrixStore() {
           joined_rooms.push(joined.roomId)
           let is_local = is_local_room(joined.roomId);
           if(!is_local) {
-
+            const state = await getRoomState(session.access_token, roomId);
+            console.log("remote room state", state)
             const messagesResult = await client.createMessagesRequest(joined.roomId, null, 100, 'b', null);
             const messages = messagesResult.chunk;
             console.log(`Fetched ${messages.length} messages using createMessagesRequest`);
@@ -161,6 +163,7 @@ export function createMatrixStore() {
                 //events.set(message.event_id, message);
               }
             }
+
           }
         } 
       } 
@@ -349,6 +352,10 @@ export function createMatrixStore() {
         });
 
         setTimeout(async () => {
+
+          const state = await getRoomState(session.access_token, roomId);
+          console.log("remote room state", state)
+
           const messagesResult = await client.createMessagesRequest(room.roomId, null, 100, 'b', null);
           const messages = messagesResult.chunk;
           console.log(`Fetched ${messages.length} messages using createMessagesRequest`);

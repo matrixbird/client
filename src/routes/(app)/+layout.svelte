@@ -330,11 +330,13 @@ function resize(e) {
 
 
     <div class="mb grid grid-rows-[auto_1fr_auto] bg-background
-        select-none absolute
-        "
+        select-none absolute"
         style="--width:{width}px; --height:{height}px;--offsetX:{position?.x}px;--offsetY:{position?.y}px;"
         class:drag-shadow={dragging}
-        class:boxed={!expanded}
+        class:rounded-3xl={!expanded}
+        class:border-[7px]={!expanded}
+        class:border-bird-200={!expanded}
+        class:border-bird-300={dragging}
         class:nexp={!expanded}
         class:expanded={expanded} 
         use:draggable={dragopts}
@@ -345,11 +347,8 @@ function resize(e) {
         </div>
 
 
-        <div class="overflow-hidden 
-            grid"
-            class:grid-cols-[3rem_1fr]={expanded}
-            class:boxed-content={!expanded && !dragging}
-            class:boxed-alt={!expanded && dragging}>
+        <div class="overflow-hidden grid rounded-b-3xl"
+            class:grid-cols-[3rem_1fr]={expanded}>
 
             {#if expanded}
                 <Switcher />
@@ -362,16 +361,15 @@ function resize(e) {
 
         </div>
 
-        <div class="group absolute bottom-[-4px] right-[-4px] pr-1 pb-1 cursor-nwse-resize"
+        {#if !expanded}
+        <div class="group absolute bottom-[-10px] right-[-10px] pr-1 pb-1 cursor-nwse-resize"
                 onmousedown={startResize}
                 onmouseup={stopResize}>
-            <div class="grabber h-4 w-4 border-r
-                border-b
-                group-hover:border-bird-900
-                group-hover:bg-bird-200
-                border-bird-700">
+            <div class="grabber 
+                group-hover:border-bird-900">
             </div>
         </div>
+        {/if}
 
     </div>
 
@@ -420,8 +418,6 @@ function resize(e) {
 }
 
 .drag-shadow {
-    outline: 2px solid theme('colors.bird.700');
-    box-shadow: none;
 }
 
 .boxed-alt {
@@ -430,6 +426,10 @@ function resize(e) {
     border-bottom: 1px solid theme('colors.bird.700');
 }
 .grabber {
-    clip-path: polygon(0 100%,100% 0,100% 100%);
+    height: 20px;
+    width: 20px;
+    border-radius: 0 0 20px 0;
+    border-right: 7px solid theme('colors.bird.400');
+    border-bottom: 7px solid theme('colors.bird.400');
 }
 </style>

@@ -90,7 +90,7 @@ let sync_opts = $derived.by(() => {
 
 </script>
 
-<div class="flex border-t border-border ">
+<div class="flex border-t border-border rounded-b-2xl">
 
     {#if !expanded}
     <div class="flex place-items-center px-2 py-1 cursor-pointer"

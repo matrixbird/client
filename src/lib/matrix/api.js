@@ -81,3 +81,22 @@ export const syncOnce = async (token) => {
 
 }
 
+export const getRoomState = async (token, roomId ) => {
+  let url = `${PUBLIC_HOMESERVER}/_matrix/client/v3/rooms/${roomId}/state`;
+
+  let options = {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  }
+
+  try {
+    const response = await fetch(url, options)
+    return response.json();
+  } catch (error) {
+    throw error
+  }
+
+}
+
