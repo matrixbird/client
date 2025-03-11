@@ -31,12 +31,10 @@ let initials = $derived.by(() => {
 
 </script>
 
-<div class="flex place-items-center">
-    <div class="grid place-items-center text-xs bg-bird-700 w-6 h-6 
-        hover:bg-white hover:border-4 hover:border-bird-700
-        rounded-[50%]">
-        <div class="font-semibold text-white uppercase">
-            {initials} 
-        </div>
+<div class="grid place-items-center text-xs bg-bird-700 w-7 h-7 
+    hover:bg-white hover:border-4 hover:border-bird-700
+    rounded-[50%]">
+    <div class="font-semibold text-white uppercase">
+        {initials} 
     </div>
 </div>

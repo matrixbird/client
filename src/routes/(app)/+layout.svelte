@@ -58,7 +58,7 @@ onMount(() => {
 
 function storeWindow() {
     let pos = localStorage.getItem('window_position')
-    if(!pos) {
+    if(!pos && position.x != 0 && position.y != 0) {
         localStorage.setItem('window_position', JSON.stringify([position.x,position.y]))
     }
     let size = localStorage.getItem('window_size')
@@ -76,6 +76,9 @@ onDestroy(() => {
 function handleResize(e) {
     calcSize()
     position = calcPosition()
+    if(position.x == 0 && position.y == 0) {
+        return
+    }
     localStorage.setItem('window_position', JSON.stringify([position.x,position.y]))
 }
 
@@ -221,7 +224,9 @@ let dragopts = $derived.by(() => {
             dragging = false
             setTimeout(() => {
                 ui_state.drag_offset = [offsetX, offsetY]
-                localStorage.setItem('window_position', JSON.stringify([offsetX, offsetY]))
+                if(offsetX != 0 && offsetY != 0) {
+                    localStorage.setItem('window_position', JSON.stringify([offsetX, offsetY]))
+                }
             }, 10)
         },
     }

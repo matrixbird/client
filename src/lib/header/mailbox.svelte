@@ -46,10 +46,9 @@ function kill() {
 
 let opts = $derived.by(() => {
     return {
-        mask: false,
+        mask: true,
         placement: 'bottom-start',
         decoration: false,
-        action: 'hover',
         hoverDelay: 10,
         hoverOutDelay: 300,
     }
@@ -68,9 +67,9 @@ function open(path) {
 </Popup>
 
 {#snippet content()}
-<div class="flex flex-col bg-bird-800 cursor-pointer min-w-22">
+<div class="flex flex-col bg-bird-800 cursor-pointer min-w-22 rounded-b-2xl">
 
-    <div class="flex"
+    <div class="flex px-2 py-1"
         class:hover:bg-bird-700={!is_inbox}
             onclick={() => open("inbox")}>
         <div class="flex place-items-center mx-2 py-1">
@@ -86,7 +85,7 @@ function open(path) {
         {/if}
     </div>
 
-    <div class="flex"
+    <div class="flex px-2 py-1"
         class:hover:bg-bird-700={!is_sent}
             onclick={() => open("sent")}>
         <div class="flex place-items-center mx-2 py-1">
@@ -102,7 +101,7 @@ function open(path) {
         {/if}
     </div>
 
-    <div class="flex "
+    <div class="flex px-2 rounded-b-2xl py-1"
         class:hover:bg-bird-700={!is_drafts}
             onclick={() => open("drafts")}>
         <div class="flex place-items-center mx-2 py-1">
@@ -123,7 +122,7 @@ function open(path) {
 
 {#snippet trigger()}
 
-<div class="mailbox-select flex h-full">
+<div class="mailbox-select flex h-full ml-2">
     <div class="flex place-items-center mx-2 py-1">
         {#if is_inbox}
             {@html inbox}

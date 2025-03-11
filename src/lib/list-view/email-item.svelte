@@ -268,14 +268,17 @@ let el;
 </script>
 
 
-<div bind:this={el} class="email-item flex flex-col cursor-pointer hover:bg-bird-50 border-b
-    border-bird-300 overflow-x-hidden"
+<div bind:this={el} class="email-item flex flex-col cursor-pointer hover:bg-bird-50 overflow-x-hidden"
     oncontextmenu={log}
     class:active={active}
     class:inactive={!active}
     onclick={open}>
 
-    <div class="flex p-2 ml-2 overflow-x-hidden">
+    <div class="flex p-2 overflow-x-hidden">
+
+        <div class="flex mr-3 mt-1">
+            <UserAvatar {email} />
+        </div>
 
         <div class="flex flex-col flex-1 overflow-x-hidden">
             <div class="flex place-items-center leading-normal">

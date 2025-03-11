@@ -53,7 +53,7 @@ $effect(() => {
 
     if(active && element) {
         setTimeout(() => {
-            element.scrollIntoView({block: "center", inline: "nearest"})
+            //element.scrollIntoView({block: "center", inline: "nearest"})
         }, 10)
     }
 })

@@ -15,7 +15,8 @@ function newMessage() {
     <button 
         onclick={newMessage}
         class="primary flex justify-center items-center py-2 px-3 w-full"
-        class:text-md={expanded}>
+        class:text-md={expanded}
+        class:rounded={!expanded}>
 
         <div class="flex">
             <div class="">
@@ -34,7 +35,7 @@ function newMessage() {
 <style lang="postcss">
 
 button {
-    border-radius: 4px;
+    border-radius: 500px;
 }
 
 </style>
