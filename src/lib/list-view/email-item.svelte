@@ -1,4 +1,5 @@
 <script>
+import { onMount } from 'svelte';
 import { goto } from '$app/navigation';
 import { page } from '$app/stores';
 
@@ -6,6 +7,10 @@ import {
     mxid_to_email,
     get_localpart
 } from '$lib/utils/matrix.js'
+
+import { 
+    downloadContent
+} from '$lib/matrix/api.js'
 
 import { 
     get_first_line
@@ -126,7 +131,11 @@ let is_matrixbird = $derived.by(() => {
 
 
 let first_line = $derived.by(() => {
-    return get_first_line(email?.content?.body?.html)
+    if(is_large && content) {
+        return get_first_line(content)
+    } else {
+        return get_first_line(email?.content?.body?.html)
+    }
 })
 
 
@@ -223,6 +232,34 @@ async function markRead() {
 
     let read = await store.client.sendReceipt(event, "m.read")
     console.log('read', read)
+}
+
+let is_large = $derived.by(() => {
+    return email?.content?.body?.content_uri != undefined
+})
+
+let content_uri = $derived.by(() => {
+    return email?.content?.body?.content_uri
+})
+
+onMount (() => {
+    if(is_large && access_token) {
+        console.log('large', email)
+        fetchContent()
+    }
+})
+
+let access_token = $derived.by(() => {
+    return store.session.access_token
+})
+
+let content = $state(null)
+
+async function fetchContent() {
+    let _content = await downloadContent(access_token, content_uri)
+    if(_content) {
+        content = _content
+    }
 }
 
 let el;

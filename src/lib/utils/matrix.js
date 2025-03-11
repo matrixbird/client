@@ -63,3 +63,7 @@ export function is_local_room(roomId) {
   return domain === PUBLIC_HOMESERVER_NAME;
 
 }
+
+export function strip_mxc(mxc) {
+  return mxc.replace('mxc://', '');
+}
