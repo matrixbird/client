@@ -280,9 +280,6 @@ empty.`,
         );
         console.log('thread marker event', thr)
 
-        // pull this thread in
-        await store.get_new_thread(room_id, msg.event_id)
-
         /*
         let outbox_room_id = mailbox_rooms["OUTBOX"]
         if(outbox_room_id) {

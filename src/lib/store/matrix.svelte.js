@@ -15,6 +15,9 @@ import {
 import {
   getEvent,
   getStateEvent,
+  get_thread_root_event,
+  get_threads,
+  get_thread_events,
   syncOnce,
   getRoomState,
 } from '$lib/matrix/api.js'
@@ -426,6 +429,7 @@ export function createMatrixStore() {
     client.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
       let exists = joined_rooms.find(r => r === room.roomId);
       if(!exists) {
+        console.log("not in room", room.roomId)
         return;
       }
       if(event.event.type === "matrixbird.thread.marker") {
@@ -437,6 +441,7 @@ export function createMatrixStore() {
         }
       }
     });
+
 
 
 
@@ -498,9 +503,8 @@ export function createMatrixStore() {
     */
 
 
-
     async function buildThreadForJoinedRoom(roomId) {
-      let thread = await get_threads(roomId);
+      let thread = await get_threads(session.access_token, roomId);
       console.log("found threads", thread)
 
       if(thread.chunk.length > 0) {
@@ -527,7 +531,7 @@ export function createMatrixStore() {
       }
 
       const threadPromises = eventPairs.map(([roomId, eventId]) => 
-        get_thread_events(roomId, eventId));
+        get_thread_events(session.access_token, roomId, eventId));
       const allEvents = await Promise.allSettled(threadPromises);
 
       const updates = new Map();
@@ -570,7 +574,7 @@ export function createMatrixStore() {
       })
       */
 
-      const threadPromises = rooms.map(room => get_threads(room));
+      const threadPromises = rooms.map(room => get_threads(session.access_token, room));
       const allThreads = await Promise.allSettled(threadPromises);
 
       const roomEventsMap = {};
@@ -597,35 +601,6 @@ export function createMatrixStore() {
       status.threads_ready = true;
       status.thread_events_ready = true;
 
-      //await buildInbox();
-      //await buildSentMail();
-
-
-
-      for (const room of rooms) {
-
-        /*
-        let roomType = room.currentState.getStateEvents("matrixbird.room.type")[0];
-        console.log(roomType)
-
-        let filter = sdk.Filter.fromJson(null, "test", {
-          room: {
-            timeline: {
-              types: ['matrixbird.email.matrix'],
-              limit: 100,
-            }
-          }
-        })
-        */
-
-
-        //const threads = await get_threads(room.roomId);
-        //console.log(threads)
-
-        //const messagesResult = await client.createMessagesRequest(room.roomId, null, 100, 'b', filter);
-        //const messages = messagesResult.chunk;
-        //console.log(`Fetched ${messages.length} messages using createMessagesRequest`);
-      }
 
       ready = true
 
@@ -673,7 +648,6 @@ export function createMatrixStore() {
           rooms[roomId] = room;
         });
 
-        getMailboxRooms();
 
       }
     });
@@ -695,144 +669,21 @@ export function createMatrixStore() {
       initialSyncLimit: 1,
       lazyLoadMembers: false,
       //disablePresence: true,
-      threadSupport: true,
+      //threadSupport: true,
       resolveInvitesToProfiles: true,
     });
 
 
   }
 
-    const get_threads = async (roomId) => {
-      const url = `${PUBLIC_HOMESERVER}/_matrix/client/v1/rooms/${roomId}/threads?limit=50`;
-
-      let options = {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
-        },
-      }
-
-      try {
-        const response = await fetch(url, options)
-        return response.json();
-      } catch (error) {
-        throw error
-      }
-
-    }
-
-    const get_thread_root_event = async (roomId, eventId) => {
-      const url = `${PUBLIC_HOMESERVER}/_matrix/client/v3/rooms/${roomId}/event/${eventId}`;
-
-      let options = {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
-        },
-      }
-
-      try {
-        const response = await fetch(url, options)
-        return response.json();
-      } catch (error) {
-        throw error
-      }
-
-    }
-
-    const get_thread_events = async (roomId, eventId) => {
-      const url = `${PUBLIC_HOMESERVER}/_matrix/client/v1/rooms/${roomId}/relations/${eventId}/m.thread?limit=50`;
-
-      let options = {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
-        },
-      }
-
-      try {
-        const response = await fetch(url, options)
-        return response.json();
-      } catch (error) {
-        throw error
-      }
-
-    }
-
-    function hasNoUserEvents(threadEvents) {
-      return !threadEvents.some(event => event.sender === session.user_id);
-    }
-
-    function findLastNonUserEvent(threadEvents) {
-      const nonUserEvents = threadEvents.filter(event => event.sender !== session.user_id);
-
-      if (nonUserEvents.length === 0) return null;
-
-      return nonUserEvents.reduce((latest, current) => 
-        current.origin_server_ts > latest.origin_server_ts ? current : latest, 
-        nonUserEvents[0]);
-    }
-
-    async function buildSentMail() {
-      //console.log("building sent mail with threads")
-      for (const [threadId, thread] of threads) {
-        let children = thread_events.get(threadId);
-        // if thread root is sent by this user, add to sent
-        if(thread.sender == user.userId) {
-          sent_mail.set(threadId, thread);
-        }
-        // add any child event sent by this user
-        if(children) {
-          for (const child of children) {
-            if(child.sender == user.userId) {
-              sent_mail.set(child.event_id, child);
-            }
-          }
-        }
-      }
-      //console.log("sent mail built", sent_mail)
-      status.sent_ready = true;
-    }
-
-
-    async function buildInbox() {
-      //console.log("building inbox with threads")
-      for (const [threadId, thread] of threads) {
-        let children = thread_events.get(threadId);
-        // this thread has event relations, we'll need to process 
-        // them to find the latest reply from another sender
-        if(children) {
-          let nonUserReply = findLastNonUserEvent(children);
-          if(nonUserReply) {
-            inbox_mail.set(nonUserReply.event_id, nonUserReply);
-          } else {
-            // this may be an email chain started by another user but 
-            // all child events are sent by this user, so we'll 
-            // return the original thread event
-            inbox_mail.set(threadId, thread);
-          }
-        }
-        // this thread has no event relations, so this is either
-        // an email sent by this user or recieved from another user
-        // add to inbox if it's not sent by this user
-        if(!children) {
-          if(thread.sender != user.userId) {
-            inbox_mail.set(threadId, thread);
-          }
-        }
-      }
-      console.log("inbox built", inbox_mail)
-      status.inbox_ready = true;
-    }
-
 
     async function get_new_thread(room_id, thread_id) {
-      let thread = await get_thread_root_event(room_id, thread_id);
+      let thread = await get_thread_root_event(session.access_token, room_id, thread_id);
       console.log("found thread root event", thread)
       events.set(thread_id, thread);
       threads.set(thread_id, thread);
 
-      let thread_children = await get_thread_events(room_id, thread_id);
+      let thread_children = await get_thread_events(session.access_token, room_id, thread_id);
       let _events = thread_children.chunk;
       if(_events) {
         console.log("found thread events", _events)
@@ -850,26 +701,7 @@ export function createMatrixStore() {
       } else {
         thread_events.set(thread_id, []);
       }
-      //await buildInbox();
     }
-
-
-  async function getMailboxRooms() {
-    let inbox = await client.getAccountDataFromServer("matrixbird.room.inbox");
-    if(inbox?.room_id) {
-      mailbox_rooms.inbox = inbox.room_id;
-    }
-    let self = await client.getAccountDataFromServer("matrixbird.room.self");
-    if(self?.room_id) {
-      mailbox_rooms.self = self.room_id;
-    }
-    let drafts = await client.getAccountDataFromServer("matrixbird.room.drafts");
-    if(drafts?.room_id) {
-      mailbox_rooms.drafts = drafts.room_id;
-    }
-  }
-
-
 
   function getUser(user_id){
     return client.store.getUser(user_id)
@@ -1022,6 +854,5 @@ export function createMatrixStore() {
     getUser,
     doesRoomExist,
     emailRoom,
-    get_new_thread
   };
 }

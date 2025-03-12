@@ -1,5 +1,65 @@
 import { PUBLIC_HOMESERVER, PUBLIC_HOMESERVER_NAME } from '$env/static/public';
 
+
+export const get_threads = async (token, roomId) => {
+  const url = `${PUBLIC_HOMESERVER}/_matrix/client/v1/rooms/${roomId}/threads?limit=50`;
+
+  let options = {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+  }
+
+  try {
+    const response = await fetch(url, options)
+    return response.json();
+  } catch (error) {
+    throw error
+  }
+
+}
+
+
+export const get_thread_root_event = async (token, roomId, eventId) => {
+  const url = `${PUBLIC_HOMESERVER}/_matrix/client/v3/rooms/${roomId}/event/${eventId}`;
+
+  let options = {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+  }
+
+  try {
+    const response = await fetch(url, options)
+    return response.json();
+  } catch (error) {
+    throw error
+  }
+
+}
+
+export const get_thread_events = async (token, roomId, eventId) => {
+  const url = `${PUBLIC_HOMESERVER}/_matrix/client/v1/rooms/${roomId}/relations/${eventId}/m.thread?limit=50`;
+
+  let options = {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+  }
+
+  try {
+    const response = await fetch(url, options)
+    return response.json();
+  } catch (error) {
+    throw error
+  }
+
+}
+
+
 export const getStateEvent = async (token, roomId, eventType, stateKey) => {
   let url = `${PUBLIC_HOMESERVER}/_matrix/client/v3/rooms/${roomId}/state/${eventType}`;
   if(stateKey) {
