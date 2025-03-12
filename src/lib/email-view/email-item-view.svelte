@@ -8,7 +8,7 @@ import ReplyComposer from '$lib/editor/reply-composer.svelte'
 
 import { newAlert } from '$lib/store/app.svelte.js'
 
-import { createMatrixStore } from '$lib/store/matrix.svelte.js'
+import { createMatrixStore, large_email_content } from '$lib/store/matrix.svelte.js'
 const store = createMatrixStore()
 
 import { reply_editors } from '$lib/store/editor.svelte.js'
@@ -25,6 +25,16 @@ let thread_root = $derived.by(() => {
 })
 
 const body = $derived.by(() => {
+
+    if(!email) return
+
+    if(is_large) {
+        let content = large_email_content.get(email?.event_id)
+        if(content) {
+            return content
+        }
+    }
+
     return email?.content?.body?.html ? email?.content?.body?.html :
         email?.content?.body?.text
 })
@@ -123,6 +133,10 @@ function debug(e) {
 
 let debug_mode = $state(false);
 
+let is_large = $derived.by(() => {
+    return email?.content?.body?.content_uri != undefined
+})
+
 </script>
 
 <div class="email-view" bind:this={element} title={email?.event_id}
@@ -160,13 +174,18 @@ let debug_mode = $state(false);
 
     </div>
 
-
-        {#if is_html && clean}
+        {#if clean && is_large}
             <div class="body p-4 [&>p]:pb-2 leading-5">
                 {@html clean}
             </div>
         {/if}
-        {#if !is_html}
+
+        {#if is_html && clean && !is_large}
+            <div class="body p-4 [&>p]:pb-2 leading-5">
+                {@html clean}
+            </div>
+        {/if}
+        {#if !is_html && !is_large}
             <div class="p-4 leading-5" style="white-space: pre-wrap;">
                 {body}
             </div>

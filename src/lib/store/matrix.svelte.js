@@ -46,6 +46,7 @@ export let sent_mail = $state(new SvelteMap());
 
 export let email_requests = $state([]);
 
+export let large_email_content = $state(new SvelteMap());
 
 let events = $state(new SvelteMap());
 
@@ -438,33 +439,6 @@ export function createMatrixStore() {
     });
 
 
-    async function get_new_thread(room_id, thread_id) {
-      let thread = await get_thread_root_event(room_id, thread_id);
-      console.log("found thread root event", thread)
-      events.set(thread_id, thread);
-      threads.set(thread_id, thread);
-
-      let thread_children = await get_thread_events(room_id, thread_id);
-      let _events = thread_children.chunk;
-      if(_events) {
-        console.log("found thread events", _events)
-
-        let filtered = _events?.filter(event => {
-          return event.type != "matrixbird.thread.marker";
-        })
-
-        if(filtered.length > 0) {
-          thread_events.set(thread_id, filtered);
-          for (const child of filtered) {
-            events.set(child.event_id, child);
-          }
-        }
-      } else {
-        thread_events.set(thread_id, []);
-      }
-      //await buildInbox();
-    }
-
 
     /*
     client.on(sdk.RoomEvent.Timeline, async function (event, room, toStartOfTimeline) {
@@ -524,128 +498,6 @@ export function createMatrixStore() {
     */
 
 
-    const get_threads = async (roomId) => {
-      const url = `${PUBLIC_HOMESERVER}/_matrix/client/v1/rooms/${roomId}/threads?limit=50`;
-
-      let options = {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
-        },
-      }
-
-      try {
-        const response = await fetch(url, options)
-        return response.json();
-      } catch (error) {
-        throw error
-      }
-
-    }
-
-    const get_thread_root_event = async (roomId, eventId) => {
-      const url = `${PUBLIC_HOMESERVER}/_matrix/client/v3/rooms/${roomId}/event/${eventId}`;
-
-      let options = {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
-        },
-      }
-
-      try {
-        const response = await fetch(url, options)
-        return response.json();
-      } catch (error) {
-        throw error
-      }
-
-    }
-
-    const get_thread_events = async (roomId, eventId) => {
-      const url = `${PUBLIC_HOMESERVER}/_matrix/client/v1/rooms/${roomId}/relations/${eventId}/m.thread?limit=50`;
-
-      let options = {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
-        },
-      }
-
-      try {
-        const response = await fetch(url, options)
-        return response.json();
-      } catch (error) {
-        throw error
-      }
-
-    }
-
-    function hasNoUserEvents(threadEvents) {
-      return !threadEvents.some(event => event.sender === session.user_id);
-    }
-
-    function findLastNonUserEvent(threadEvents) {
-      const nonUserEvents = threadEvents.filter(event => event.sender !== session.user_id);
-
-      if (nonUserEvents.length === 0) return null;
-
-      return nonUserEvents.reduce((latest, current) => 
-        current.origin_server_ts > latest.origin_server_ts ? current : latest, 
-        nonUserEvents[0]);
-    }
-
-    async function buildSentMail() {
-      //console.log("building sent mail with threads")
-      for (const [threadId, thread] of threads) {
-        let children = thread_events.get(threadId);
-        // if thread root is sent by this user, add to sent
-        if(thread.sender == user.userId) {
-          sent_mail.set(threadId, thread);
-        }
-        // add any child event sent by this user
-        if(children) {
-          for (const child of children) {
-            if(child.sender == user.userId) {
-              sent_mail.set(child.event_id, child);
-            }
-          }
-        }
-      }
-      //console.log("sent mail built", sent_mail)
-      status.sent_ready = true;
-    }
-
-
-    async function buildInbox() {
-      //console.log("building inbox with threads")
-      for (const [threadId, thread] of threads) {
-        let children = thread_events.get(threadId);
-        // this thread has event relations, we'll need to process 
-        // them to find the latest reply from another sender
-        if(children) {
-          let nonUserReply = findLastNonUserEvent(children);
-          if(nonUserReply) {
-            inbox_mail.set(nonUserReply.event_id, nonUserReply);
-          } else {
-            // this may be an email chain started by another user but 
-            // all child events are sent by this user, so we'll 
-            // return the original thread event
-            inbox_mail.set(threadId, thread);
-          }
-        }
-        // this thread has no event relations, so this is either
-        // an email sent by this user or recieved from another user
-        // add to inbox if it's not sent by this user
-        if(!children) {
-          if(thread.sender != user.userId) {
-            inbox_mail.set(threadId, thread);
-          }
-        }
-      }
-      console.log("inbox built", inbox_mail)
-      status.inbox_ready = true;
-    }
 
     async function buildThreadForJoinedRoom(roomId) {
       let thread = await get_threads(roomId);
@@ -850,6 +702,158 @@ export function createMatrixStore() {
 
   }
 
+    const get_threads = async (roomId) => {
+      const url = `${PUBLIC_HOMESERVER}/_matrix/client/v1/rooms/${roomId}/threads?limit=50`;
+
+      let options = {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+      }
+
+      try {
+        const response = await fetch(url, options)
+        return response.json();
+      } catch (error) {
+        throw error
+      }
+
+    }
+
+    const get_thread_root_event = async (roomId, eventId) => {
+      const url = `${PUBLIC_HOMESERVER}/_matrix/client/v3/rooms/${roomId}/event/${eventId}`;
+
+      let options = {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+      }
+
+      try {
+        const response = await fetch(url, options)
+        return response.json();
+      } catch (error) {
+        throw error
+      }
+
+    }
+
+    const get_thread_events = async (roomId, eventId) => {
+      const url = `${PUBLIC_HOMESERVER}/_matrix/client/v1/rooms/${roomId}/relations/${eventId}/m.thread?limit=50`;
+
+      let options = {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+      }
+
+      try {
+        const response = await fetch(url, options)
+        return response.json();
+      } catch (error) {
+        throw error
+      }
+
+    }
+
+    function hasNoUserEvents(threadEvents) {
+      return !threadEvents.some(event => event.sender === session.user_id);
+    }
+
+    function findLastNonUserEvent(threadEvents) {
+      const nonUserEvents = threadEvents.filter(event => event.sender !== session.user_id);
+
+      if (nonUserEvents.length === 0) return null;
+
+      return nonUserEvents.reduce((latest, current) => 
+        current.origin_server_ts > latest.origin_server_ts ? current : latest, 
+        nonUserEvents[0]);
+    }
+
+    async function buildSentMail() {
+      //console.log("building sent mail with threads")
+      for (const [threadId, thread] of threads) {
+        let children = thread_events.get(threadId);
+        // if thread root is sent by this user, add to sent
+        if(thread.sender == user.userId) {
+          sent_mail.set(threadId, thread);
+        }
+        // add any child event sent by this user
+        if(children) {
+          for (const child of children) {
+            if(child.sender == user.userId) {
+              sent_mail.set(child.event_id, child);
+            }
+          }
+        }
+      }
+      //console.log("sent mail built", sent_mail)
+      status.sent_ready = true;
+    }
+
+
+    async function buildInbox() {
+      //console.log("building inbox with threads")
+      for (const [threadId, thread] of threads) {
+        let children = thread_events.get(threadId);
+        // this thread has event relations, we'll need to process 
+        // them to find the latest reply from another sender
+        if(children) {
+          let nonUserReply = findLastNonUserEvent(children);
+          if(nonUserReply) {
+            inbox_mail.set(nonUserReply.event_id, nonUserReply);
+          } else {
+            // this may be an email chain started by another user but 
+            // all child events are sent by this user, so we'll 
+            // return the original thread event
+            inbox_mail.set(threadId, thread);
+          }
+        }
+        // this thread has no event relations, so this is either
+        // an email sent by this user or recieved from another user
+        // add to inbox if it's not sent by this user
+        if(!children) {
+          if(thread.sender != user.userId) {
+            inbox_mail.set(threadId, thread);
+          }
+        }
+      }
+      console.log("inbox built", inbox_mail)
+      status.inbox_ready = true;
+    }
+
+
+    async function get_new_thread(room_id, thread_id) {
+      let thread = await get_thread_root_event(room_id, thread_id);
+      console.log("found thread root event", thread)
+      events.set(thread_id, thread);
+      threads.set(thread_id, thread);
+
+      let thread_children = await get_thread_events(room_id, thread_id);
+      let _events = thread_children.chunk;
+      if(_events) {
+        console.log("found thread events", _events)
+
+        let filtered = _events?.filter(event => {
+          return event.type != "matrixbird.thread.marker";
+        })
+
+        if(filtered.length > 0) {
+          thread_events.set(thread_id, filtered);
+          for (const child of filtered) {
+            events.set(child.event_id, child);
+          }
+        }
+      } else {
+        thread_events.set(thread_id, []);
+      }
+      //await buildInbox();
+    }
+
+
   async function getMailboxRooms() {
     let inbox = await client.getAccountDataFromServer("matrixbird.room.inbox");
     if(inbox?.room_id) {
@@ -963,6 +967,7 @@ export function createMatrixStore() {
     const newRoomId = createRoomResult.room_id;
 
     //created_rooms[userId] = newRoomId;
+    joined_rooms.push(newRoomId)
 
     console.log(`Created new DM room with ${userIds}: ${newRoomId}`);
 
@@ -1017,5 +1022,6 @@ export function createMatrixStore() {
     getUser,
     doesRoomExist,
     emailRoom,
+    get_new_thread
   };
 }

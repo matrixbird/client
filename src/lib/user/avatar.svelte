@@ -2,8 +2,13 @@
 
 import { 
     mxid_to_email,
-    get_localpart
+    get_localpart,
+    get_email_localpart
 } from '$lib/utils/matrix.js'
+
+import { 
+    create_initials
+} from '$lib/utils/string.js'
 
 import {
     getThumbnail,
@@ -12,7 +17,11 @@ import {
 import { createMatrixStore } from '$lib/store/matrix.svelte.js'
 const store = createMatrixStore()
 
-let { user_id, small = false } = $props();
+let { 
+    user_id, 
+    from,
+    small = false 
+} = $props();
 
 let user = $derived.by(() =>{
     let users = store.client.getUsers()
@@ -28,7 +37,15 @@ let user = $derived.by(() =>{
 })
 
 let initials = $derived.by(() => {
-    return user?.name ? user?.name[0] : user?.localpart[0]
+    if(from?.name) {
+        return create_initials(from.name)
+    }
+    if(from?.address) {
+        let localpart = get_email_localpart(from.address)
+        return create_initials(localpart)
+    }
+    return user?.name ? create_initials(user.name) :
+    create_initials(user?.localpart)
 })
 
 let avatar = $derived.by(() => {
@@ -36,7 +53,7 @@ let avatar = $derived.by(() => {
 })
 
 $effect(() => {
-    if(avatar) {
+    if(avatar && !from) {
         getAvatar()
     }
 })

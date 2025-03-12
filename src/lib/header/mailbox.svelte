@@ -46,9 +46,9 @@ function kill() {
 
 let opts = $derived.by(() => {
     return {
-        mask: true,
         placement: 'bottom-start',
         decoration: false,
+        action: 'hover',
         hoverDelay: 10,
         hoverOutDelay: 300,
     }

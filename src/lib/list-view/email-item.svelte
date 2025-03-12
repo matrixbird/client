@@ -31,7 +31,7 @@ import {
     email_context_menu
 } from '$lib/store/app.svelte.js'
 
-import { createMatrixStore } from '$lib/store/matrix.svelte.js'
+import { createMatrixStore, large_email_content } from '$lib/store/matrix.svelte.js'
 
 import { app } from '$lib/store/app.svelte.js'
 
@@ -47,43 +47,25 @@ let started_at = $derived(app.started_at)
 let is_new = $derived.by(() => {
     if(!email) return
     if(active) return
-    if(last_email_in_thread?.sender != store.user.userId) {
-        return last_email_in_thread.origin_server_ts > started_at
-    }
     return email.origin_server_ts > started_at
 })
 
 let replies = $derived.by(() => {
     let count = 0
+
+    if(email?.content?.["m.relates_to"]?.["rel_type"] == "m.thread") {
+        let thread_id = email?.content?.["m.relates_to"]?.["event_id"]
+        let _thread = threads.get(thread_id)
+        let _thread_events = thread_events.get(thread_id)
+        return _thread_events.length + 1
+    }
+
     for (const event of events.values()) {
         if(event.content["m.relates_to"]?.event_id == email.event_id) {
             count++
         }
     }
     return count
-})
-
-
-let last_email_in_thread = $derived.by(() => {
-    let emails = []
-    for (const event of events.values()) {
-        if(event.content["m.relates_to"]?.event_id == email.event_id) {
-            emails.push(event)
-        }
-    }
-
-    if(emails.length > 0) {
-        return emails[emails.length - 1]
-    }
-    return email
-})
-
-let which_email = $derived.by(() => {
-    if(last_email_in_thread) {
-
-        return last_email_in_thread
-    }
-    return email
 })
 
 
@@ -218,7 +200,7 @@ $effect(() => {
         let user = store.user;
         let room = store.client.getRoom(email.room_id)
         let read = room?.getReadReceiptForUserId(user.userId)
-        console.log('read', read)
+        //console.log('read', read)
 
         //let sendread = store.client.sendReadReceipt(email.room_id,
         //email.event_id)
@@ -289,6 +271,7 @@ async function fetchContent() {
     let _content = await downloadContent(access_token, content_uri)
     if(_content) {
         content = _content
+        large_email_content.set(email.event_id, _content)
     }
 }
 
@@ -307,7 +290,8 @@ let el;
     <div class="flex p-2 overflow-x-hidden mr-2">
 
         <div class="flex mr-3 mt-1">
-            <UserAvatar user_id={email.sender} />
+            <UserAvatar user_id={email.sender} 
+                from={!native ? email?.content?.from : null}/>
         </div>
 
         <div class="flex flex-col flex-1 overflow-x-hidden">
@@ -349,7 +333,13 @@ let el;
                     </div>
                 {/if}
 
-                <div class="flex-1 ml-2 text-sm text-light whitespace-nowrap overflow-hidden text-ellipsis">
+            {#if replies}
+                <div class="text-sm flex place-items-center">
+                    {replies} 
+                </div>
+            {/if}
+
+                <div class="flex-1 ml-2 mr-12 text-sm text-light whitespace-nowrap overflow-hidden text-ellipsis">
                     {#if first_line}
                         {first_line}
                     {/if}
@@ -360,11 +350,6 @@ let el;
             </div>
         </div>
 
-            {#if replies}
-                <div class="">
-                    {replies} replies
-                </div>
-            {/if}
 
 
 

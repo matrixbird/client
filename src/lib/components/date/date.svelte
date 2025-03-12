@@ -45,9 +45,6 @@ const time = $derived.by(() => {
 
 {#if today}
     {time}
-{:else if yesterday}
-    {date}
-    {time}
 {:else}
     {date}
 {/if}
