@@ -105,11 +105,16 @@ export function createMatrixStore() {
     console.info("Creating matrix client.", opts)
     updateAppStatus("Connecting...")
 
+    let store_opts = { indexedDB: window.indexedDB, localStorage: window.localStorage };
+    let store = new sdk.IndexedDBStore(store_opts);
+
+
     client =  sdk.createClient({
       baseUrl: PUBLIC_HOMESERVER,
       accessToken: session.access_token,
       userId: session.user_id,
       deviceId: session.device_id,
+      //store: store,
       timelineSupport: true,
       supportsCallTransfer: false,
       useE2eForGroupCall: false
@@ -433,16 +438,25 @@ export function createMatrixStore() {
         return;
       }
       if(event.event.type === "matrixbird.thread.marker") {
+
         let origin_server_ts = event.event.origin_server_ts
         if(origin_server_ts > sync_state.started) {
           console.log("new thread marker, pull it in")
           let thread_id = event.event.content?.["m.relates_to"]?.event_id;
           get_new_thread(event.event.room_id, thread_id)
+
+          refresh(room);
+
         }
+
       }
     });
 
-
+    async function refresh(room) {
+      //room.setTimelineNeedsRefresh(true);
+      //await room.refreshLiveTimeline();
+      //console.log("refreshed live timeline")
+    }
 
 
     /*
@@ -664,9 +678,9 @@ export function createMatrixStore() {
     })
 
     await client.startClient({
-      filter: filter,
+      //filter: filter,
       //fullState: true,
-      initialSyncLimit: 1,
+      initialSyncLimit: 1000,
       lazyLoadMembers: false,
       //disablePresence: true,
       //threadSupport: true,
@@ -677,31 +691,31 @@ export function createMatrixStore() {
   }
 
 
-    async function get_new_thread(room_id, thread_id) {
-      let thread = await get_thread_root_event(session.access_token, room_id, thread_id);
-      console.log("found thread root event", thread)
-      events.set(thread_id, thread);
-      threads.set(thread_id, thread);
+  async function get_new_thread(room_id, thread_id) {
+    let thread = await get_thread_root_event(session.access_token, room_id, thread_id);
+    console.log("found thread root event", thread)
+    events.set(thread_id, thread);
+    threads.set(thread_id, thread);
 
-      let thread_children = await get_thread_events(session.access_token, room_id, thread_id);
-      let _events = thread_children.chunk;
-      if(_events) {
-        console.log("found thread events", _events)
+    let thread_children = await get_thread_events(session.access_token, room_id, thread_id);
+    let _events = thread_children.chunk;
+    if(_events) {
+      console.log("found thread events", _events)
 
-        let filtered = _events?.filter(event => {
-          return event.type != "matrixbird.thread.marker";
-        })
+      let filtered = _events?.filter(event => {
+        return event.type != "matrixbird.thread.marker";
+      })
 
-        if(filtered.length > 0) {
-          thread_events.set(thread_id, filtered);
-          for (const child of filtered) {
-            events.set(child.event_id, child);
-          }
+      if(filtered.length > 0) {
+        thread_events.set(thread_id, filtered);
+        for (const child of filtered) {
+          events.set(child.event_id, child);
         }
-      } else {
-        thread_events.set(thread_id, []);
       }
+    } else {
+      thread_events.set(thread_id, []);
     }
+  }
 
   function getUser(user_id){
     return client.store.getUser(user_id)
@@ -709,6 +723,25 @@ export function createMatrixStore() {
 
 
   async function doesRoomExist(userIds) {
+
+    // check for an existing room with just this user
+    if(!userIds || userIds.length === 0) {
+      const rooms = client.getRooms();
+      for (const room of rooms) {
+        let stateEvent = room.currentState.getStateEvents("matrixbird.room.type")[0];
+        let is_drafts = stateEvent.getContent().type === "DRAFTS";
+        //ignore drafts room
+        if (!stateEvent || is_drafts) continue;
+
+        const joinedMembers = room.getJoinedMembers();
+        const joinedUserIds = joinedMembers.map(member => member.userId);
+        if (joinedUserIds.length === 1 && joinedUserIds[0] === client.getUserId()) {
+          return room.roomId;
+        }
+      }
+    }
+
+
     // Get all rooms the logged-in user is in
     const rooms = client.getRooms();
 
@@ -768,7 +801,7 @@ export function createMatrixStore() {
     // Create a new DM room
     const createRoomResult = await client.createRoom({
       preset: 'private_chat',
-      invite: userIds,
+      invite: userIds ? userIds : [],
       visibility: 'private',
       initial_state: [
         {
@@ -800,6 +833,7 @@ export function createMatrixStore() {
 
     //created_rooms[userId] = newRoomId;
     joined_rooms.push(newRoomId)
+    console.log("Added to joined rooms", joined_rooms)
 
     console.log(`Created new DM room with ${userIds}: ${newRoomId}`);
 

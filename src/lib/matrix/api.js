@@ -119,8 +119,8 @@ export const syncOnce = async (token) => {
         limit: 0,
       },
       state: {
-        types: ["matrixbird.room.type", "matrixbird.email.pending"],
-        limit: 2,
+        types: ["matrixbird.room.type", "matrixbird.email.pending", "m.room.member"],
+        limit: 100,
       },
       include_leave: true,
     }

@@ -94,8 +94,8 @@ let new_user = $derived(userState?.new_user)
 
 let _expanded = $state(false);
 
-let width = $state(1280);
-let height = $state(800);
+let width = $state(1298);
+let height = $state(750);
 
 $effect(() => {
 

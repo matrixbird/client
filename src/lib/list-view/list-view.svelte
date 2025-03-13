@@ -10,7 +10,7 @@ let is_email_requests = $derived.by(() => {
 })
 </script>
 
-<div class="grid grid-rows-[auto_1fr] overflow-hidden">
+<div class="grid grid-rows-[2.5rem_1fr] overflow-hidden">
     <ListHeader />
 
     <div class="items h-full overflow-y-auto overflow-x-hidden">

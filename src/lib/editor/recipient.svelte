@@ -86,7 +86,7 @@ function remove(e) {
 </script>
 
 <div bind:this={el}
-    class="flex place-items-center my-2 pl-1 mr-1
+    class="recipient flex place-items-center my-2 pl-1 mr-2
     hover:border-bird-900 duration-100
     border border-bird-400
     bg-bird-50 hover:bg-bird-100 rounded-[500px] cursor-default"

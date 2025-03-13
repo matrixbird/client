@@ -1,9 +1,9 @@
 <script>
+import EmailViewHeader from "./email-view-header.svelte";
 import EmailItemView from "$lib/email-view/email-item-view.svelte";
 import Divider from "$lib/components/email/divider.svelte";
 
 import { page } from '$app/stores';
-import { goto } from '$app/navigation';
 
 import { close } from '$lib/assets/icons.js'
 
@@ -16,6 +16,19 @@ const thread_events = $derived(store?.thread_events)
 
 let ready = $derived(() => {
     return emails?.length > 0
+})
+
+let thread_event = $derived.by(() => {
+    let event_id = $page.params.event
+    const event = events.get(event_id)
+    const thread_id = event?.content["m.relates_to"]?.event_id
+    if(thread_id) {
+        const thread = threads.get(thread_id)
+        if(thread) {
+            return thread
+        }
+    }
+    return event
 })
 
 function buildEmails(event_id) {
@@ -96,69 +109,59 @@ $effect(() => {
 })
 
 
-function killEmailItemView() {
-    let mailbox = $page.params.mailbox
-    goto(`/mail/${mailbox}`)
-}
-
 </script>
 
 {#if ready}
-<div class="thread-container h-full grid grid-rows-[auto_1fr] overflow-hidden">
+<div class="thread-container h-full grid grid-rows-[2.5rem_1fr] overflow-hidden">
 
-    <div class="">
-        <div class="flex place-items-center cursor-pointer" 
-        onclick={killEmailItemView}>
-            {@html close}
-        </div>
-    </div>
+    <EmailViewHeader {thread_event} />
 
-<div class="email-thread h-full overflow-x-auto overflow-y-auto select-text">
+    <div class="email-thread h-full overflow-x-auto overflow-y-auto select-text">
 
-    {#if emails?.length > 0}
+        {#if emails?.length > 0}
 
-        {#if emails?.length <= 4}
-            {#each emails as email, i (email?.event_id)}
-                <div class="email-item">
-                    <EmailItemView {email} last={i == emails.length - 1} />
-                </div>
-            {/each}
-        {/if}
-
-
-        {#if emails?.length >= 5 && split}
-            {#each split[0] as email, i (email?.event_id)}
-                <div class="email-item">
-                    <EmailItemView {email} last={i == emails.length - 1} />
-                </div>
-            {/each}
-
-            {#if !collapsed}
-                {#each split[1] as email, i (email?.event_id)}
+            {#if emails?.length <= 4}
+                {#each emails as email, i (email?.event_id)}
                     <div class="email-item">
                         <EmailItemView {email} last={i == emails.length - 1} />
                     </div>
                 {/each}
-            {:else}
-                <Divider emails={split[1]} {showEmails} />
             {/if}
 
 
+            {#if emails?.length >= 5 && split}
+                {#each split[0] as email, i (email?.event_id)}
+                    <div class="email-item">
+                        <EmailItemView {email} last={i == emails.length - 1} />
+                    </div>
+                {/each}
 
-            {#each split[2] as email, i (email?.event_id)}
-                <div class="email-item">
-                    <EmailItemView {email} last={i == split[2].length - 1} />
-                </div>
-            {/each}
+                {#if !collapsed}
+                    {#each split[1] as email, i (email?.event_id)}
+                        <div class="email-item">
+                            <EmailItemView {email} last={i == emails.length - 1} />
+                        </div>
+                    {/each}
+                {:else}
+                    <Divider emails={split[1]} {showEmails} />
+                {/if}
 
+
+
+                {#each split[2] as email, i (email?.event_id)}
+                    <div class="email-item">
+                        <EmailItemView {email} last={i == split[2].length - 1} />
+                    </div>
+                {/each}
+
+            {/if}
+
+
+        {:else}
+            no email
         {/if}
 
-
-    {:else}
-        no email
-    {/if}
-
-</div>
+    </div>
 </div>
 {/if}
 

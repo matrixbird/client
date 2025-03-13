@@ -197,6 +197,11 @@ empty.`,
     updateAppStatus("Sending email...")
 
     if(mxids.length == 1 && mxids[0] == store.user?.userId) {
+        mxids = []
+    }
+
+    /*
+    if(mxids.length == 1 && mxids[0] == store.user?.userId) {
         console.log("this is for me")
 
         let self_room = await store.client.getAccountDataFromServer("matrixbird.room.self")
@@ -230,6 +235,7 @@ empty.`,
 
         return
     }
+    */
 
 
     try {
@@ -478,11 +484,13 @@ let opts_close = $derived.by(() => {
 
 
 {#if !hidden}
-<div class="border-x-[7px] border-t-[7px] border-bird-200 editor grid grid-rows-[auto_1fr]
+<div class="editor border-x-[7px] border-t-[7px] border-bird-200 editor grid grid-rows-[auto_1fr]
         bg-white rounded-t-3xl
     min-w-[34rem]
     select-none"
     class:base={!expanded}
+    class:rounded-b-3xl={expanded}
+    class:border-b-[7px]={expanded}
     class:expand={expanded}>
 
     <div class="editor-header rounded-t-2xl flex bg-bird-900 text-white font-medium py-1"
@@ -593,11 +601,11 @@ button {
 
 .editor {
     z-index: 100;
+    max-width: 34rem;
 }
 
 .content {
     min-height: 48dvh;
-    max-width: 34rem;
 }
 
 .max {
