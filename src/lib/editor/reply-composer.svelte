@@ -1,4 +1,6 @@
 <script>
+
+import { browser } from '$app/environment'
 import { onMount, tick } from 'svelte';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -15,7 +17,8 @@ import {
 } from '$lib/utils/email.js'
 
 import { 
-    close 
+    close,
+    emoji
 } from '$lib/assets/icons.js'
 
 import { newAlert, updateAppStatus } from '$lib/store/app.svelte.js'
@@ -176,6 +179,48 @@ function updateScroll() {
     }
 }
 
+let toggler;
+let emp;
+let picker;
+
+onMount(async() => {
+    if(browser) {
+        await import('emoji-picker-element/picker')
+            .then(({ default: Picker }) => {
+            picker = new Picker({
+                emojiVersion: 15.0
+            });
+            picker.addEventListener('emoji-click', (event) => {
+                composer.insert(event.detail.unicode)
+                emojiVisible = false
+            });
+        });
+    }
+})
+
+let emojiVisible = $state(false);
+
+function toggleEmoji(e) {
+    e.preventDefault()
+    emojiVisible = !emojiVisible
+}
+
+$effect(() => {
+    if(browser && emp && emojiVisible) {
+        emp.appendChild(picker);
+        document.addEventListener('click', handleClickOutside);
+    } else if(browser && emp && !emojiVisible) {
+        emp.innerHTML = ''
+        document.removeEventListener('click', handleClickOutside);
+    }
+})
+
+function handleClickOutside(event) {
+    if (!emp.contains(event.target) && !toggler.contains(event.target)) {
+        emojiVisible = false
+    }
+}
+
 </script>
 
 <div class="editor grid grid-rows-[auto_1fr_auto] 
@@ -203,15 +248,31 @@ function updateScroll() {
                 {updateComposer} />
     </div>
 
-    <div class="tools px-4 pb-3 border-b border-x border-bird-300 rounded-b-xl">
-        <button class="primary text-sm font-medium" 
-            class:py-1={!expanded}
-            class:py-2={expanded}
-            class:px-3={!expanded}
-            class:px-5={expanded}
-            onclick={process}>
-            Send
-        </button>
+    <div class="tools relative flex px-4 pb-3 border-b border-x border-bird-300 rounded-b-xl">
+
+        <div class="">
+            <button class="primary text-sm font-medium" 
+                class:py-1={!expanded}
+                class:py-2={expanded}
+                class:px-3={!expanded}
+                class:px-5={expanded}
+                onclick={process}>
+                Send
+            </button>
+        </div>
+
+        <div class="flex-1">
+        </div>
+
+        <div class="emoji flex place-items-center cursor-pointer" 
+            bind:this={toggler}
+            onclick={toggleEmoji}>
+            {@html emoji}
+        </div>
+
+        <div class="absolute bottom-12 right-2 right-0" bind:this={emp}>
+        </div>
+
     </div>
 </div>
 

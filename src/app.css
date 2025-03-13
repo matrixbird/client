@@ -438,3 +438,11 @@ input::placeholder {
 .icon.icon-active:hover svg {
     fill: var(--icon-active-hover-fill, currentColor);
 }
+
+emoji-picker {
+    --background: theme('colors.bird.900');
+    --emoji-font-family: Twemoji;
+    --emoji-size: 1.3rem;
+    --border-radius: 1rem;
+    --indicator-color: theme('colors.bird.200');
+}

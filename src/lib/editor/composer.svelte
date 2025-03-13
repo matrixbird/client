@@ -65,7 +65,7 @@ onMount(() => {
 });
 
 function handleScrollDown(event) {
-    if (editor.isFocused && event.key === 'Enter') {
+    if (editor.isFocused && event.key === 'Enter' && isReply) {
         //event.preventDefault();
         updateScroll();
     }
@@ -80,6 +80,11 @@ onDestroy(() => {
 
 export function focus() {
     editor.commands.focus();
+}
+
+export function insert(data) {
+    editor.chain().focus().insertContent(data).run();
+    focus();
 }
 </script>
 
