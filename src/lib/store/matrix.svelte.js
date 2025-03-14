@@ -365,7 +365,7 @@ export function createMatrixStore() {
           const state = await getRoomState(session.access_token, roomId);
           console.log("remote room state", state)
 
-          const messagesResult = await client.createMessagesRequest(room.roomId, null, 100, 'b', null);
+          const messagesResult = await client.createMessagesRequest(roomId, null, 100, 'b', null);
           const messages = messagesResult.chunk;
           console.log(`Fetched ${messages.length} messages using createMessagesRequest`);
           joined_rooms.push(roomId);
