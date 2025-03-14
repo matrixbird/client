@@ -416,10 +416,9 @@ input::placeholder {
 
 .popup-decoration {
     background: var(--popup-background);
-    border: 1px solid var(--popup-border);
+    border: 7px solid theme('colors.bird.200');
+    border-radius: 1.5rem;
     transform: translate(0, 0);
-    border-radius: 1px;
-    box-shadow: 4px 4px 0 theme('colors.bird.600');
 }
 
 .icon svg {
@@ -451,3 +450,21 @@ emoji-picker {
     --input-padding: 0.125rem 0.6rem;
     --input-border-radius: 500px;
 }
+
+
+@keyframes bobble {
+0%, 100% {
+    transform: translateY(0);
+    box-shadow: 6px 6px 0 theme('colors.bird.200');
+}
+50% {
+    transform: translateY(-10px);
+    box-shadow: 10px 10px 0 theme('colors.bird.400');
+}
+}
+
+.bobble {
+    animation: bobble 0.6s ease-in-out infinite;
+}
+
+

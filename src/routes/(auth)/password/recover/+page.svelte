@@ -92,7 +92,7 @@ let focused = $state(false);
 <div class="box w-full flex flex-col" 
     class:bobble={busy}>
 
-    <div class="flex p-4 box-title">
+    <div class="flex p-4 border-b border-border">
 
         <div class="flex items-center flex-1 font-medium">
             Recover your account
@@ -170,25 +170,6 @@ let focused = $state(false);
 
 <style>
 
-.box-title {
-    border-bottom: 1px solid #dadada;
-}
-
-
-@keyframes bobble {
-0%, 100% {
-    transform: translateY(0);
-    box-shadow: 6px 6px 0 #a7a7a729;
-}
-50% {
-    transform: translateY(-10px);
-    box-shadow: 10px 10px 0 #4b4b4b29;
-}
-}
-
-.bobble {
-    animation: bobble 0.6s ease-in-out infinite;
-}
 .focus {
     border-left: 2px solid #464646;
     border-radius: 0 4px 4px 0;

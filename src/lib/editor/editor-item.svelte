@@ -88,7 +88,9 @@ function toggleMinimize() {
     }
 }
 
-function closeWindow() {
+async function closeWindow() {
+
+    let drafts = await store.getDraftsRoom()
     editorStore.killEditor(editor.id)
 }
 

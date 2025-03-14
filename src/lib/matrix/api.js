@@ -165,6 +165,26 @@ export const getRoomState = async (token, roomId ) => {
 
 }
 
+export const getAccountData = async (token, userId, type ) => {
+  let url = `${PUBLIC_HOMESERVER}/_matrix/client/v3/user/${userId}/account_data/${type}`;
+
+  let options = {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  }
+
+  try {
+    const response = await fetch(url, options)
+    return response.json();
+  } catch (error) {
+    throw error
+  }
+
+}
+
+
 export const sendReadReceipt = async (token, roomId, eventId, body ) => {
   let url = `${PUBLIC_HOMESERVER}/_matrix/client/v3/rooms/${roomId}/receipt/m.read/${eventId}`;
 

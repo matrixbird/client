@@ -28,7 +28,7 @@ function kill(e) {
 <div class="alert h-screen w-full grid place-items-center" 
     onclick={kill}>
     <div class="box grid grid-rows-[auto_1fr_auto] p-4 
-        min-w-[300px] max-w-[500px]">
+        min-w-[500px] max-w-[700px]">
         <div class="font-medium">
             {title || 'Error'}
         </div>

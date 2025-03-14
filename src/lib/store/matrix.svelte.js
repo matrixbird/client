@@ -15,6 +15,7 @@ import {
 import {
   getEvent,
   getStateEvent,
+  getAccountData,
   get_thread_root_event,
   get_threads,
   get_thread_events,
@@ -139,15 +140,32 @@ export function createMatrixStore() {
     }
 
     try {
+      const mailboxes = await getAccountData(
+        session.access_token,
+        session.user_id,
+        "matrixbird.mailbox.rooms"
+      );
+      if(mailboxes) {
+        for (const [key, value] of Object.entries(mailboxes)) {
+          mailbox_rooms[key] = value;
+        }
+        console.log("mailbox rooms", mailbox_rooms)
+      }
+    } catch(e) {
+    }
+
+    try {
       const init_sync = await syncOnce(session.access_token);
       console.log(init_sync);
 
+      /*
       let mb_rooms = init_sync.account_data?.events?.find(e => e.type == "matrixbird.mailbox.rooms");
       if(mb_rooms) {
         for (const [key, value] of Object.entries(mb_rooms.content)) {
           mailbox_rooms[key] = value;
         }
       }
+      */
 
       for (const [room_id, room] of Object.entries(init_sync.rooms.join)) {
         let pending_event = room.state?.events?.find(e => e.type == "matrixbird.email.pending");
@@ -840,7 +858,19 @@ export function createMatrixStore() {
     return newRoomId;
   };
 
+  const updateMailboxRoomsAccountData = async () => {
+    let ac = await client.setAccountData("matrixbird.mailbox.rooms", mailbox_rooms)
+    console.log("Mailbox rooms updated in account data.", ac)
+  }
+
   const getDraftsRoom = async () => {
+
+    let drafts_room = mailbox_rooms["DRAFTS"];
+    if(!drafts_room) {
+      console.log(mailbox_rooms)
+      console.log("no drafts room in mailbox rooms")
+    }
+
     const rooms = client.getRooms();
     for (const room of rooms) {
       let stateEvent = room.currentState.getStateEvents("matrixbird.room.type")[0];
@@ -871,6 +901,9 @@ export function createMatrixStore() {
     console.log("Added drafts room to joined rooms", joined_rooms)
 
     console.log(`Created new Drafts room with: ${newRoomId}`);
+
+    mailbox_rooms["DRAFTS"] = newRoomId;
+    updateMailboxRoomsAccountData();
 
   }
 
@@ -922,5 +955,6 @@ export function createMatrixStore() {
     getUser,
     doesRoomExist,
     createEmailRoom,
+    getDraftsRoom,
   };
 }
