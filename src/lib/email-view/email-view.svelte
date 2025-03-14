@@ -112,7 +112,7 @@ $effect(() => {
 </script>
 
 {#if ready}
-<div class="thread-container h-full grid grid-rows-[2.5rem_1fr] overflow-hidden">
+<div class="thread-container h-full grid grid-rows-[auto_1fr] overflow-hidden">
 
     <EmailViewHeader {thread_event} />
 

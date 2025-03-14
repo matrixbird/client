@@ -440,9 +440,15 @@ input::placeholder {
 }
 
 emoji-picker {
+    height: 300px;
+    z-index: 10000;
     --background: theme('colors.bird.900');
     --emoji-font-family: Twemoji;
-    --emoji-size: 1.3rem;
+    --emoji-size: 1.2rem;
+    --emoji-padding: 0.35rem;
     --border-radius: 1rem;
     --indicator-color: theme('colors.bird.200');
+    --input-font-size: 0.9rem;
+    --input-padding: 0.125rem 0.6rem;
+    --input-border-radius: 500px;
 }

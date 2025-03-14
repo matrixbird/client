@@ -1,10 +1,11 @@
 <script>
+import * as sdk from 'matrix-js-sdk';
 import { PUBLIC_HOMESERVER } from '$env/static/public';
 import logo from '$lib/logo/logo.js'
 import { onMount, tick } from 'svelte';
 
 import {
-	goto,
+    goto,
 } from '$app/navigation';
 
 import { createMatrixStore } from '$lib/store/matrix.svelte.js'
@@ -21,10 +22,59 @@ onMount(() => {
     if(data) {
         //store.updateSession(data)
         setTimeout(() => {
+            //store.createMatrixClient(data)
+        }, 1000)
+        sync(data)
+    }
+});
+
+let mailbox_rooms_ready = $state(false);
+let event_count = $state(0);
+
+async function sync(data) {
+    console.log('syncing with data', data)
+    let client =  sdk.createClient({
+        baseUrl: PUBLIC_HOMESERVER,
+        accessToken: data.access_token,
+        userId: data.user_id,
+        deviceId: data.device_id,
+    });
+
+    client.on(sdk.ClientEvent.AccountData, function (event) {
+        if(event?.event?.type == "matrixbird.mailbox.rooms") {
+            mailbox_rooms_ready = true
+            //store.createMatrixClient(data)
+        }
+    });
+    client.on(sdk.RoomEvent.Timeline, function (event, room) {
+        if(event?.event?.type == "matrixbird.email.matrix") {
+            event_count = event_count + 1
+        }
+    });
+    let filter = sdk.Filter.fromJson(null, "test", {
+        account_data: {
+            types: ["matrixbird.mailbox.rooms"],
+            limit: 1,
+        },
+    })
+    await client.startClient({
+        filter: filter,
+        initialSyncLimit: 100,
+        lazyLoadMembers: true,
+        timelineSupport: true,
+    });
+}
+
+let synced = $state(false);
+
+$effect(() => {
+    if(!synced && mailbox_rooms_ready && event_count > 1) {
+        synced = true
+        setTimeout(() => {
             store.createMatrixClient(data)
         }, 1000)
     }
-});
+})
 
 
 let busy = $state(false);

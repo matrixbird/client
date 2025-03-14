@@ -250,8 +250,7 @@ empty.`,
             }
         }
 
-        let room_id = await store.emailRoom(mxids, preview)
-        console.log("room id", room_id)
+        let room_id = await store.createEmailRoom(mxids, preview)
 
         const msg = await store.client.sendEvent(
             room_id,
@@ -270,7 +269,8 @@ empty.`,
             },
             uuidv4()
         );
-        console.log('msg', msg)
+        console.log('Email event: ', msg)
+
         const thr = await store.client.sendEvent(
             room_id,
             "matrixbird.thread.marker",
@@ -284,7 +284,7 @@ empty.`,
             },
             uuidv4()
         );
-        console.log('thread marker event', thr)
+        console.log('Thread marker event:', thr)
 
         /*
         let outbox_room_id = mailbox_rooms["OUTBOX"]

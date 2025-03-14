@@ -2,11 +2,18 @@
 import { PUBLIC_HOMESERVER_NAME } from '$env/static/public';
 import { onMount, tick } from 'svelte';
 import { v4 as uuidv4 } from 'uuid';
+import { passwordStrength } from 'check-password-strength'
+
 
 import { 
     signup,
     usernameAvailable,
 } from '$lib/appservice/api.js';
+
+import { 
+    showPassword,
+    hidePassword,
+} from '$lib/assets/icons.js';
 
 import {
     goto,
@@ -23,7 +30,10 @@ import {
     debounce
 } from '$lib/utils/utils.js';
 
-let { data, session } = $props();
+let { 
+    data, 
+    session 
+} = $props();
 
 let require_invite_code = $derived.by(() => {
     return data?.features?.require_invite_code
@@ -91,6 +101,10 @@ function startProcess(event) {
     }
 }
 
+function checkPasswordStrength(event) {
+    //console.log(passwordStrength(password).value)
+}
+
 function codeEnter(event) {
     if(code.length === 0) {
         codeInput.focus();
@@ -98,6 +112,16 @@ function codeEnter(event) {
     }
     if(event.key === 'Enter') {
         process();
+    }
+}
+
+function nameEnter(event) {
+    if(name.length === 0) {
+        nameInput.focus();
+        return;
+    }
+    if(event.key === 'Enter') {
+        usernameInput.focus();
     }
 }
 
@@ -230,9 +254,24 @@ function checkUsername(e) {
 
 let focused = $state(false);
 
+let passwordVisible = $state(false);
+
+async function togglePassword() {
+    passwordVisible = !passwordVisible;
+    if(passwordVisible) {
+        passwordInput.type = 'text';
+    } else {
+        passwordInput.type = 'password';
+    }
+
+    await tick();
+    passwordInput.focus();
+}
+
 </script>
 
-<div class="content flex-1 flex flex-col p-4 mt-4">
+<div class="content flex-1 flex flex-col p-4 mt-4 mb-2">
+
     <div class="con">
         <input 
             class="py-3 pl-3 pr-[164px]"
@@ -256,15 +295,28 @@ let focused = $state(false);
 
     </div>
 
-    <div class="mt-3">
-        <input 
+    <div class="password mt-3 relative">
+        <input id="password" name="password"
             class="py-3 px-3"
             bind:this={passwordInput} 
             bind:value={password} 
             type="password" 
+            autocomplete="new-password"
             disabled={busy}
+            oninput={checkPasswordStrength}
             onkeydown={startProcess}
             placeholder="Password" />
+
+        <div class="absolute right-[10px] top-[13px] cursor-pointer flex
+            place-items-center opacity-70 hover:opacity-100"
+            onclick={togglePassword}>
+            {#if passwordVisible}
+                {@html hidePassword}
+            {:else}
+                {@html showPassword}
+            {/if}
+        </div>
+
     </div>
 
     {#if code_valid && invite_code_email}
@@ -319,7 +371,7 @@ let focused = $state(false);
         </button>
     </div>
 
-    {#if !code_valid && !invite_code_email}
+    {#if require_invite_code && !code_valid && !invite_code_email}
         <div class="mt-4">
             <a href="/request/invite" class="text-bird-900 text-sm
                 hover:underline">Need an invite code?</a>

@@ -787,16 +787,16 @@ export function createMatrixStore() {
     return null;
   }
 
-  const emailRoom = async (userIds, preview) => {
+  const createEmailRoom = async (userIds, preview) => {
 
     const existingRoomId = await doesRoomExist(userIds);
 
     if (existingRoomId) {
-      console.log(`Found existing DM room with ${userIds}: ${existingRoomId}`);
+      console.log(`Found existing email room with ${userIds}: ${existingRoomId}`);
       return existingRoomId;
     }
 
-    console.log(`No existing DM room found with ${userIds}, creating one...`);
+    console.log(`No existing email room found with ${userIds}, creating one...`);
 
     // Create a new DM room
     const createRoomResult = await client.createRoom({
@@ -835,10 +835,44 @@ export function createMatrixStore() {
     joined_rooms.push(newRoomId)
     console.log("Added to joined rooms", joined_rooms)
 
-    console.log(`Created new DM room with ${userIds}: ${newRoomId}`);
+    console.log(`Created new email room with ${userIds}: ${newRoomId}`);
 
     return newRoomId;
   };
+
+  const getDraftsRoom = async () => {
+    const rooms = client.getRooms();
+    for (const room of rooms) {
+      let stateEvent = room.currentState.getStateEvents("matrixbird.room.type")[0];
+      let is_drafts = stateEvent.getContent().type === "DRAFTS";
+      if(is_drafts) {
+        return room.roomId;
+      }
+    }
+
+    console.log("Drafts room not found, creating one...")
+    const createRoomResult = await client.createRoom({
+      preset: 'private_chat',
+      visibility: 'private',
+      initial_state: [
+        {
+          type: 'matrixbird.room.type',
+          state_key: 'DRAFTS',
+          content: {
+            type: 'DRAFTS'
+          }
+        },
+      ]
+    });
+
+    const newRoomId = createRoomResult.room_id;
+
+    joined_rooms.push(newRoomId)
+    console.log("Added drafts room to joined rooms", joined_rooms)
+
+    console.log(`Created new Drafts room with: ${newRoomId}`);
+
+  }
 
 
   return {
@@ -887,6 +921,6 @@ export function createMatrixStore() {
     createMatrixClient,
     getUser,
     doesRoomExist,
-    emailRoom,
+    createEmailRoom,
   };
 }

@@ -87,7 +87,8 @@ let is_dev_mode = $derived(dev_mode?.enabled);
 
 const events = $derived(matrixStore?.events)
 const first_event = $derived.by(() => {
-    return events?.values().next().value
+    //return events?.values().next().value
+    return [...events.values()].pop();
 })
 
 let new_user = $derived(userState?.new_user)
@@ -100,8 +101,8 @@ let height = $state(750);
 $effect(() => {
 
     if(new_user && first_event) {
-        //userState.new_user = false
-        //goto(`/mail/inbox/${first_event.event_id}`)
+        userState.new_user = false
+        goto(`/mail/inbox/${first_event.event_id}`)
     }
 
     if(browser && expanded) {

@@ -84,7 +84,6 @@ export function focus() {
 
 export function insert(data) {
     editor.chain().focus().insertContent(data).run();
-    focus();
 }
 </script>
 
