@@ -94,13 +94,6 @@ function setVerified(event) {
 </div>
 
 <style>
-.box {
-    background: white;
-    border: 1px solid #464646;
-    box-shadow: 6px 6px 0 #a7a7a729;
-    transform: translate(0, 0);
-    border-radius: 1px;
-}
 
 .box-title {
     border-bottom: 1px solid #dadada;

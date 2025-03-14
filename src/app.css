@@ -224,7 +224,7 @@ button {
     font-style: normal;
     box-shadow: inset 0px -3px 0 var(--button-box-shadow);
     border: 1px solid var(--button-border);
-    border-radius: 3px;
+    border-radius: 500px;
     background-color: var(--button-background);
     color: var(--button-text);
     transition: background-color 0.1s;
@@ -236,7 +236,7 @@ button.primary {
     font-style: normal;
     box-shadow: inset 0px -3px 0 var(--button-primary-box-shadow);
     border: 1px solid var(--button-primary-border);
-    border-radius: 2px;
+    border-radius: 500px;
     background-color: var(--button-primary-background);
     color: var(--button-primary-text);
     transition: background-color 0.1s;
@@ -343,9 +343,8 @@ input::placeholder {
 
 .box {
     background: var(--background);
-    border: 1px solid var(--border);
-    box-shadow: 6px 6px 0 var(--box-shadow);
-    transform: translate(0, 0);
+    border: 7px solid theme('colors.bird.200');
+    border-radius: 1.5rem;
 }
 
 .box:hover {
