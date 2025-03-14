@@ -48,6 +48,10 @@ let initials = $derived.by(() => {
     create_initials(user?.localpart)
 })
 
+let squeeze = $derived.by(() => {
+    return initials?.length > 1
+})
+
 let avatar = $derived.by(() => {
     return user?.avatar_url
 })
@@ -73,6 +77,7 @@ async function getAvatar() {
 <div class="grid place-items-center text-xs bg-bird-700 
     hover:bg-white hover:border-4 hover:border-bird-700
     rounded-[50%]"
+    class:text-[11px]={squeeze}
     class:w-7={!small}
     class:h-7={!small}
     class:w-4={small}

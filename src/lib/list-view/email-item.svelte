@@ -216,14 +216,24 @@ $effect(() => {
         //let sendread = store.client.sendReadReceipt(email.room_id,
         //email.event_id)
 
-        markRead()
+        if(!read) {
+            markRead()
+        }
     }
 
 })
 
-let read = $derived.by(() => {
+let read = $state(true);
+
+let _read = $derived.by(() => {
     return read_events.get(email.event_id) == email.event_id ||
         read_events.get(email.event_id) == thread_id
+})
+
+$effect(() => {
+    if(!_read) {
+        read = false
+    }
 })
 
 let thread_id = $derived.by(() => {
@@ -250,7 +260,7 @@ let event_to_read = $derived.by(() => {
 
 async function markRead() {
 
-    let read = await sendReadReceipt(
+    await sendReadReceipt(
         store.session.access_token, 
         email.room_id, 
         event_to_read,
@@ -258,6 +268,7 @@ async function markRead() {
             thread_id: thread_id
         }
     )
+    read = true
     //console.log('read', read)
 
 }
@@ -314,7 +325,9 @@ let el;
         <div class="flex flex-col flex-1 overflow-x-hidden">
             <div class="flex place-items-center leading-normal">
 
-                <div class="subject whitespace-nowrap overflow-hidden text-ellipsis flex-1">
+                <div class="subject whitespace-nowrap overflow-hidden
+                    text-ellipsis flex-1"
+                class:font-semibold={!read}>
                     {subject}
                 </div>
 
@@ -348,12 +361,14 @@ let el;
                         {#if name}
                             <span class="mr-2">{name}</span>
                         {/if}
-                            <span class="text-xs text-bird-800">&lt;{address}&gt;</span>
+                            <span class="text-bird-700">&lt;{address}&gt;</span>
                     </div>
                 {/if}
 
             {#if replies}
-                <div class="text-sm flex place-items-center">
+                <div class="text-xs font-medium text-light flex
+                        place-items-center bg-background
+                        rounded px-1 border border-bird-300">
                     {replies} 
                 </div>
             {/if}
