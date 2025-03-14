@@ -678,7 +678,7 @@ export function createMatrixStore() {
           updateAppStatus(null)
         }, 2000)
 
-        sync_state.last_sync = new Date();
+        sync_state.last_sync = Date.now();
 
         nextSyncToken = data.nextSyncToken;
 
@@ -705,7 +705,7 @@ export function createMatrixStore() {
         ephemeral: {
           types: ["m.receipt"],
           unread_thread_notifications: true,
-          limit: 100,
+          limit: 1000,
         },
         timeline: {
           unread_thread_notifications: true,

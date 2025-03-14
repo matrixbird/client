@@ -17,7 +17,7 @@ import {
     get_first_line
 } from '$lib/utils/string.js'
 
-import Date from '$lib/components/date/date.svelte'
+import EmailDate from '$lib/components/date/date.svelte'
 import AttchmentItems from './attachments/attachment-items.svelte'
 
 import UserAvatar from '$lib/user/avatar.svelte'
@@ -31,7 +31,11 @@ import {
     email_context_menu
 } from '$lib/store/app.svelte.js'
 
-import { createMatrixStore, large_email_content } from '$lib/store/matrix.svelte.js'
+import { 
+    createMatrixStore, 
+    large_email_content ,
+    sync_state
+} from '$lib/store/matrix.svelte.js'
 
 import { app } from '$lib/store/app.svelte.js'
 
@@ -42,14 +46,6 @@ const threads = $derived(store?.threads)
 const thread_events = $derived(store?.thread_events)
 
 let { email } = $props();
-
-let started_at = $derived(app.started_at)
-
-let is_new = $derived.by(() => {
-    if(!email) return
-    if(active) return
-    return email.origin_server_ts > started_at
-})
 
 let replies = $derived.by(() => {
     let count = 0
@@ -273,6 +269,8 @@ async function markRead() {
 
 }
 
+let last_sync = $derived(sync_state.last_sync)
+
 let is_large = $derived.by(() => {
     return email?.content?.body?.content_uri != undefined
 })
@@ -281,7 +279,15 @@ let content_uri = $derived.by(() => {
     return email?.content?.body?.content_uri
 })
 
+let is_new = $state(false);
+
 onMount (() => {
+    if(email.origin_server_ts > last_sync) {
+        is_new = true
+        setTimeout(() => {
+            is_new = false
+        }, 5000)
+    }
     if(is_large && access_token) {
         console.log('large', email)
         fetchContent()
@@ -334,8 +340,9 @@ let el;
 
 
                 <div class="flex flex-col ml-2">
-                    <div class="text-[12px] text-bird-800">
-                        <Date event={email} />
+                    <div class="text-[12px] text-bird-800"
+                        class:font-semibold={!read}>
+                        <EmailDate event={email} />
                     </div>
                 </div>
 
@@ -352,7 +359,10 @@ let el;
 
                 {:else if native && user}
                     <div class="text-sm flex place-items-center">
-                        <span class="mr-2">{user?.name}</span>
+                        <span class="mr-2"
+                        class:font-medium={!read}>
+                            {user?.name}
+                        </span>
                     </div>
                 {/if}
 
@@ -366,10 +376,12 @@ let el;
                 {/if}
 
             {#if replies}
-                <div class="text-xs font-medium text-light flex
-                        place-items-center bg-background
-                        rounded px-1 border border-bird-300">
-                    {replies} 
+                <div class="flex place-items-center">
+                    <div class="text-xs font-medium text-light 
+                            bg-bird-700 text-white
+                            rounded px-1 ">
+                        {replies} 
+                    </div>
                 </div>
             {/if}
 
@@ -378,6 +390,14 @@ let el;
                         {first_line}
                     {/if}
                 </div>
+
+                {#if is_new}
+                <div class="flex place-items-center mr-2">
+                    <div class="text-xs font-bold rounded bg-blue-700 px-1 text-white">
+                        New
+                    </div>
+                </div>
+                {/if}
 
                 {#if !read}
                 <div class="flex place-items-center">
@@ -390,12 +410,8 @@ let el;
             </div>
         </div>
 
-
     </div>
 
-
-    {#if is_new}
-    {/if}
 
     {#if has_attachments}
         <AttchmentItems {email} />
