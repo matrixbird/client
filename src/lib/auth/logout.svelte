@@ -1,4 +1,7 @@
 <script>
+import {
+    goto,
+} from '$app/navigation';
 import { deleteAll } from '$lib/utils/indexedDB'
 
 let form;
@@ -11,6 +14,7 @@ async function logout() {
         console.error('Error deleting all databases', error);
     }
     form.submit();
+    goto('/logout')
 }
 
 </script>

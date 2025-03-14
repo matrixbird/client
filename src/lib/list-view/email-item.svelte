@@ -37,6 +37,7 @@ import { app } from '$lib/store/app.svelte.js'
 
 const store = createMatrixStore()
 const events = $derived(store?.events)
+const read_events = $derived(store?.read_events)
 const threads = $derived(store?.threads)
 const thread_events = $derived(store?.thread_events)
 
@@ -197,17 +198,32 @@ $effect(() => {
     }
 
     if(email && active) {
-        let user = store.user;
-        let room = store.client.getRoom(email.room_id)
-        let read = room?.getReadReceiptForUserId(user.userId)
-        //console.log('read', read)
+        //let user = store.user;
+        //let room = store.client.getRoom(email.room_id)
+
+        //let live_timeline = room.getLiveTimeline()
+        //let events = live_timeline.getEvents()
+
+        //let event = events.find(event => event.getId() == email.event_id)
+        //console.log('event', event)
+
+        //let receipts = room.getReceiptsForEvent(event)
+        //console.log('receipts', receipts)
+
+        //let read = room?.getReadReceiptForUserId(user.userId)
+        //console.log('last read', read)
 
         //let sendread = store.client.sendReadReceipt(email.room_id,
         //email.event_id)
 
-        //markRead()
+        markRead()
     }
 
+})
+
+let read = $derived.by(() => {
+    return read_events.get(email.event_id) == email.event_id ||
+        read_events.get(email.event_id) == thread_id
 })
 
 let thread_id = $derived.by(() => {
@@ -242,7 +258,7 @@ async function markRead() {
             thread_id: thread_id
         }
     )
-    console.log('read', read)
+    //console.log('read', read)
 
 }
 
@@ -285,6 +301,7 @@ let el;
     oncontextmenu={log}
     class:active={active}
     class:inactive={!active}
+    title={email.event_id}
     onclick={open}>
 
     <div class="flex p-2 overflow-x-hidden mr-2">
@@ -300,6 +317,8 @@ let el;
                 <div class="subject whitespace-nowrap overflow-hidden text-ellipsis flex-1">
                     {subject}
                 </div>
+
+
 
                 <div class="flex flex-col ml-2">
                     <div class="text-[12px] text-bird-800">
@@ -345,15 +364,20 @@ let el;
                     {/if}
                 </div>
 
+                {#if !read}
+                <div class="flex place-items-center">
+                    <div class="h-2 w-2 rounded-[50%] bg-green-600">
+                    </div>
+                </div>
+                {/if}
 
 
             </div>
         </div>
 
 
-
-
     </div>
+
 
     {#if is_new}
     {/if}

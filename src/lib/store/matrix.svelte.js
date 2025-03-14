@@ -54,6 +54,8 @@ export let large_email_content = $state(new SvelteMap());
 
 let events = $state(new SvelteMap());
 
+let read_events = $state(new SvelteMap());
+
 let joined_rooms = $state([]);
 
 export let status = $state({
@@ -470,6 +472,18 @@ export function createMatrixStore() {
       }
     });
 
+    client.on(sdk.RoomEvent.Receipt, function (event, room, toStartOfTimeline) {
+      for (const event_id in event.event.content) {
+        let thread_id = event.event.content[event_id]?.["m.read"]?.[session.user_id]?.thread_id;
+        if(thread_id && thread_id != "main") {
+          read_events.set(event_id, thread_id);
+        }
+      }
+      if(event?.event?.type == "matrixbird.room.type") {
+      }
+    });
+
+
     async function refresh(room) {
       //room.setTimelineNeedsRefresh(true);
       //await room.refreshLiveTimeline();
@@ -688,15 +702,20 @@ export function createMatrixStore() {
 
     let filter = sdk.Filter.fromJson(null, "test", {
       room: {
+        ephemeral: {
+          types: ["m.receipt"],
+          unread_thread_notifications: true,
+          limit: 100,
+        },
         timeline: {
           unread_thread_notifications: true,
-          limit: 1,
+          limit: 100,
         }
       }
     })
 
     await client.startClient({
-      //filter: filter,
+      filter: filter,
       //fullState: true,
       initialSyncLimit: 1000,
       lazyLoadMembers: false,
@@ -928,6 +947,10 @@ export function createMatrixStore() {
 
     get events() {
       return events;
+    },
+
+    get read_events() {
+      return read_events;
     },
 
     get threads() {
