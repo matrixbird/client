@@ -472,6 +472,19 @@ export function createMatrixStore() {
       }
     });
 
+    client.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
+      if(event.event.type === "matrixbird.receipt" && 
+        event.event.sender == session.user_id) {
+
+          let _event_id = event.event.content?.["m.relates_to"]?.["m.in_reply_to"];
+          if(_event_id) {
+            read_events.set(_event_id, event.event);
+          }
+
+      }
+    });
+
+    /*
     client.on(sdk.RoomEvent.Receipt, function (event, room, toStartOfTimeline) {
       for (const event_id in event.event.content) {
         let thread_id = event.event.content[event_id]?.["m.read"]?.[session.user_id]?.thread_id;
@@ -482,6 +495,7 @@ export function createMatrixStore() {
       if(event?.event?.type == "matrixbird.room.type") {
       }
     });
+    */
 
 
     async function refresh(room) {
@@ -589,6 +603,17 @@ export function createMatrixStore() {
           // add all events to events map
           for (const event of items.chunk) {
             events.set(event.event_id, event);
+
+            if(event.type == "matrixbird.receipt" && 
+              event.sender == session.user_id) {
+
+              let _event_id = event.content?.["m.relates_to"]?.["m.in_reply_to"];
+              if(_event_id) {
+                read_events.set(_event_id, event);
+              }
+
+            }
+
           }
 
           let thread_root = items.chunk[0]?.content?.["m.relates_to"]?.event_id;
@@ -597,7 +622,9 @@ export function createMatrixStore() {
             let filtered = items.chunk.filter(event => {
               return event.type != "matrixbird.thread.marker";
             });
-
+            filtered = filtered.filter(event => {
+              return event.type != "matrixbird.receipt";
+            });
             updates.set(thread_root, filtered);
           }
         }

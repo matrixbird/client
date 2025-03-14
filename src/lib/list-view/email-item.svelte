@@ -2,6 +2,7 @@
 import { onMount } from 'svelte';
 import { goto } from '$app/navigation';
 import { page } from '$app/stores';
+import { v4 as uuidv4 } from 'uuid';
 
 import { 
     mxid_to_email,
@@ -58,7 +59,7 @@ let replies = $derived.by(() => {
     }
 
     for (const event of events.values()) {
-        if(event.content["m.relates_to"]?.event_id == email.event_id) {
+        if(event.type != "matrixbird.receipt" && event.content["m.relates_to"]?.event_id == email.event_id) {
             count++
         }
     }
@@ -221,14 +222,21 @@ $effect(() => {
 
 let read = $state(true);
 
-let _read = $derived.by(() => {
-    return read_events.get(email.event_id) == email.event_id ||
-        read_events.get(email.event_id) == thread_id
+let read_event = $derived.by(() => {
+    return read_events.get(email.event_id)
 })
 
+let _read = $derived.by(() => {
+    return read_event == email.event_id || read_event == thread_id
+})
+
+
 $effect(() => {
-    if(!_read) {
+    if(!read_event) {
         read = false
+    }
+    if(!_read) {
+        //read = false
     }
 })
 
@@ -246,7 +254,7 @@ let thread_id = $derived.by(() => {
 let event_to_read = $derived.by(() => {
     let relation = email?.content?.["m.relates_to"]?.["event_id"]
     if(relation) {
-        return email.event_id
+        return relation
     }
     if(email?.unsigned?.["m.relations"]?.["m.thread"]) {
         return email?.event_id
@@ -255,6 +263,36 @@ let event_to_read = $derived.by(() => {
 })
 
 async function markRead() {
+
+    read = true
+
+    console.log("Check if receipt event exists in thread events...")
+    console.log("event to read", event_to_read)
+
+    let _read_event = read_events.get(event_to_read)
+    if(!_read_event) {
+        // receipt event does not exist in thread events 
+        // so we'll send a read receipt
+        console.log("Sending read receipt in thread event: ", thread_id)
+        const thr = await store.client.sendEvent(
+            email.room_id,
+            "matrixbird.receipt",
+            {
+                msgtype: "matrixbird.receipt.read",
+                "m.relates_to": {
+                    "event_id": thread_id,
+                    "m.in_reply_to": email.event_id,
+                    "rel_type": "m.thread"
+                },
+            },
+            uuidv4()
+        );
+        console.log('Receipt event:', thr)
+    } else {
+        console.log("Receipt event exists. No need to send read receipt.")
+    }
+
+    return
 
     await sendReadReceipt(
         store.session.access_token, 
@@ -375,7 +413,7 @@ let el;
                     </div>
                 {/if}
 
-            {#if replies}
+            {#if replies > 1}
                 <div class="flex place-items-center">
                     <div class="text-xs font-medium text-light 
                             bg-bird-700 text-white
