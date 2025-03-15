@@ -351,7 +351,7 @@ let el;
                         {#if name}
                             <span class="mr-2">{name}</span>
                         {/if}
-                            <span class="text-bird-700">&lt;{address}&gt;</span>
+                            <span class="text-light">&lt;{address}&gt;</span>
                     </div>
                 {/if}
 

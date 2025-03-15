@@ -93,7 +93,7 @@ let sync_opts = $derived.by(() => {
 <div class="flex border-t border-border rounded-b-2xl">
 
     {#if !expanded}
-    <div class="flex place-items-center px-2 py-1 cursor-pointer"
+    <div class="ml-2 flex place-items-center px-2 py-1 cursor-pointer"
         use:tooltip={opts} onclick={toggleSidebar}>
         {#if sidebar_hidden}
             {@html show_sidebar}

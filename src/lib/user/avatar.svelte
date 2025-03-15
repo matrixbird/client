@@ -20,7 +20,8 @@ const store = createMatrixStore()
 let { 
     user_id, 
     from,
-    small = false 
+    small = false ,
+    large = false 
 } = $props();
 
 let user = $derived.by(() =>{
@@ -78,11 +79,11 @@ async function getAvatar() {
 
 </script>
 
-<div class="grid place-items-center text-xs bg-bird-700 
-    hover:bg-white hover:border-4 hover:border-bird-700
-    rounded-[50%]"
-    class:w-7={!small}
-    class:h-7={!small}
+<div class="grid place-items-center text-xs bg-bird-700 rounded-[50%] pointer-events-none"
+    class:w-9={large}
+    class:h-9={large}
+    class:w-7={!small && !large}
+    class:h-7={!small && !large}
     class:w-4={small}
     class:h-4={small}>
     <div class="font-semibold text-white uppercase"

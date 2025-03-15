@@ -23,7 +23,7 @@ function killEmailItemView() {
 let subject = $derived(thread_event?.content?.subject || `(no subject)`)
 </script>
 
-<div class="flex border-b border-border py-1 pl-4 pr-3">
+<div class="flex border-b border-border py-1 pl-4 pr-3 min-h-[2.5rem]">
     <div class="flex flex-1 place-items-center select-text">
         <span class="font-medium text-lg">{subject}</span>
     </div>

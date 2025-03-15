@@ -3,7 +3,7 @@ import Search from '$lib/search/search.svelte';
 import { filter  } from '$lib/assets/icons';
 </script>
 
-<div class="flex border-b border-border py-1 pl-1 pr-2">
+<div class="flex border-b border-border pl-1 pr-2">
     <Search />
     <div class="">
     </div>

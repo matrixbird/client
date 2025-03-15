@@ -175,7 +175,7 @@ $effect(() => {
 <style lang="postcss">
 @reference "tailwindcss/theme";
 .email-thread .email-item {
-    border-bottom: 1px solid var(--bird-200);
+    border-bottom: 1px solid var(--bird-100);
 }
 .email-thread .email-item:last-child {
     border-bottom: none;

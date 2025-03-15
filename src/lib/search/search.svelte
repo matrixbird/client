@@ -13,7 +13,7 @@ let focused = $state(false);
 </script>
 
 
-<div class="search flex flex-1"
+<div class="search flex place-items-center flex-1"
     class:border-bird-800={focused}
     onclick={focus}>
     <div class="flex place-items-center px-2 opacity-70">

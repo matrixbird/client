@@ -1,8 +1,10 @@
 <script>
 import { page } from '$app/state';
 import DOMPurify from "dompurify";
-import { mxid_to_email } from '$lib/utils/matrix.js'
-
+import { 
+    get_localpart,
+    mxid_to_email
+} from '$lib/utils/matrix.js'
 
 import UserAvatar from '$lib/user/avatar.svelte'
 import ReplyComposer from '$lib/editor/reply-composer.svelte'
@@ -21,8 +23,17 @@ let active = $derived.by(() => {
     return email?.event_id == page.params.event
 })
 
+let is_matrixbird = $derived.by(() => {
+    return get_localpart(email?.sender) == "matrixbird"
+})
+
+
 let thread_root = $derived.by(() => {
     return email?.content?.["m.relates_to"] == undefined 
+})
+
+let recepients = $derived.by(() => {
+    return email?.content?.recipients
 })
 
 const body = $derived.by(() => {
@@ -144,56 +155,60 @@ let is_large = $derived.by(() => {
     onclick={debug}>
 
     <div class="meta p-4 flex flex-col">
-        {#if thread_root}
 
-            <div class="flex place-items-center mb-3">
-                <div class="flex-1 text font-semibold leading-1">
-                    {subject}
+        <div class="flex">
+
+            <UserAvatar user_id={email.sender} large={true}
+                from={!native ? email?.content?.from : null}/>
+
+
+            <div class="flex flex-col ml-3">
+                {#if native && user}
+                    <div class="text-sm">
+                        <span class="font-medium">{is_matrixbird ? `Matrixbird` : user?.name}</span>
+                        <span class="text-xs text-light">&lt;{user?.address}&gt;</span>
+                    </div>
+                {/if}
+
+                {#if !native}
+                    <div class="text-sm">
+                        {#if name}
+                            <span class="font-medium">{name}</span>
+                        {/if}
+                            <span class="text-xs text-light">&lt;{address}&gt;</span>
+                    </div>
+                {/if}
+                <div class="text-xs text-light">
+                    to {recepients}
                 </div>
             </div>
 
-        {/if}
-
-            <UserAvatar user_id={email.sender} 
-                from={!native ? email?.content?.from : null}/>
-
-        {#if native && user}
-            <div class="text-sm">
-                <span class="font-medium">{user?.name}</span>
-                <span class="text-xs text-bird-800">&lt;{user?.address}&gt;</span>
+            <div class="flex">
             </div>
-        {/if}
 
-        {#if !native}
-            <div class="">
-                {#if name}
-                    <span>{name}</span>
-                {/if}
-                    <span>{address}</span>
-            </div>
-        {/if}
-        <div class="text-xs text-bird-800">
-            {email?.sender ? email.sender : ''}
         </div>
+
+
+
 
     </div>
 
-        {#if clean && is_large}
-            <div class="body p-4 [&>p]:pb-2 leading-5">
-                {@html clean}
-            </div>
-        {/if}
+    {#if clean && is_large}
+        <div class="body text-md p-4 [&>p]:pb-2 leading-5">
+            {@html clean}
+        </div>
+    {/if}
 
-        {#if is_html && clean && !is_large}
-            <div class="body p-4 [&>p]:pb-2 leading-5">
-                {@html clean}
-            </div>
-        {/if}
-        {#if !is_html && !is_large}
-            <div class="p-4 leading-5" style="white-space: pre-wrap;">
-                {body}
-            </div>
-        {/if}
+    {#if is_html && clean && !is_large}
+        <div class="body text-md p-4 [&>p]:pb-2 leading-5">
+            {@html clean}
+        </div>
+    {/if}
+    {#if !is_html && !is_large}
+        <div class="body text-md p-4 leading-5" style="white-space: pre-wrap;">
+            {body}
+        </div>
+    {/if}
 
 
     {#if last}
