@@ -1,8 +1,7 @@
 <script>
 import { onMount } from 'svelte';
 import { goto } from '$app/navigation';
-import { page } from '$app/stores';
-import { v4 as uuidv4 } from 'uuid';
+import { page } from '$app/state';
 
 import { 
     mxid_to_email,
@@ -127,7 +126,7 @@ function open(e) {
         console.log($state.snapshot(email))
         return
     }
-    const mailbox = $page.params.mailbox
+    const mailbox = page.params.mailbox
 
 
     goto(`/mail/${mailbox}/${email.event_id}`)
@@ -161,7 +160,7 @@ const active = $derived.by(() => {
     // matches this event's event_id
     let is_root_thread = email?.content?.["m.relates_to"] === undefined
     if(is_root_thread) {
-        return $page.params.event === email.event_id
+        return page.params.event === email.event_id
     }
 
     // if this is a thread event, we'll see if any sibling events 
@@ -172,17 +171,17 @@ const active = $derived.by(() => {
     if(is_thread_child) {
         let thread_id = email?.content?.["m.relates_to"]?.["event_id"]
 
-        if(thread_id == $page.params.event) {
+        if(thread_id == page.params.event) {
             return true
         }
 
         let children = thread_events.get(thread_id)
         if(children) {
-            return children.some(event => event.event_id == $page.params.event)
+            return children.some(event => event.event_id == page.params.event)
         }
     }
 
-    return $page.params.event === email.event_id
+    return page.params.event === email.event_id
 })
 
 const has_attachments = $derived.by(() => {
@@ -191,31 +190,11 @@ const has_attachments = $derived.by(() => {
 
 $effect(() => {
     if(active) {
-        route_state.mail = $page.url.pathname
+        route_state.mail = page.url.pathname
     }
 
-    if(email && active) {
-        //let user = store.user;
-        //let room = store.client.getRoom(email.room_id)
-
-        //let live_timeline = room.getLiveTimeline()
-        //let events = live_timeline.getEvents()
-
-        //let event = events.find(event => event.getId() == email.event_id)
-        //console.log('event', event)
-
-        //let receipts = room.getReceiptsForEvent(event)
-        //console.log('receipts', receipts)
-
-        //let read = room?.getReadReceiptForUserId(user.userId)
-        //console.log('last read', read)
-
-        //let sendread = store.client.sendReadReceipt(email.room_id,
-        //email.event_id)
-
-        if(!read) {
-            markRead()
-        }
+    if(email && active && !read) {
+        markRead()
     }
 
 })
@@ -226,17 +205,9 @@ let read_event = $derived.by(() => {
     return read_events.get(email.event_id)
 })
 
-let _read = $derived.by(() => {
-    return read_event == email.event_id || read_event == thread_id
-})
-
-
 $effect(() => {
     if(!read_event) {
         read = false
-    }
-    if(!_read) {
-        //read = false
     }
 })
 
@@ -266,34 +237,6 @@ async function markRead() {
 
     read = true
 
-    console.log("Check if receipt event exists in thread events...")
-    console.log("event to read", event_to_read)
-
-    let _read_event = read_events.get(event_to_read)
-    if(!_read_event) {
-        // receipt event does not exist in thread events 
-        // so we'll send a read receipt
-        console.log("Sending read receipt in thread event: ", thread_id)
-        const thr = await store.client.sendEvent(
-            email.room_id,
-            "matrixbird.receipt",
-            {
-                msgtype: "matrixbird.receipt.read",
-                "m.relates_to": {
-                    "event_id": thread_id,
-                    "m.in_reply_to": email.event_id,
-                    "rel_type": "m.thread"
-                },
-            },
-            uuidv4()
-        );
-        console.log('Receipt event:', thr)
-    } else {
-        console.log("Receipt event exists. No need to send read receipt.")
-    }
-
-    return
-
     await sendReadReceipt(
         store.session.access_token, 
         email.room_id, 
@@ -302,8 +245,6 @@ async function markRead() {
             thread_id: thread_id
         }
     )
-    read = true
-    //console.log('read', read)
 
 }
 

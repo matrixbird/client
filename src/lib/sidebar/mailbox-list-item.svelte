@@ -1,5 +1,5 @@
 <script>
-import { page } from '$app/stores';
+import { page } from '$app/state';
 import { goto } from '$app/navigation';
 
 import { createMatrixStore } from '$lib/store/matrix.svelte.js'
@@ -19,7 +19,7 @@ function open() {
 }
 
 let active = $derived.by(() => {
-    return $page.params.mailbox === mailbox.path
+    return page.params.mailbox === mailbox.path
 })
 
 let is_inbox = $derived.by(() => {

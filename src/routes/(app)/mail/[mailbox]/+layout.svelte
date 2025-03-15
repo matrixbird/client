@@ -1,11 +1,11 @@
 <script>
-import { page } from '$app/stores';
+import { page } from '$app/state';
 import ListView from '$lib/list-view/list-view.svelte'
 
 let { children } = $props();
 
 let event_open = $derived.by(() => {
-    return $page.params.event !== undefined
+    return page.params.event !== undefined
 })
 
 import { ui_state } from '$lib/store/app.svelte.js'

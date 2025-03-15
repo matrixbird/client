@@ -1,5 +1,5 @@
 <script>
-import { page } from '$app/stores';
+import { page } from '$app/state';
 import { goto } from '$app/navigation';
 import { 
     calendar, 
@@ -13,7 +13,7 @@ function open() {
 }
 
 let active = $derived.by(() => {
-    return $page.route.id.startsWith(`/(app)/chat`)
+    return page.route.id.startsWith(`/(app)/chat`)
 })
 
 </script>

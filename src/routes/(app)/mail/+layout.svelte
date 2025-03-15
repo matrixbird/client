@@ -1,5 +1,5 @@
 <script>
-import { page } from '$app/stores';
+import { page } from '$app/state';
 
 import Footer from '$lib/footer/footer.svelte'
 import Sidebar from '$lib/sidebar/sidebar.svelte'
@@ -10,7 +10,7 @@ let expanded = $derived(ui_state?.expanded)
 let sidebar_toggled = $derived(ui_state?.sidebar_toggled)
 
 let email_open = $derived.by(() => {
-    return $page.params.email !== undefined
+    return page.params.email !== undefined
 })
 
 import ListView from '$lib/list-view/list-view.svelte'

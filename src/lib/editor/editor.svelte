@@ -1,5 +1,5 @@
 <script>
-import { page } from '$app/stores';
+import { page } from '$app/state';
 import EditorItem from './editor-item.svelte';
 import { createEditorStore } from '$lib/store/editor.svelte.js'
 const store = createEditorStore()

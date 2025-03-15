@@ -1,5 +1,5 @@
 <script>
-import { page } from '$app/stores';
+import { page } from '$app/state';
 import DOMPurify from "dompurify";
 import { mxid_to_email } from '$lib/utils/matrix.js'
 
@@ -17,7 +17,7 @@ let { email, last } = $props();
 
 
 let active = $derived.by(() => {
-    return email?.event_id == $page.params.event
+    return email?.event_id == page.params.event
 })
 
 let thread_root = $derived.by(() => {

@@ -3,7 +3,7 @@ import EmailViewHeader from "./email-view-header.svelte";
 import EmailItemView from "$lib/email-view/email-item-view.svelte";
 import Divider from "$lib/components/email/divider.svelte";
 
-import { page } from '$app/stores';
+import { page } from '$app/state';
 
 import { close } from '$lib/assets/icons.js'
 
@@ -19,7 +19,7 @@ let ready = $derived(() => {
 })
 
 let thread_event = $derived.by(() => {
-    let event_id = $page.params.event
+    let event_id = page.params.event
     const event = events.get(event_id)
     const thread_id = event?.content["m.relates_to"]?.event_id
     if(thread_id) {
@@ -77,7 +77,7 @@ function buildEmails(event_id) {
 
 let emails = $derived.by(() => {
     if(!status.thread_events_ready) return 
-    return buildEmails($page.params.event)
+    return buildEmails(page.params.event)
 })
 
 let split = $derived.by(() => {
@@ -103,7 +103,7 @@ function showEmails() {
 }
 
 $effect(() => {
-    if($page.params.event) {
+    if(page.params.event) {
         collapsed = true
     }
 })

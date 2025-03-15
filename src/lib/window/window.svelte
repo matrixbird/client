@@ -2,7 +2,7 @@
 import { draggable } from '@neodrag/svelte';
 import { onMount, onDestroy } from 'svelte';
 import { browser } from '$app/environment';
-import { page } from '$app/stores';
+import { page } from '$app/state';
 import { ui_state } from '$lib/store/app.svelte.js'
 
 let {

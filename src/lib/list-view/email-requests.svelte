@@ -5,7 +5,7 @@ import EmailRequestItem from './email-request-item.svelte'
 
 
 import { goto } from '$app/navigation';
-import { page } from '$app/stores';
+import { page } from '$app/state';
 
 import { count } from '$lib/store/app.svelte.js'
 
@@ -22,7 +22,7 @@ const thread_events = $derived(store?.thread_events)
 let user = $derived(store?.user)
 
 let mailbox = $derived.by(() => {
-    return $page.params.mailbox
+    return page.params.mailbox
 })
 
 let is_inbox = $derived.by(() => {

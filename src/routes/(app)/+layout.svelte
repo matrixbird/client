@@ -4,7 +4,7 @@ import { PUBLIC_HOMESERVER } from '$env/static/public';
 import { onMount, onDestroy } from 'svelte';
 import { goto } from '$app/navigation';
 import { browser } from '$app/environment';
-import { page } from '$app/stores';
+import { page } from '$app/state';
 import { draggable } from '@neodrag/svelte';
 import { mxid_to_email } from '$lib/utils/matrix.js'
 
@@ -45,7 +45,7 @@ onMount(() => {
         matrixStore.createMatrixClient(data)
     }
 
-    if($page.url.hostname == "localhost") {
+    if(page.url.hostname == "localhost") {
         dev_mode.enabled = true
     }
     if(browser) {
@@ -243,7 +243,7 @@ function dragEnd() {
 }
 
 let mailbox = $derived.by(() => {
-    return $page.params.mailbox
+    return page.params.mailbox
 })
 
 let title = $derived.by(() => {

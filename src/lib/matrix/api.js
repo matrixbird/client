@@ -111,7 +111,7 @@ export const syncOnce = async (token) => {
     room: {
       ephemeral: {
         types: ["m.receipt"],
-        limit: 1,
+        limit: 1000,
         unread_thread_notifications: true,
       },
       timeline: {

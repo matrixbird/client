@@ -1,5 +1,5 @@
 <script>
-import { page } from '$app/stores';
+import { page } from '$app/state';
 import { goto } from '$app/navigation';
 import { close } from '$lib/assets/icons.js'
 
@@ -8,7 +8,7 @@ let {
 } = $props();
 
 function killEmailItemView() {
-    let mailbox = $page.params.mailbox
+    let mailbox = page.params.mailbox
     goto(`/mail/${mailbox}`)
 }
 

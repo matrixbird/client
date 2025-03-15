@@ -174,6 +174,23 @@ export function createMatrixStore() {
         if(pending_event) {
           pending_emails_event = pending_event;
         }
+
+        // build read_events
+        let ephemeral = room.ephemeral?.events;
+        if(ephemeral) {
+          for (const event of ephemeral) {
+            if(event.type == "m.receipt") {
+              for (const event_id in event.content) {
+                let thread_id = event.content[event_id]?.["m.read"]?.[session.user_id]?.thread_id;
+                if(thread_id && thread_id != "main") {
+                  read_events.set(event_id, thread_id);
+                  //console.log("read events", read_events)
+                }
+              }
+            }
+          }
+        }
+
       } 
 
       if(init_sync.rooms.invite) {
@@ -472,6 +489,7 @@ export function createMatrixStore() {
       }
     });
 
+    /*
     client.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
       if(event.event.type === "matrixbird.receipt" && 
         event.event.sender == session.user_id) {
@@ -483,8 +501,8 @@ export function createMatrixStore() {
 
       }
     });
+    */
 
-    /*
     client.on(sdk.RoomEvent.Receipt, function (event, room, toStartOfTimeline) {
       for (const event_id in event.event.content) {
         let thread_id = event.event.content[event_id]?.["m.read"]?.[session.user_id]?.thread_id;
@@ -492,10 +510,7 @@ export function createMatrixStore() {
           read_events.set(event_id, thread_id);
         }
       }
-      if(event?.event?.type == "matrixbird.room.type") {
-      }
     });
-    */
 
 
     async function refresh(room) {
@@ -604,6 +619,7 @@ export function createMatrixStore() {
           for (const event of items.chunk) {
             events.set(event.event_id, event);
 
+            /*
             if(event.type == "matrixbird.receipt" && 
               event.sender == session.user_id) {
 
@@ -613,6 +629,7 @@ export function createMatrixStore() {
               }
 
             }
+            */
 
           }
 

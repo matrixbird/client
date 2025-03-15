@@ -3,10 +3,10 @@ import ListHeader from './list-header.svelte'
 import EmailItems from './email-items.svelte'
 import EmailRequests from './email-requests.svelte';
 
-import { page } from '$app/stores';
+import { page } from '$app/state';
 
 let is_email_requests = $derived.by(() => {
-    return $page.params.mailbox == "requests";
+    return page.params.mailbox == "requests";
 })
 </script>
 

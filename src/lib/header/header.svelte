@@ -1,5 +1,5 @@
 <script>
-import { page } from '$app/stores';
+import { page } from '$app/state';
 import { expand, circle, collapse, inbox, fullscreen } from '$lib/assets/icons.js'
 import { tooltip } from '$lib/components/tooltip/tooltip'
 
@@ -81,7 +81,7 @@ function end() {
 }
 
 let mailbox = $derived.by(() => {
-    return $page.params.mailbox
+    return page.params.mailbox
 })
 
 let mailbox_title = $derived.by(() => {

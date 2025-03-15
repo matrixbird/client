@@ -3,7 +3,7 @@ import { SvelteMap } from 'svelte/reactivity';
 import { createMatrixStore, status, inbox_mail } from '$lib/store/matrix.svelte.js'
 import EmailItem from './email-item.svelte'
 import { goto } from '$app/navigation';
-import { page } from '$app/stores';
+import { page } from '$app/state';
 
 import { count } from '$lib/store/app.svelte.js'
 
@@ -16,7 +16,7 @@ const thread_events = $derived(store?.thread_events)
 let user = $derived(store?.user)
 
 let mailbox = $derived.by(() => {
-    return $page.params.mailbox
+    return page.params.mailbox
 })
 
 let is_inbox = $derived.by(() => {
@@ -35,7 +35,7 @@ $effect(() => {
     if(inbox_emails) {
         count.inbox = inbox_emails.length
     }
-    if($page.params.mailbox && status.threads_ready &&
+    if(page.params.mailbox && status.threads_ready &&
         status.thread_events_ready) {
         //console.log("Building mailbox email list.")
     }

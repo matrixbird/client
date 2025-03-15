@@ -1,5 +1,5 @@
 <script>
-import { page } from '$app/stores';
+import { page } from '$app/state';
 import { ui_state } from '$lib/store/app.svelte.js'
 import { inbox, sent, drafts, down, dot } from '$lib/assets/icons.js'
 import { goto } from '$app/navigation';
@@ -7,7 +7,7 @@ import { goto } from '$app/navigation';
 import Popup from '$lib/components/popup/popup.svelte'
 
 let mailbox = $derived.by(() => {
-    return $page.params.mailbox
+    return page.params.mailbox
 })
 
 let mailbox_title = $derived.by(() => {

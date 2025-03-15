@@ -1,5 +1,5 @@
 <script>
-import { page } from '$app/stores';
+import { page } from '$app/state';
 import { goto } from '$app/navigation';
 
 import { tooltip } from '$lib/components/tooltip/tooltip'
@@ -26,7 +26,7 @@ function open() {
 }
 
 let active = $derived.by(() => {
-    return $page.params.mailbox == `inbox`
+    return page.params.mailbox == `inbox`
 })
 
 let opts = {
