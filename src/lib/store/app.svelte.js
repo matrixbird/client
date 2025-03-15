@@ -22,13 +22,11 @@ export const userState = $state({
 
 export const ui_state = $state({
     expanded: false,
-    sidebar_toggled: false,
+    sidebar_hidden: false,
     drag_offset: null,
 });
 
-export const route_state = $state({
-    mail: null,
-});
+export const route_state = $state({});
 
 export const email_context_menu = $state({
     email: null,
@@ -67,7 +65,7 @@ function getFromLS(item) {
 }
 
 if(browser) {
-    let items = ['expanded', 'sidebar_toggled']
+    let items = ['expanded', 'sidebar_hidden']
     items.forEach(item => {
         if(getFromLS(item)) {
             ui_state[item] = true
@@ -98,16 +96,16 @@ export function createAppStore() {
   };
 }
 
-export function sidebar_toggled() {
-    return ui_state.sidebar_toggled
+export function sidebar_hidden() {
+    return ui_state.sidebar_hidden
 }
 
 export function toggleSidebar() {
-    ui_state.sidebar_toggled = !ui_state.sidebar_toggled
-    if(ui_state.sidebar_toggled) {
-        localStorage.setItem('sidebar_toggled', true)
+    ui_state.sidebar_hidden = !ui_state.sidebar_hidden
+    if(ui_state.sidebar_hidden) {
+        localStorage.setItem('sidebar_hidden', true)
     } else {
-        localStorage.removeItem('sidebar_toggled')
+        localStorage.removeItem('sidebar_hidden')
     }
   }
 

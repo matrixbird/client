@@ -56,6 +56,10 @@ let avatar = $derived.by(() => {
     return user?.avatar_url
 })
 
+let is_matrixbird = $derived.by(() => {
+    return get_localpart(user_id) == "matrixbird"
+})
+
 $effect(() => {
     if(avatar && !from) {
         getAvatar()
@@ -77,13 +81,14 @@ async function getAvatar() {
 <div class="grid place-items-center text-xs bg-bird-700 
     hover:bg-white hover:border-4 hover:border-bird-700
     rounded-[50%]"
-    class:text-[11px]={squeeze}
     class:w-7={!small}
     class:h-7={!small}
     class:w-4={small}
     class:h-4={small}>
-    <div class="font-semibold text-white uppercase">
-        {#if !avatar}
+    <div class="font-semibold text-white uppercase"
+    class:text-[11px]={squeeze}
+    class:tracking-wide={squeeze}>
+        {#if !avatar} 
             {initials} 
         {/if}
         {#if avatar && url}

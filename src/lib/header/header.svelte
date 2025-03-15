@@ -7,7 +7,7 @@ import Mailbox from './mailbox.svelte'
 
 import { ui_state } from '$lib/store/app.svelte.js'
 
-let sidebar_toggled = $derived(ui_state?.sidebar_toggled)
+let sidebar_hidden = $derived(ui_state?.sidebar_hidden)
 
 let { dragging, dragStart, dragEnd } = $props();
 
@@ -100,15 +100,15 @@ let mailbox_title = $derived.by(() => {
         class:rounded-t-2xl={!expanded}
 ondblclick={cycle}>
 
-    {#if !expanded && !sidebar_toggled}
+    {#if !expanded && sidebar_hidden}
         <Mailbox />
     {/if}
 
-    {#if expanded || sidebar_toggled}
+    {#if expanded || !sidebar_hidden}
         <div class="flex place-items-center silk cursor-pointer text-sm " 
             class:py-1={expanded}
             class:ml-2={expanded}
-            class:ml-3={!expanded && sidebar_toggled}>
+            class:ml-3={!expanded && !sidebar_hidden}>
             matrixbird
         </div>
     {/if}

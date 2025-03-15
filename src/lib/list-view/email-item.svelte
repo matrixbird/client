@@ -120,15 +120,16 @@ let first_line = $derived.by(() => {
 })
 
 
+let mailbox = $derived.by(() => {
+    return page.params.mailbox
+})
+
 function open(e) {
     if(e.ctrlKey) {
         //console.log(events.get(email.event_id))
         console.log($state.snapshot(email))
         return
     }
-    const mailbox = page.params.mailbox
-
-
     goto(`/mail/${mailbox}/${email.event_id}`)
 }
 
@@ -190,7 +191,7 @@ const has_attachments = $derived.by(() => {
 
 $effect(() => {
     if(active) {
-        route_state.mail = page.url.pathname
+        route_state[mailbox] = page.url.pathname
     }
 
     if(email && active && !read) {
@@ -240,7 +241,7 @@ async function markRead() {
     await sendReadReceipt(
         store.session.access_token, 
         email.room_id, 
-        event_to_read,
+        email.event_id,
         {
             thread_id: thread_id
         }

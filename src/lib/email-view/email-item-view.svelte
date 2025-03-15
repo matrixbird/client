@@ -4,6 +4,7 @@ import DOMPurify from "dompurify";
 import { mxid_to_email } from '$lib/utils/matrix.js'
 
 
+import UserAvatar from '$lib/user/avatar.svelte'
 import ReplyComposer from '$lib/editor/reply-composer.svelte'
 
 import { newAlert } from '$lib/store/app.svelte.js'
@@ -152,6 +153,9 @@ let is_large = $derived.by(() => {
             </div>
 
         {/if}
+
+            <UserAvatar user_id={email.sender} 
+                from={!native ? email?.content?.from : null}/>
 
         {#if native && user}
             <div class="text-sm">

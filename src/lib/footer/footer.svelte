@@ -17,7 +17,7 @@ let expanded = $derived(ui_state?.expanded)
 
 let app_status = $derived(app?.status)
 
-let sidebar_toggled = $derived(ui_state?.sidebar_toggled)
+let sidebar_hidden = $derived(ui_state?.sidebar_hidden)
 
 import { sync_state } from '$lib/store/matrix.svelte.js'
 
@@ -71,7 +71,7 @@ let text = $derived.by(() => {
 
 let opts = $derived.by(() => {
     return {
-        text: sidebar_toggled ? "Hide sidebar" : "Show sidebar",
+        text: sidebar_hidden ? "Show sidebar" : "Hide sidebar",
         placement: 'top-start',
         classes: 'p-4',
         offset: [10, 6]
@@ -95,10 +95,10 @@ let sync_opts = $derived.by(() => {
     {#if !expanded}
     <div class="flex place-items-center px-2 py-1 cursor-pointer"
         use:tooltip={opts} onclick={toggleSidebar}>
-        {#if sidebar_toggled}
-            {@html hide_sidebar}
-        {:else}
+        {#if sidebar_hidden}
             {@html show_sidebar}
+        {:else}
+            {@html hide_sidebar}
         {/if}
     </div>
     {/if}

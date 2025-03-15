@@ -12,9 +12,20 @@ let inbox_count = $derived.by(() => {
     return count?.inbox
 })
 
+import { 
+    route_state,
+} from '$lib/store/app.svelte.js'
+
+
 let { mailbox } = $props();
 
 function open() {
+    let route_exists = route_state[mailbox.path]
+    if(route_exists) {
+        goto(route_state[mailbox.path])
+        return
+    }
+
     goto(`/mail/${mailbox.path}`)
 }
 

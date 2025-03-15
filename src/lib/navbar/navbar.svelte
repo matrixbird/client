@@ -5,7 +5,7 @@ import ViewToggle from '$lib/components/view_toggle/view_toggle.svelte';
 
 import { ui_state } from '$lib/store/app.svelte.js'
 let expanded = $derived(ui_state?.expanded)
-let sidebar_toggled = $derived(ui_state?.sidebar_toggled)
+let sidebar_hidden = $derived(ui_state?.sidebar_hidden)
 
 </script>
 
@@ -20,7 +20,7 @@ let sidebar_toggled = $derived(ui_state?.sidebar_toggled)
 
     <div class="flex justify-end">
         <div class="flex justify-end ">
-            {#if !expanded && !sidebar_toggled}
+            {#if !expanded && sidebar_hidden}
                 <NewMessage />
             {/if}
         </div>

@@ -7,8 +7,16 @@ let {
     thread_event
 } = $props();
 
+import { 
+    route_state,
+} from '$lib/store/app.svelte.js'
+
+let mailbox = $derived.by(() => {
+    return page.params.mailbox
+})
+
 function killEmailItemView() {
-    let mailbox = page.params.mailbox
+    route_state[mailbox] = null
     goto(`/mail/${mailbox}`)
 }
 
