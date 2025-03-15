@@ -1,5 +1,5 @@
 import * as EmailValidator from 'email-validator';
-function validateLocalhostEmail(email) {
+function validateLocalhostEmail(email: string) {
   if (!email || typeof email !== 'string') {
     return false;
   }
@@ -10,7 +10,7 @@ function validateLocalhostEmail(email) {
   return localhostEmailRegex.test(email);
 }
 
-export function validate(email) {
+export function validate(email: string) {
   let email_valid = EmailValidator.validate(email);
   if (!email_valid) {
     email_valid = validateLocalhostEmail(email);
@@ -18,14 +18,14 @@ export function validate(email) {
   return email_valid;
 }
 
-function localhost_replace(original, pos = 0) {
+function localhost_replace(original: string, pos: number = 0) {
   const regex = /^(.+:)(\d)(\d)(\d+)$/;
-  return original.replace(regex, (match, domain, first, second, rest) => {
+  return original.replace(regex, (_match, domain, first, _second, rest) => {
     return `${domain}${first}${pos}${rest}`;
   });
 }
 
-export function get_email_domain(email) {
+export function get_email_domain(email: string) {
   if (!email || typeof email !== 'string' || !email.includes('@')) {
     return null;
   }

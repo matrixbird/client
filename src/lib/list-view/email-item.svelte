@@ -6,7 +6,7 @@ import { page } from '$app/state';
 import { 
     mxid_to_email,
     get_localpart
-} from '$lib/utils/matrix.js'
+} from '$lib/utils/matrix'
 
 import { 
     downloadContent,
@@ -15,7 +15,7 @@ import {
 
 import { 
     get_first_line
-} from '$lib/utils/string.js'
+} from '$lib/utils/string'
 
 import EmailDate from '$lib/components/date/date.svelte'
 import AttchmentItems from './attachments/attachment-items.svelte'

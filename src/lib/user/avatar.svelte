@@ -4,11 +4,11 @@ import {
     mxid_to_email,
     get_localpart,
     get_email_localpart
-} from '$lib/utils/matrix.js'
+} from '$lib/utils/matrix'
 
 import { 
     create_initials
-} from '$lib/utils/string.js'
+} from '$lib/utils/string'
 
 import {
     getThumbnail,

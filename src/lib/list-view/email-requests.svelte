@@ -1,6 +1,6 @@
 <script>
 import { SvelteMap } from 'svelte/reactivity';
-import { createMatrixStore, status, inbox_mail } from '$lib/store/matrix.svelte.js'
+import { createMatrixStore, status } from '$lib/store/matrix.svelte.js'
 import EmailRequestItem from './email-request-item.svelte'
 
 

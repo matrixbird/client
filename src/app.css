@@ -370,7 +370,36 @@ input::placeholder {
 }
 
 .ProseMirror {
+    font-size: 15px;
 }
+
+.ProseMirror p {
+    margin-bottom: 0.5rem;
+}
+
+.ProseMirror p:last-child {
+    margin-bottom: 1rem;
+}
+
+.ProseMirror pre {
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    border: 1px solid var(--border);
+}
+
+.ProseMirror pre code {
+    border-radius: none;
+    padding: none;
+    border: none;
+}
+
+.ProseMirror code {
+    padding: 0.25rem;
+    padding: 0 0.125rem;
+    border: 1px solid var(--border);
+}
+
 .ProseMirror-focused {
     outline: none;
 }

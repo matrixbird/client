@@ -6,7 +6,7 @@ import { goto } from '$app/navigation';
 import { browser } from '$app/environment';
 import { page } from '$app/state';
 import { draggable } from '@neodrag/svelte';
-import { mxid_to_email } from '$lib/utils/matrix.js'
+import { mxid_to_email } from '$lib/utils/matrix'
 
 import logo from '$lib/logo/logo.js'
 

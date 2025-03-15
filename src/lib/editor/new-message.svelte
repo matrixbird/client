@@ -1,6 +1,6 @@
 <script>
 import { plus } from '$lib/assets/icons.js'
-import { createEditorStore } from '$lib/store/editor.svelte.js'
+import { createEditorStore } from '$lib/store/editor.svelte'
 const store = createEditorStore()
 
 import { ui_state } from '$lib/store/app.svelte.js'

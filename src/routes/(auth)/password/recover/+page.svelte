@@ -9,7 +9,7 @@ import {
 
 import { 
     debounce
-} from '$lib/utils/utils.js';
+} from '$lib/utils/utils';
 
 
 onMount(() => {

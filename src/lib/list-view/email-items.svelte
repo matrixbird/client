@@ -1,6 +1,6 @@
 <script>
 import { SvelteMap } from 'svelte/reactivity';
-import { createMatrixStore, status, inbox_mail } from '$lib/store/matrix.svelte.js'
+import { createMatrixStore, status } from '$lib/store/matrix.svelte.js'
 import EmailItem from './email-item.svelte'
 import { goto } from '$app/navigation';
 import { page } from '$app/state';
@@ -32,6 +32,9 @@ let is_drafts = $derived.by(() => {
 })
 
 $effect(() => {
+    if(store?.inbox_items) {
+        console.log("inbox items", store.inbox_items)
+    }
     if(inbox_emails) {
         count.inbox = inbox_emails.length
     }
@@ -101,6 +104,7 @@ function buildInboxEmails(_threads) {
 let inbox_emails = $derived.by(() => {
     if(is_inbox && status.threads_ready && status.thread_events_ready) {
         return buildInboxEmails(threads)
+        //return store.inbox_items
     }
 })
 

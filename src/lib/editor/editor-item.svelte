@@ -8,14 +8,14 @@ import Recipient from './recipient.svelte'
 import {
     email_to_mxid,
     mxid_to_email
-} from '$lib/utils/matrix.js'
+} from '$lib/utils/matrix'
 
 import { tooltip } from '$lib/components/tooltip/tooltip'
 
 import {
     validate,
     get_email_domain
-} from '$lib/utils/email.js'
+} from '$lib/utils/email'
 
 import { 
     expand, 
@@ -30,7 +30,7 @@ import { newAlert, updateAppStatus } from '$lib/store/app.svelte.js'
 import { createMatrixStore, mailbox_rooms } from '$lib/store/matrix.svelte.js'
 const store = createMatrixStore()
 
-import { createEditorStore } from '$lib/store/editor.svelte.js'
+import { createEditorStore } from '$lib/store/editor.svelte'
 const editorStore = createEditorStore()
 
 let { editor, index } = $props();

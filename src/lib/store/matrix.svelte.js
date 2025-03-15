@@ -1,12 +1,16 @@
+import { PUBLIC_HOMESERVER } from '$env/static/public';
 import * as sdk from 'matrix-js-sdk';
 import { SvelteMap } from 'svelte/reactivity';
 import { browser } from '$app/environment';
+import { untrack } from 'svelte';
 
 import { updateAppStatus } from '$lib/store/app.svelte.js';
 
 import { 
-  PUBLIC_HOMESERVER,
-} from '$env/static/public';
+  buildInboxEmails,
+  buildSentEmails
+} from '$lib/matrix/process'
+
 import { v4 as uuidv4 } from 'uuid';
 import {
   goto,
@@ -25,7 +29,7 @@ import {
 
 import {
   is_local_room
-} from '$lib/utils/matrix.js'
+} from '$lib/utils/matrix'
 
 let ready = $state(false);
 let synced = $state(false);
@@ -44,9 +48,6 @@ let members = $state(new SvelteMap());
 
 let threads = $state(new SvelteMap());
 let thread_events = $state(new SvelteMap());
-
-export let inbox_mail = $state(new SvelteMap());
-export let sent_mail = $state(new SvelteMap());
 
 export let email_requests = $state([]);
 
@@ -78,6 +79,20 @@ export let sync_state = $state({
 
 let requests = $derived.by(() =>{
   return email_requests;
+})
+
+let inbox_items = $derived.by(() =>{
+  if(!status.threads_ready || !status.thread_events_ready) {
+    return []
+  }
+  return buildInboxEmails(session, threads, thread_events);
+})
+
+let sent_items = $derived.by(() =>{
+  if(!status.threads_ready || !status.thread_events_ready) {
+    return []
+  }
+  return buildSentEmails(session, threads, thread_events);
 })
 
 export let mailbox_rooms = $state({});
@@ -687,6 +702,7 @@ export function createMatrixStore() {
       });
 
       await buildThreadEvents(roomEventsMap);
+      console.log("thread events are", thread_events)
 
       status.threads_ready = true;
       status.thread_events_ready = true;
@@ -1015,6 +1031,10 @@ export function createMatrixStore() {
 
     get requests() {
       return requests;
+    },
+
+    get inbox_items() {
+      return inbox_items;
     },
 
     updateSession,

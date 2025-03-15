@@ -1,7 +1,7 @@
 <script>
 import { page } from '$app/state';
 import EditorItem from './editor-item.svelte';
-import { createEditorStore } from '$lib/store/editor.svelte.js'
+import { createEditorStore } from '$lib/store/editor.svelte'
 const store = createEditorStore()
 
 let editors = $derived.by(() => {

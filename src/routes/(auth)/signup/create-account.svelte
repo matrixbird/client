@@ -28,7 +28,7 @@ import { userState } from '$lib/store/app.svelte.js'
 
 import { 
     debounce
-} from '$lib/utils/utils.js';
+} from '$lib/utils/utils';
 
 let { 
     data, 

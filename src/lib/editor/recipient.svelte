@@ -7,7 +7,7 @@ import UserAvatar from '$lib/user/avatar.svelte'
 
 import {
     get_email_domain
-} from '$lib/utils/matrix.js'
+} from '$lib/utils/matrix'
 
 import { createMatrixStore } from '$lib/store/matrix.svelte';
 

@@ -3,7 +3,7 @@ import Logout from '$lib/auth/logout.svelte'
 import { 
     mxid_to_email,
     get_localpart
-} from '$lib/utils/matrix.js'
+} from '$lib/utils/matrix'
 let { kill } = $props();
 import { createMatrixStore } from '$lib/store/matrix.svelte.js'
 const matrix = createMatrixStore()

@@ -9,12 +9,12 @@ import Composer from './composer.svelte'
 import {
     email_to_mxid,
     mxid_to_email
-} from '$lib/utils/matrix.js'
+} from '$lib/utils/matrix'
 
 import {
     validate,
     get_email_domain
-} from '$lib/utils/email.js'
+} from '$lib/utils/email'
 
 import { 
     close,
@@ -26,13 +26,13 @@ import { newAlert, updateAppStatus } from '$lib/store/app.svelte.js'
 import { createMatrixStore } from '$lib/store/matrix.svelte.js'
 const store = createMatrixStore()
 
-import { createEditorStore } from '$lib/store/editor.svelte.js'
+import { createEditorStore } from '$lib/store/editor.svelte'
 const editorStore = createEditorStore()
 
 import { ui_state } from '$lib/store/app.svelte.js'
 let expanded = $derived(ui_state?.expanded)
 
-import { reply_editors } from '$lib/store/editor.svelte.js'
+import { reply_editors } from '$lib/store/editor.svelte'
 
 let { 
     email,

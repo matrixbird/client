@@ -4,7 +4,7 @@ import DOMPurify from "dompurify";
 import { 
     get_localpart,
     mxid_to_email
-} from '$lib/utils/matrix.js'
+} from '$lib/utils/matrix'
 
 import UserAvatar from '$lib/user/avatar.svelte'
 import ReplyComposer from '$lib/editor/reply-composer.svelte'
@@ -14,7 +14,7 @@ import { newAlert } from '$lib/store/app.svelte.js'
 import { createMatrixStore, large_email_content } from '$lib/store/matrix.svelte.js'
 const store = createMatrixStore()
 
-import { reply_editors } from '$lib/store/editor.svelte.js'
+import { reply_editors } from '$lib/store/editor.svelte'
 
 let { email, last } = $props();
 

@@ -2,6 +2,7 @@
 import { onMount, onDestroy } from 'svelte';
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
+import Image from '@tiptap/extension-image'
 
 import { ui_state } from '$lib/store/app.svelte.js'
 
@@ -30,8 +31,9 @@ let caret = $derived.by(() => {
 onMount(() => {
     editor = new Editor({
         element: element,
-        extensions: [StarterKit],
+        extensions: [StarterKit, Image],
         content: content ? content : '',
+        //autofocus: true,
         onTransaction: ({ editor }) => {
             editor = editor;
             let data = {

@@ -7,7 +7,7 @@ import { page } from '$app/state';
 
 import { close } from '$lib/assets/icons.js'
 
-import { createMatrixStore, status, inbox_mail } from '$lib/store/matrix.svelte.js'
+import { createMatrixStore, status } from '$lib/store/matrix.svelte.js'
 const store = createMatrixStore()
 
 const events = $derived(store?.events)
