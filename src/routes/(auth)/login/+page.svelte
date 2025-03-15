@@ -11,7 +11,7 @@ import {
     login as appservice_login,
 } from '$lib/appservice/api.js';
 
-import { createMatrixStore } from '$lib/store/matrix.svelte.js'
+import { createMatrixStore } from '$lib/store/matrix.svelte'
 const store = createMatrixStore()
 
 onMount(() => {

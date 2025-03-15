@@ -35,7 +35,7 @@ import {
     createMatrixStore, 
     large_email_content ,
     sync_state
-} from '$lib/store/matrix.svelte.js'
+} from '$lib/store/matrix.svelte'
 
 import { app } from '$lib/store/app.svelte'
 

@@ -1,5 +1,5 @@
 <script>
-import { createMatrixStore } from '$lib/store/matrix.svelte.js'
+import { createMatrixStore } from '$lib/store/matrix.svelte'
 
 import Popup from '$lib/components/popup/popup.svelte'
 import Menu from './menu.svelte'

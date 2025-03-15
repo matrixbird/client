@@ -11,7 +11,7 @@ import ReplyComposer from '$lib/editor/reply-composer.svelte'
 
 import { newAlert } from '$lib/store/app.svelte'
 
-import { createMatrixStore, large_email_content } from '$lib/store/matrix.svelte.js'
+import { createMatrixStore, large_email_content } from '$lib/store/matrix.svelte'
 const store = createMatrixStore()
 
 import { reply_editors } from '$lib/store/editor.svelte'

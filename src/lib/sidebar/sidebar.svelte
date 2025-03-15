@@ -3,7 +3,7 @@ import MailboxList from './mailbox-list.svelte'
 import NewMessage from '$lib/editor/new-message.svelte'
 import EmailRequests from './email-requests.svelte';
 
-import { createMatrixStore } from '$lib/store/matrix.svelte.js'
+import { createMatrixStore } from '$lib/store/matrix.svelte'
 const store = createMatrixStore()
 
 let requests = $derived(store.requests)

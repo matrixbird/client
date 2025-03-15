@@ -23,7 +23,7 @@ import {
 
 import { newAlert, updateAppStatus } from '$lib/store/app.svelte'
 
-import { createMatrixStore } from '$lib/store/matrix.svelte.js'
+import { createMatrixStore } from '$lib/store/matrix.svelte'
 const store = createMatrixStore()
 
 import { createEditorStore } from '$lib/store/editor.svelte'

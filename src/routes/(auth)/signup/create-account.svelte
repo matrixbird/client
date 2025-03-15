@@ -21,7 +21,7 @@ import {
 
 import { page } from '$app/state';
 
-import { createMatrixStore } from '$lib/store/matrix.svelte.js'
+import { createMatrixStore } from '$lib/store/matrix.svelte'
 const store = createMatrixStore()
 
 import { userState } from '$lib/store/app.svelte'

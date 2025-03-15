@@ -8,7 +8,7 @@ import { route_state } from '$lib/store/app.svelte'
 
 let {expanded} = $props();
 
-import { createMatrixStore } from '$lib/store/matrix.svelte.js'
+import { createMatrixStore } from '$lib/store/matrix.svelte'
 const store = createMatrixStore()
 
 let requests = $derived(store.requests)

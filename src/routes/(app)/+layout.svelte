@@ -25,7 +25,7 @@ import { userState, ui_state } from '$lib/store/app.svelte'
 import { createAppStore, dev_mode } from '$lib/store/app.svelte'
 const store = createAppStore()
 
-import { createMatrixStore } from '$lib/store/matrix.svelte.js'
+import { createMatrixStore } from '$lib/store/matrix.svelte'
 const matrixStore = createMatrixStore()
 
 const session = $derived(matrixStore?.session)

@@ -2,7 +2,7 @@
 import { page } from '$app/state';
 import { goto } from '$app/navigation';
 
-import { createMatrixStore } from '$lib/store/matrix.svelte.js'
+import { createMatrixStore } from '$lib/store/matrix.svelte'
 import { count } from '$lib/store/app.svelte'
 
 const store = createMatrixStore()

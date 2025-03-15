@@ -27,7 +27,7 @@ import {
 
 import { newAlert, updateAppStatus } from '$lib/store/app.svelte'
 
-import { createMatrixStore, mailbox_rooms } from '$lib/store/matrix.svelte.js'
+import { createMatrixStore, mailbox_rooms } from '$lib/store/matrix.svelte'
 const store = createMatrixStore()
 
 import { createEditorStore } from '$lib/store/editor.svelte'

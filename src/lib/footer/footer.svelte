@@ -19,7 +19,7 @@ let app_status = $derived(app?.status)
 
 let sidebar_hidden = $derived(ui_state?.sidebar_hidden)
 
-import { sync_state } from '$lib/store/matrix.svelte.js'
+import { sync_state } from '$lib/store/matrix.svelte'
 
 let connected = $derived.by(() => {
     return sync_state.state == "PREPARED" || sync_state.state == "SYNCING"

@@ -5,7 +5,7 @@ import Profile from '$lib/profile/profile.svelte'
 
 import { ui_state } from '$lib/store/app.svelte'
 
-import { createMatrixStore } from '$lib/store/matrix.svelte.js'
+import { createMatrixStore } from '$lib/store/matrix.svelte'
 const store = createMatrixStore()
 
 let requests = $derived(store.requests)

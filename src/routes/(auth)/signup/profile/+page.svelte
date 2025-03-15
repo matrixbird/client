@@ -8,7 +8,7 @@ import {
     goto,
 } from '$app/navigation';
 
-import { createMatrixStore } from '$lib/store/matrix.svelte.js'
+import { createMatrixStore } from '$lib/store/matrix.svelte'
 const store = createMatrixStore()
 
 

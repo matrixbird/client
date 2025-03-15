@@ -5,7 +5,7 @@ import {
     get_localpart
 } from '$lib/utils/matrix'
 let { kill } = $props();
-import { createMatrixStore } from '$lib/store/matrix.svelte.js'
+import { createMatrixStore } from '$lib/store/matrix.svelte'
 const matrix = createMatrixStore()
 
 let user = $derived(matrix?.user)

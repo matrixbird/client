@@ -1,6 +1,6 @@
 <script>
 import { SvelteMap } from 'svelte/reactivity';
-import { createMatrixStore, status } from '$lib/store/matrix.svelte.js'
+import { createMatrixStore, status } from '$lib/store/matrix.svelte'
 import EmailItem from './email-item.svelte'
 import { goto } from '$app/navigation';
 import { page } from '$app/state';
