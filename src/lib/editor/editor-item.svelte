@@ -25,7 +25,7 @@ import {
     close 
 } from '$lib/assets/icons.js'
 
-import { newAlert, updateAppStatus } from '$lib/store/app.svelte.js'
+import { newAlert, updateAppStatus } from '$lib/store/app.svelte'
 
 import { createMatrixStore, mailbox_rooms } from '$lib/store/matrix.svelte.js'
 const store = createMatrixStore()

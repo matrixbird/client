@@ -4,7 +4,7 @@ import { page } from '$app/state';
 import Footer from '$lib/footer/footer.svelte'
 import Sidebar from '$lib/sidebar/sidebar.svelte'
 
-import { ui_state } from '$lib/store/app.svelte.js'
+import { ui_state } from '$lib/store/app.svelte'
 
 let expanded = $derived(ui_state?.expanded)
 let sidebar_hidden = $derived(ui_state?.sidebar_hidden)

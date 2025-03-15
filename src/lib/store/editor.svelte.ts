@@ -1,11 +1,22 @@
 import { SvelteMap } from 'svelte/reactivity';
 import { v4 as uuidv4 } from 'uuid';
 
-export let editor = $state({
-  editors: [],
+interface Editor {
+    id: string,
+    state: any
+}
+
+interface Editors {
+    editors: Editor[]
+}
+
+export let editor: Editors = $state({
+    editors: []
 });
 
-let maximized = $state(null);
+type Maximized = string | null;
+
+let maximized: Maximized = $state(null);
 
 export let reply_editors = $state(new SvelteMap());
 
@@ -18,14 +29,14 @@ export function createEditorStore() {
       return
     }
 
-    let id = uuidv4();
+    let id: string = uuidv4();
     editor.editors.unshift({
       id: id,
       state: null
     });
   }
 
-  function killEditor(id){
+  function killEditor(id: string){
     let index = editor.editors.findIndex((i) => i.id === id);
     editor.editors.splice(index, 1)
     if(editor.editors.length == 0) {
@@ -33,7 +44,7 @@ export function createEditorStore() {
     }
   }
 
-  function maximizeEditor(id){
+  function maximizeEditor(id: string){
     maximized = id;
   }
 

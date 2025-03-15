@@ -5,7 +5,7 @@ import { get } from 'svelte/store';
 
 import { 
     email_context_menu
-} from '$lib/store/app.svelte.js'
+} from '$lib/store/app.svelte'
 
 let menuEl = $state(null);
 let open = $state(false);

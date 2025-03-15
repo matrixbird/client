@@ -8,7 +8,7 @@ import {
 } from '$lib/assets/icons'
 
 
-import { ui_state } from '$lib/store/app.svelte.js'
+import { ui_state } from '$lib/store/app.svelte'
 let expanded = $derived(ui_state?.expanded)
 
 function open() {

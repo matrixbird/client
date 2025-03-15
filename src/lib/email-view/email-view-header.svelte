@@ -9,7 +9,7 @@ let {
 
 import { 
     route_state,
-} from '$lib/store/app.svelte.js'
+} from '$lib/store/app.svelte'
 
 let mailbox = $derived.by(() => {
     return page.params.mailbox

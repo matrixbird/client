@@ -11,7 +11,7 @@ import {
     hide_sidebar
 } from '$lib/assets/icons.js'
 
-import { app, ui_state, toggleSidebar } from '$lib/store/app.svelte.js'
+import { app, ui_state, toggleSidebar } from '$lib/store/app.svelte'
 
 let expanded = $derived(ui_state?.expanded)
 

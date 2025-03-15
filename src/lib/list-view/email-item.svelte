@@ -29,7 +29,7 @@ import {
 import { 
     route_state,
     email_context_menu
-} from '$lib/store/app.svelte.js'
+} from '$lib/store/app.svelte'
 
 import { 
     createMatrixStore, 
@@ -37,7 +37,7 @@ import {
     sync_state
 } from '$lib/store/matrix.svelte.js'
 
-import { app } from '$lib/store/app.svelte.js'
+import { app } from '$lib/store/app.svelte'
 
 const store = createMatrixStore()
 const events = $derived(store?.events)

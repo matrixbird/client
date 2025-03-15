@@ -3,7 +3,7 @@ import { page } from '$app/state';
 import { goto } from '$app/navigation';
 
 import { createMatrixStore } from '$lib/store/matrix.svelte.js'
-import { count } from '$lib/store/app.svelte.js'
+import { count } from '$lib/store/app.svelte'
 
 const store = createMatrixStore()
 const events = $derived(store?.events)
@@ -14,7 +14,7 @@ let inbox_count = $derived.by(() => {
 
 import { 
     route_state,
-} from '$lib/store/app.svelte.js'
+} from '$lib/store/app.svelte'
 
 
 let { mailbox } = $props();

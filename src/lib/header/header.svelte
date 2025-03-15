@@ -5,7 +5,7 @@ import { tooltip } from '$lib/components/tooltip/tooltip'
 
 import Mailbox from './mailbox.svelte'
 
-import { ui_state } from '$lib/store/app.svelte.js'
+import { ui_state, toggleExpand } from '$lib/store/app.svelte'
 
 let sidebar_hidden = $derived(ui_state?.sidebar_hidden)
 
@@ -13,50 +13,12 @@ let { dragging, dragStart, dragEnd } = $props();
 
 let expanded = $derived(ui_state?.expanded)
 
-function cycle() {
-    if(expanded) {
-        ui_state.expanded = false
-        localStorage.removeItem('expanded')
-        return
-    }
-
-    if(!expanded) {
-        ui_state.expanded = true
-        localStorage.setItem('expanded', 'true')
-        return
-    }
-
-}
-
-function minimize(e) {
-    e.stopPropagation()
-    ui_state.expanded = false
-    localStorage.removeItem('expanded')
-}
-
-function maximize(e) {
-    e.stopPropagation()
-    ui_state.expanded = true
-    localStorage.setItem('expanded', 'true')
-}
-
-
 let placement = $derived.by(() => {
     return expanded ? "bottom" : "top-end"
 })
 
 let offset = $derived.by(() => {
     return expanded ? [10, -34] : [20, 4]
-})
-
-let opts_min = $derived.by(() => {
-    return {
-        disabled: !expanded,
-        text: "Minimize",
-        placement: placement,
-        classes: 'silk',
-        offset: offset,
-    }
 })
 
 let opts = $derived.by(() => {
@@ -98,7 +60,7 @@ let mailbox_title = $derived.by(() => {
 
 <div class="flex bg-bird-900 pr-2 text-white font-medium h-8"
         class:rounded-t-2xl={!expanded}
-ondblclick={cycle}>
+ondblclick={toggleExpand}>
 
     {#if !expanded && sidebar_hidden}
         <Mailbox />
@@ -122,7 +84,7 @@ ondblclick={cycle}>
     </div>
 
     <div class="flex place-items-center mr-1 cursor-pointer"
-    onclick={cycle}
+    onclick={toggleExpand}
     use:tooltip={opts}>
         {#if expanded}
             {@html collapse}

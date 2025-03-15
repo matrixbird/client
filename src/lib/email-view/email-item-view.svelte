@@ -9,7 +9,7 @@ import {
 import UserAvatar from '$lib/user/avatar.svelte'
 import ReplyComposer from '$lib/editor/reply-composer.svelte'
 
-import { newAlert } from '$lib/store/app.svelte.js'
+import { newAlert } from '$lib/store/app.svelte'
 
 import { createMatrixStore, large_email_content } from '$lib/store/matrix.svelte.js'
 const store = createMatrixStore()

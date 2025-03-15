@@ -21,7 +21,7 @@ import {
     emoji
 } from '$lib/assets/icons.js'
 
-import { newAlert, updateAppStatus } from '$lib/store/app.svelte.js'
+import { newAlert, updateAppStatus } from '$lib/store/app.svelte'
 
 import { createMatrixStore } from '$lib/store/matrix.svelte.js'
 const store = createMatrixStore()
@@ -29,7 +29,7 @@ const store = createMatrixStore()
 import { createEditorStore } from '$lib/store/editor.svelte'
 const editorStore = createEditorStore()
 
-import { ui_state } from '$lib/store/app.svelte.js'
+import { ui_state } from '$lib/store/app.svelte'
 let expanded = $derived(ui_state?.expanded)
 
 import { reply_editors } from '$lib/store/editor.svelte'

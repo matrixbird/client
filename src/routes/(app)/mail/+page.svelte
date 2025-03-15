@@ -1,5 +1,5 @@
 <script>
-import { createAppStore } from '$lib/store/app.svelte.js'
+import { createAppStore } from '$lib/store/app.svelte'
 const store = createAppStore()
 const events = $derived(store?.events)
 

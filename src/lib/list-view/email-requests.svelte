@@ -7,7 +7,7 @@ import EmailRequestItem from './email-request-item.svelte'
 import { goto } from '$app/navigation';
 import { page } from '$app/state';
 
-import { count } from '$lib/store/app.svelte.js'
+import { count } from '$lib/store/app.svelte'
 
 
 const store = createMatrixStore()

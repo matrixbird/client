@@ -4,7 +4,7 @@ import { SvelteMap } from 'svelte/reactivity';
 import { browser } from '$app/environment';
 import { untrack } from 'svelte';
 
-import { updateAppStatus } from '$lib/store/app.svelte.js';
+import { updateAppStatus, ui_state } from '$lib/store/app.svelte';
 
 import { 
   buildInboxEmails,
@@ -987,6 +987,7 @@ export function createMatrixStore() {
   }
 
 
+
   return {
 
     get synced() {
@@ -1043,5 +1044,11 @@ export function createMatrixStore() {
     doesRoomExist,
     createEmailRoom,
     getDraftsRoom,
+    updateClientSettings
   };
+}
+
+export async function updateClientSettings(settings_type, data) {
+  await client.setAccountData(`matrixbird.client.settings.${settings_type}`, data)
+  console.log("Client settings updated in account data.", data)
 }

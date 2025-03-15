@@ -3,7 +3,7 @@ import { page } from '$app/state';
 import { goto } from '$app/navigation';
 import Profile from '$lib/profile/profile.svelte'
 
-import { ui_state } from '$lib/store/app.svelte.js'
+import { ui_state } from '$lib/store/app.svelte'
 
 import { createMatrixStore } from '$lib/store/matrix.svelte.js'
 const store = createMatrixStore()

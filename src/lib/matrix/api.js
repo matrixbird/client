@@ -105,8 +105,8 @@ export const syncOnce = async (token) => {
 
   let filter = {
     account_data: {
-      types: ["matrixbird.mailbox.rooms"],
-      limit: 1,
+      types: ["matrixbird.mailbox.rooms", "matrixbird.client.settings.ui"],
+      limit: 2,
     },
     room: {
       ephemeral: {

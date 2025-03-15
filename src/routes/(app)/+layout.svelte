@@ -10,6 +10,7 @@ import { mxid_to_email } from '$lib/utils/matrix'
 
 import logo from '$lib/logo/logo.js'
 
+import Matrix from '$lib/matrix/matrix.svelte'
 import Listeners from '$lib/app/listeners.svelte'
 import Header from '$lib/header/header.svelte'
 import Switcher from '$lib/switcher/switcher.svelte'
@@ -19,8 +20,9 @@ import ThemeToggle from '$lib/theme/toggle.svelte'
 import Navbar from '$lib/navbar/navbar.svelte';
 import Alert from '$lib/components/alert/alert.svelte'
 
-import { userState, ui_state } from '$lib/store/app.svelte.js'
-import { createAppStore, dev_mode } from '$lib/store/app.svelte.js'
+import { updateSession } from '$lib/store/session.svelte'
+import { userState, ui_state } from '$lib/store/app.svelte'
+import { createAppStore, dev_mode } from '$lib/store/app.svelte'
 const store = createAppStore()
 
 import { createMatrixStore } from '$lib/store/matrix.svelte.js'
@@ -42,6 +44,7 @@ $effect(() => {
 
 onMount(() => {
     if(data?.access_token && data?.device_id && data?.user_id) {
+        updateSession(data)
         matrixStore.createMatrixClient(data)
     }
 
@@ -224,7 +227,7 @@ let dragopts = $derived.by(() => {
         onDragEnd: ({ offsetX, offsetY, rootNode, currentNode, event }) => {
             dragging = false
             setTimeout(() => {
-                ui_state.drag_offset = [offsetX, offsetY]
+                //ui_state.drag_offset = [offsetX, offsetY]
                 if(offsetX != 0 && offsetY != 0) {
                     localStorage.setItem('window_position', JSON.stringify([offsetX, offsetY]))
                 }
@@ -308,6 +311,8 @@ function resize(e) {
 <svelte:head>
     <title>{title} - {email}</title>
 </svelte:head>
+
+<Matrix />
 
 {#if !ready}
     <div class="loading grid h-screen w-screen overflow-hidden">

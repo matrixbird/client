@@ -1,12 +1,16 @@
 import { browser } from '$app/environment';
 
-import { 
-  PUBLIC_HOMESERVER,
-} from '$env/static/public';
+import { session } from '$lib/store/session.svelte'
 
-let session = $state(null);
+import { updateClientSettings } from './matrix.svelte'
 
-export const app = $state({
+interface App {
+    started_at: number,
+    ready: boolean,
+    status: string | null,
+}
+
+export const app: App = $state({
     started_at: new Date().valueOf(),
     ready: false,
     status: null,
@@ -20,10 +24,14 @@ export const userState = $state({
     new_user: false
 });
 
-export const ui_state = $state({
+interface UIState {
+    expanded: boolean,
+    sidebar_hidden: boolean,
+}
+
+export const ui_state: UIState = $state({
     expanded: false,
     sidebar_hidden: false,
-    drag_offset: null,
 });
 
 export const route_state = $state({});
@@ -38,13 +46,20 @@ export const count = $state({
     inbox: null
 });
 
-export const alert = $state({
-    active: false,
+
+interface Alert {
+    title: string | null,
+    message: string | null,
+    active: boolean,
+}
+
+export const alert: Alert = $state({
     title: null,
     message: null,
+    active: false,
 });
 
-export function newAlert(data) {
+export function newAlert(data: Alert) {
     alert.title = data.title
     alert.message = data.message
     alert.active = true
@@ -57,7 +72,7 @@ export function killAlert() {
 }
 
 
-function getFromLS(item) {
+function getFromLS(item: string) {
     if(localStorage.getItem(item)) {
         return true
     }
@@ -65,15 +80,16 @@ function getFromLS(item) {
 }
 
 if(browser) {
-    let items = ['expanded', 'sidebar_hidden']
+    let items: Array<keyof UIState> = ['expanded', 'sidebar_hidden'];
     items.forEach(item => {
         if(getFromLS(item)) {
             ui_state[item] = true
         }
     })
+
 }
 
-export function updateAppStatus(status) {
+export function updateAppStatus(status: string) {
   app.status = status;
 }
 
@@ -100,12 +116,28 @@ export function sidebar_hidden() {
     return ui_state.sidebar_hidden
 }
 
-export function toggleSidebar() {
+export async function toggleExpand() {
+    ui_state.expanded = !ui_state.expanded
+    if(!ui_state.expanded) {
+        localStorage.removeItem('expanded')
+    } else {
+        localStorage.setItem('expanded', 'true')
+    }
+    if(session) {
+        await updateClientSettings('ui', ui_state)
+    }
+}
+
+
+export async function toggleSidebar() {
     ui_state.sidebar_hidden = !ui_state.sidebar_hidden
     if(ui_state.sidebar_hidden) {
-        localStorage.setItem('sidebar_hidden', true)
+        localStorage.setItem('sidebar_hidden', "true")
     } else {
         localStorage.removeItem('sidebar_hidden')
     }
-  }
+    if(session) {
+        await updateClientSettings('ui', ui_state)
+    }
+}
 

@@ -43,12 +43,15 @@
 		"@tiptap/extension-image": "^2.11.5",
 		"@tiptap/pm": "^2.11.5",
 		"@tiptap/starter-kit": "^2.11.5",
+		"@types/uuid": "^10.0.0",
 		"check-password-strength": "^3.0.0",
 		"dayjs": "^1.11.13",
 		"dompurify": "^3.2.4",
 		"email-validator": "^2.0.4",
 		"emoji-picker-element": "^1.26.1",
+		"install": "^0.13.0",
 		"matrix-js-sdk": "^36.2.0",
+		"npm": "^11.2.0",
 		"uuid": "^11.0.5"
 	}
 }

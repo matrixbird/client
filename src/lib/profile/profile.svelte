@@ -10,7 +10,7 @@ import {
     getThumbnail,
 } from '$lib/matrix/api.js'
 
-import { ui_state } from '$lib/store/app.svelte.js'
+import { ui_state } from '$lib/store/app.svelte'
 let expanded = $derived(ui_state?.expanded)
 
 let user = $derived.by(() => {
