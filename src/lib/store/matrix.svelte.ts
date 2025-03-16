@@ -20,9 +20,9 @@ import {
   getEvent,
   getStateEvent,
   getAccountData,
-  get_thread_root_event,
-  get_threads,
-  get_thread_events,
+  getThreadRootEvent,
+  getThreads,
+  getThreadEvents,
   syncOnce,
   getRoomState,
 } from '$lib/matrix/api.js'
@@ -594,7 +594,7 @@ export function createMatrixStore() {
 
 
     async function buildThreadForJoinedRoom(roomId) {
-      let thread = await get_threads(session.access_token, roomId);
+      let thread = await getThreads(session.access_token, roomId);
       console.log("found threads", thread)
 
       if(thread.chunk.length > 0) {
@@ -621,7 +621,7 @@ export function createMatrixStore() {
       }
 
       const threadPromises = eventPairs.map(([roomId, eventId]) => 
-        get_thread_events(session.access_token, roomId, eventId));
+        getThreadEvents(session.access_token, roomId, eventId));
       const allEvents = await Promise.allSettled(threadPromises);
 
       const updates = new Map();
@@ -679,7 +679,7 @@ export function createMatrixStore() {
       })
       */
 
-      const threadPromises = rooms.map(room => get_threads(session.access_token, room));
+      const threadPromises = rooms.map(room => getThreads(session.access_token, room));
       const allThreads = await Promise.allSettled(threadPromises);
 
       const roomEventsMap = {};
@@ -789,12 +789,12 @@ export function createMatrixStore() {
 
 
   async function get_new_thread(room_id, thread_id) {
-    let thread = await get_thread_root_event(session.access_token, room_id, thread_id);
+    let thread = await getThreadRootEvent(session.access_token, room_id, thread_id);
     console.log("found thread root event", thread)
     events.set(thread_id, thread);
     threads.set(thread_id, thread);
 
-    let thread_children = await get_thread_events(session.access_token, room_id, thread_id);
+    let thread_children = await getThreadEvents(session.access_token, room_id, thread_id);
     let _events = thread_children.chunk;
     if(_events) {
       console.log("found thread events", _events)

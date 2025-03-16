@@ -1,7 +1,7 @@
 import { PUBLIC_HOMESERVER, PUBLIC_HOMESERVER_NAME } from '$env/static/public';
 
 
-export const get_threads = async (token, roomId) => {
+export const getThreads = async (token, roomId) => {
   const url = `${PUBLIC_HOMESERVER}/_matrix/client/v1/rooms/${roomId}/threads?limit=50`;
 
   let options = {
@@ -21,7 +21,7 @@ export const get_threads = async (token, roomId) => {
 }
 
 
-export const get_thread_root_event = async (token, roomId, eventId) => {
+export const getThreadRootEvent = async (token, roomId, eventId) => {
   const url = `${PUBLIC_HOMESERVER}/_matrix/client/v3/rooms/${roomId}/event/${eventId}`;
 
   let options = {
@@ -40,7 +40,7 @@ export const get_thread_root_event = async (token, roomId, eventId) => {
 
 }
 
-export const get_thread_events = async (token, roomId, eventId) => {
+export const getThreadEvents = async (token, roomId, eventId) => {
   const url = `${PUBLIC_HOMESERVER}/_matrix/client/v1/rooms/${roomId}/relations/${eventId}/m.thread?limit=50`;
 
   let options = {

@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
 import * as sdk from 'matrix-js-sdk';
 import { PUBLIC_HOMESERVER } from '$env/static/public';
 import logo from '$lib/logo/logo.js'
 import { onMount, tick } from 'svelte';
+import UploadAvatar from '$lib/user/upload-avatar.svelte';
 
 import {
     goto,
@@ -11,14 +12,25 @@ import {
 import { createMatrixStore } from '$lib/store/matrix.svelte'
 const store = createMatrixStore()
 
+type Props = {
+    data: {
+        access_token: string,
+        device_id: string,
+        user_id: string,
+    }
+}
 
-let { data } = $props();
+let { 
+    data
+}: Props = $props();
 
 $effect(() => {
 })
 
 onMount(() => {
-    nameInput.focus();
+    if(nameInput) {
+        nameInput.focus();
+    }
     if(data) {
         //store.updateSession(data)
         setTimeout(() => {
@@ -61,7 +73,6 @@ async function sync(data) {
         filter: filter,
         initialSyncLimit: 100,
         lazyLoadMembers: true,
-        timelineSupport: true,
     });
 }
 
@@ -88,11 +99,11 @@ async function goHome() {
     goto('/mail/inbox')
 }
 
-let nameInput;
-let name = $state('');
+let nameInput: HTMLInputElement | null = null;
+let name: string = $state('');
 
 async function save() {
-    if(name == '') {
+    if(nameInput && name == '') {
         nameInput.focus();
         return;
     }
@@ -100,17 +111,29 @@ async function save() {
     await store.createMatrixClient(data)
     let resp = await store.client.setDisplayName(name);
     console.log(resp)
+    /*
+    if(avatar_url) {
+        await store.client.setAvatarUrl(avatar_url);
+    }
+    */
     goto('/mail/inbox')
 }
 
-function handleKeydown(event) {
-    if(name == '') {
+function handleKeydown(event: KeyboardEvent) {
+    if(nameInput && name == '') {
         nameInput.focus();
         return;
     }
     if(event.key === 'Enter') {
         save()
     }
+}
+
+let avatar_url: string | null = $state(null);
+
+function setAvatarUrl(url: string) {
+    console.log("url is", url)
+    avatar_url = url
 }
 
 </script>
@@ -131,7 +154,10 @@ function handleKeydown(event) {
     </div>
 
     <div class="content flex-1 flex flex-col p-4 ">
-        <div class="mt-2">
+        <div class="flex justify-center mt-2">
+            <UploadAvatar {setAvatarUrl} />
+        </div>
+        <div class="mt-4">
             <input 
                 class="py-3 pl-3 pr-[164px]"
                 bind:this={nameInput} 
