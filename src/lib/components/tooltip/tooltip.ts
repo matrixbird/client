@@ -6,7 +6,7 @@ import {
   shift, 
 } from '@floating-ui/dom';
 
-export function tooltip(node, opts = {
+export function tooltip(node: HTMLElement, opts = {
   disabled: false,
   text: '',
   placement: 'top',
@@ -83,7 +83,7 @@ export function tooltip(node, opts = {
       crossAxis: 0
     }
 
-    if(!Array.isArray(opts.offset) && opts.offset !== NaN) {
+    if(!Array.isArray(opts.offset) && !isNaN(opts.offset)) {
       if(opts.offset > 0) {
         _offset.mainAxis = opts.offset;
       }

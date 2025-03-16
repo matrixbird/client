@@ -1,5 +1,5 @@
 <script>
-import logo from '$lib/logo/logo.js'
+import logo from '$lib/logo/logo'
 import { onMount, tick } from 'svelte';
 import * as EmailValidator from 'email-validator';
 

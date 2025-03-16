@@ -24,7 +24,7 @@ import UserAvatar from '$lib/user/avatar.svelte'
 
 import { 
     check_small
-} from '$lib/assets/icons.js'
+} from '$lib/assets/icons'
 
 import { 
     route_state,

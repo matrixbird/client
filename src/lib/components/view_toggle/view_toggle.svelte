@@ -1,6 +1,6 @@
 <script>
 import { page } from '$app/state';
-import { expand_vertical, collapse, inbox, fullscreen } from '$lib/assets/icons.js'
+import { expand_vertical, collapse, inbox, fullscreen } from '$lib/assets/icons'
 import { tooltip } from '$lib/components/tooltip/tooltip'
 
 import { ui_state } from '$lib/store/app.svelte'

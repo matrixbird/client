@@ -1,6 +1,6 @@
 <script>
 import { PUBLIC_HOMESERVER_NAME } from '$env/static/public';
-import logo from '$lib/logo/logo.js'
+import logo from '$lib/logo/logo'
 import { onMount, tick } from 'svelte';
 
 import { 

@@ -5,7 +5,7 @@ import Divider from "$lib/components/email/divider.svelte";
 
 import { page } from '$app/state';
 
-import { close } from '$lib/assets/icons.js'
+import { close } from '$lib/assets/icons'
 
 import { createMatrixStore, status } from '$lib/store/matrix.svelte'
 const store = createMatrixStore()

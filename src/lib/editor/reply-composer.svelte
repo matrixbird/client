@@ -19,7 +19,7 @@ import {
 import { 
     close,
     emoji
-} from '$lib/assets/icons.js'
+} from '$lib/assets/icons'
 
 import { newAlert, updateAppStatus } from '$lib/store/app.svelte'
 

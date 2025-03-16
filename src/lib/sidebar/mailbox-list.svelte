@@ -1,7 +1,7 @@
 <script>
 import MailboxListItem from './mailbox-list-item.svelte'
 
-import { inbox, sent, drafts } from '$lib/assets/icons.js'
+import { inbox, sent, drafts } from '$lib/assets/icons'
 
 let mailboxes = [
     {

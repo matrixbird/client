@@ -13,7 +13,7 @@ import {
 import { 
     showPassword,
     hidePassword,
-} from '$lib/assets/icons.js';
+} from '$lib/assets/icons';
 
 import {
     goto,

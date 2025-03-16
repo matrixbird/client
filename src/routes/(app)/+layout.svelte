@@ -8,7 +8,7 @@ import { page } from '$app/state';
 import { draggable } from '@neodrag/svelte';
 import { mxid_to_email } from '$lib/utils/matrix'
 
-import logo from '$lib/logo/logo.js'
+import logo from '$lib/logo/logo'
 
 import Matrix from '$lib/matrix/matrix.svelte'
 import Listeners from '$lib/app/listeners.svelte'

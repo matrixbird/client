@@ -4,13 +4,9 @@ import { json } from '@sveltejs/kit';
 export function GET() {
   const data = {
     'm.homeserver': {
-      'base_url': "https://matrix.matrixbird.com",
+      'base_url': PUBLIC_HOMESERVER_BASE_URL
     },
-    "org.matrix.msc3575.proxy": {
-      "url": "https://matrix.matrixbird.com"
-    }
   }
-
   return json(data);
 }
 

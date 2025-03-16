@@ -1,5 +1,5 @@
 <script>
-import { paperclip } from '$lib/assets/icons.js'
+import { paperclip } from '$lib/assets/icons'
 let { attachment } = $props();
 
 const filename = $derived.by(() => {

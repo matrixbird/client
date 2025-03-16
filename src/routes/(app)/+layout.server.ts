@@ -1,9 +1,9 @@
-import { PUBLIC_APPSERVICE } from '$env/static/public';
-import { error, redirect } from "@sveltejs/kit";
+//import { PUBLIC_APPSERVICE } from '$env/static/public';
+import { redirect } from "@sveltejs/kit";
 
-/** @type {import('./$types').LayoutServerLoad} */
-export async function load( { cookies, fetch } ) {
+import type { LayoutServerLoad } from './$types';
 
+export const load: LayoutServerLoad = async ({ cookies }) => {
   let session_id = cookies.get("session_id");
   let access_token = cookies.get("access_token");
   let device_id = cookies.get("device_id");

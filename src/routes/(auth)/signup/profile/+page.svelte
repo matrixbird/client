@@ -1,7 +1,7 @@
 <script lang="ts">
 import * as sdk from 'matrix-js-sdk';
 import { PUBLIC_HOMESERVER } from '$env/static/public';
-import logo from '$lib/logo/logo.js'
+import logo from '$lib/logo/logo'
 import { onMount, tick } from 'svelte';
 import UploadAvatar from '$lib/user/upload-avatar.svelte';
 

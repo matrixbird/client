@@ -9,7 +9,7 @@ import {
     cloud_off,
     show_sidebar,
     hide_sidebar
-} from '$lib/assets/icons.js'
+} from '$lib/assets/icons'
 
 import { app, ui_state, toggleSidebar } from '$lib/store/app.svelte'
 

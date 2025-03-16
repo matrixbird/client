@@ -1,7 +1,7 @@
 <script>
 import { page } from '$app/state';
 import { ui_state } from '$lib/store/app.svelte'
-import { inbox, sent, drafts, down, dot } from '$lib/assets/icons.js'
+import { inbox, sent, drafts, down, dot } from '$lib/assets/icons'
 import { goto } from '$app/navigation';
 
 import Popup from '$lib/components/popup/popup.svelte'
