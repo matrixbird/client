@@ -1,7 +1,7 @@
 import { PUBLIC_APPSERVICE } from '$env/static/public';
 
-/** @type {import('./$types').PageServerLoad} */
-export async function load({ fetch, url }) {
+import type { PageServerLoad } from './$types';
+export const load: PageServerLoad = async ({ fetch, url }) => {
 
   const endpoint = `${PUBLIC_APPSERVICE}/health`;
   const res = await fetch(endpoint);

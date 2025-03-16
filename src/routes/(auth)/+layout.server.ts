@@ -1,7 +1,7 @@
 import { redirect } from "@sveltejs/kit";
 
-/** @type {import('./$types').LayoutServerLoad} */
-export function load( { locals, cookies } ) {
+import type { LayoutServerLoad } from './$types';
+export const load: LayoutServerLoad = async ( { locals, cookies } ) => {
   /*
   let session_id = cookies.get("session_id");
   let device_id = cookies.get("device_id");
@@ -10,6 +10,5 @@ export function load( { locals, cookies } ) {
     redirect(303, '/mail/inbox');
   }
   */
-
   return locals;
 }
