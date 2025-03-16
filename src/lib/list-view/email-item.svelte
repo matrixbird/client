@@ -11,7 +11,7 @@ import {
 import { 
     downloadContent,
     sendReadReceipt
-} from '$lib/matrix/api.js'
+} from '$lib/matrix/api'
 
 import { 
     get_first_line

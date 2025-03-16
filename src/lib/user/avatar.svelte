@@ -12,7 +12,7 @@ import {
 
 import {
     getThumbnail,
-} from '$lib/matrix/api.js'
+} from '$lib/matrix/api'
 
 import { createMatrixStore } from '$lib/store/matrix.svelte'
 const store = createMatrixStore()

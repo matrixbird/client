@@ -25,7 +25,7 @@ import {
   getThreadEvents,
   syncOnce,
   getRoomState,
-} from '$lib/matrix/api.js'
+} from '$lib/matrix/api'
 
 import {
   is_local_room

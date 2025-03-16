@@ -1,7 +1,6 @@
-import { PUBLIC_HOMESERVER, PUBLIC_HOMESERVER_NAME } from '$env/static/public';
+import { PUBLIC_HOMESERVER } from '$env/static/public';
 
-
-export const getThreads = async (token, roomId) => {
+export const getThreads = async (token: string, roomId: string) => {
   const url = `${PUBLIC_HOMESERVER}/_matrix/client/v1/rooms/${roomId}/threads?limit=50`;
 
   let options = {
@@ -21,7 +20,7 @@ export const getThreads = async (token, roomId) => {
 }
 
 
-export const getThreadRootEvent = async (token, roomId, eventId) => {
+export const getThreadRootEvent = async (token: string, roomId: string, eventId: string) => {
   const url = `${PUBLIC_HOMESERVER}/_matrix/client/v3/rooms/${roomId}/event/${eventId}`;
 
   let options = {
@@ -40,7 +39,7 @@ export const getThreadRootEvent = async (token, roomId, eventId) => {
 
 }
 
-export const getThreadEvents = async (token, roomId, eventId) => {
+export const getThreadEvents = async (token: string, roomId: string, eventId: string) => {
   const url = `${PUBLIC_HOMESERVER}/_matrix/client/v1/rooms/${roomId}/relations/${eventId}/m.thread?limit=50`;
 
   let options = {
@@ -60,7 +59,7 @@ export const getThreadEvents = async (token, roomId, eventId) => {
 }
 
 
-export const getStateEvent = async (token, roomId, eventType, stateKey) => {
+export const getStateEvent = async (token: string, roomId: string, eventType: string, stateKey: string | null) => {
   let url = `${PUBLIC_HOMESERVER}/_matrix/client/v3/rooms/${roomId}/state/${eventType}`;
   if(stateKey) {
     url = `${PUBLIC_HOMESERVER}/_matrix/client/v3/rooms/${roomId}/state/${eventType}/${stateKey}`;
@@ -82,7 +81,7 @@ export const getStateEvent = async (token, roomId, eventType, stateKey) => {
 
 }
 
-export const getEvent = async (token, roomId, eventId) => {
+export const getEvent = async (token: string, roomId: string, eventId: string) => {
   let url = `${PUBLIC_HOMESERVER}/_matrix/client/v3/rooms/${roomId}/event/${eventId}`;
 
   let options = {
@@ -101,7 +100,7 @@ export const getEvent = async (token, roomId, eventId) => {
 
 }
 
-export const syncOnce = async (token) => {
+export const syncOnce = async (token: string) => {
 
   let filter = {
     account_data: {
@@ -146,7 +145,7 @@ export const syncOnce = async (token) => {
 
 }
 
-export const getRoomState = async (token, roomId ) => {
+export const getRoomState = async (token: string, roomId: string ) => {
   let url = `${PUBLIC_HOMESERVER}/_matrix/client/v3/rooms/${roomId}/state`;
 
   let options = {
@@ -165,7 +164,7 @@ export const getRoomState = async (token, roomId ) => {
 
 }
 
-export const getAccountData = async (token, userId, type ) => {
+export const getAccountData = async (token: string, userId: string, type: string ) => {
   let url = `${PUBLIC_HOMESERVER}/_matrix/client/v3/user/${userId}/account_data/${type}`;
 
   let options = {
@@ -184,11 +183,20 @@ export const getAccountData = async (token, userId, type ) => {
 
 }
 
+interface FetchOptions {
+    method: string;
+    headers: {
+        'Content-Type': string;
+        'Authorization': string;
+    };
+    body?: string;
+    
+}
 
-export const sendReadReceipt = async (token, roomId, eventId, body ) => {
+export const sendReadReceipt = async (token: string, roomId: string, eventId: string, body: object | null ) => {
   let url = `${PUBLIC_HOMESERVER}/_matrix/client/v3/rooms/${roomId}/receipt/m.read/${eventId}`;
 
-  let options = {
+  let options: FetchOptions = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -210,7 +218,7 @@ export const sendReadReceipt = async (token, roomId, eventId, body ) => {
 }
 
 
-export const downloadContent = async (token, mxcid ) => {
+export const downloadContent = async (token: string, mxcid: string ) => {
 
   let stripped = mxcid.replace('mxc://', '');
 
@@ -231,7 +239,7 @@ export const downloadContent = async (token, mxcid ) => {
   }
 }
 
-export const getThumbnail = async (token, mxcid ) => {
+export const getThumbnail = async (token: string, mxcid: string ) => {
 
   let stripped = mxcid.replace('mxc://', '');
 

@@ -7,7 +7,7 @@ import * as EmailValidator from 'email-validator';
 import { 
     verify_email,
     verify_code
-} from '$lib/appservice/api.js';
+} from '$lib/appservice/api';
 
 
 let { setVerified } = $props();

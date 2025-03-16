@@ -8,7 +8,7 @@ import { passwordStrength } from 'check-password-strength'
 import { 
     signup,
     usernameAvailable,
-} from '$lib/appservice/api.js';
+} from '$lib/appservice/api';
 
 import { 
     showPassword,

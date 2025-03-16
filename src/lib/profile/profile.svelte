@@ -8,7 +8,7 @@ const store = createMatrixStore()
 
 import {
     getThumbnail,
-} from '$lib/matrix/api.js'
+} from '$lib/matrix/api'
 
 import { ui_state } from '$lib/store/app.svelte'
 let expanded = $derived(ui_state?.expanded)

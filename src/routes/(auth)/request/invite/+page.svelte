@@ -5,7 +5,7 @@ import * as EmailValidator from 'email-validator';
 
 import { 
     request_invite,
-} from '$lib/appservice/api.js';
+} from '$lib/appservice/api';
 
 import { 
     debounce

@@ -9,7 +9,7 @@ import {
 
 import { 
     login as appservice_login,
-} from '$lib/appservice/api.js';
+} from '$lib/appservice/api';
 
 import { createMatrixStore } from '$lib/store/matrix.svelte'
 const store = createMatrixStore()

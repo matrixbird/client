@@ -5,7 +5,7 @@ import { onMount, tick } from 'svelte';
 
 import { 
     request_invite,
-} from '$lib/appservice/api.js';
+} from '$lib/appservice/api';
 
 import { 
     debounce

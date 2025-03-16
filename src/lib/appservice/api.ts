@@ -1,6 +1,6 @@
-import { PUBLIC_APPSERVICE, PUBLIC_HOMESERVER } from '$env/static/public';
+import { PUBLIC_APPSERVICE } from '$env/static/public';
 
-export const login = async (body) => {
+export const login = async (body: object) => {
   console.log(body)
   const url = `${PUBLIC_APPSERVICE}/auth/login`;
 
@@ -21,7 +21,7 @@ export const login = async (body) => {
 
 }
 
-export const verify_email = async (body) => {
+export const verify_email = async (body: object) => {
   console.log(body)
   const url = `${PUBLIC_APPSERVICE}/auth/email/verify`;
 
@@ -42,7 +42,7 @@ export const verify_email = async (body) => {
 
 }
 
-export const verify_code = async (body) => {
+export const verify_code = async (body: object) => {
   console.log(body)
   const url = `${PUBLIC_APPSERVICE}/auth/code/verify`;
 
@@ -63,7 +63,7 @@ export const verify_code = async (body) => {
 
 }
 
-export const signup = async (body) => {
+export const signup = async (body: object) => {
   console.log(body)
   const url = `${PUBLIC_APPSERVICE}/auth/signup`;
 
@@ -84,7 +84,7 @@ export const signup = async (body) => {
 
 }
 
-export const usernameAvailable = async (username) => {
+export const usernameAvailable = async (username: string) => {
   const url = `${PUBLIC_APPSERVICE}/auth/username/available/${username}`;
 
   let options = {
@@ -102,7 +102,7 @@ export const usernameAvailable = async (username) => {
 
 }
 
-export const request_invite = async (email) => {
+export const request_invite = async (email: string) => {
   const url = `${PUBLIC_APPSERVICE}/auth/request/invite/${email}`;
 
   let options = {
@@ -120,7 +120,7 @@ export const request_invite = async (email) => {
 
 }
 
-export const query_code = async (code) => {
+export const query_code = async (code: string) => {
   const url = `${PUBLIC_APPSERVICE}/auth/code/validate/${code}`;
 
   let options = {
@@ -138,7 +138,7 @@ export const query_code = async (code) => {
 
 }
 
-export const valid_domain = async (domain) => {
+export const valid_domain = async (domain: string) => {
   const url = `${PUBLIC_APPSERVICE}/domain/${domain}`;
 
   let options = {
@@ -156,7 +156,7 @@ export const valid_domain = async (domain) => {
 
 }
 
-export const valid_email = async (email) => {
+export const valid_email = async (email: string) => {
   const url = `${PUBLIC_APPSERVICE}/email/${email}`;
 
   let options = {
