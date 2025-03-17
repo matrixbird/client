@@ -25,7 +25,6 @@ let opts = $derived.by(() => {
     return {
         text: expanded ? "Minimize" : "Maximize",
         placement: placement,
-        classes: 'silk',
         offset: offset,
     }
 })

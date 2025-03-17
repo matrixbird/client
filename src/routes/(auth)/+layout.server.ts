@@ -2,13 +2,10 @@ import { redirect } from "@sveltejs/kit";
 
 import type { LayoutServerLoad } from './$types';
 export const load: LayoutServerLoad = async ( { locals, cookies } ) => {
-  /*
-  let session_id = cookies.get("session_id");
-  let device_id = cookies.get("device_id");
+  let access_token = cookies.get("access_token");
 
-  if(session_id && device_id) {
+  if(access_token) {
     redirect(303, '/mail/inbox');
   }
-  */
   return locals;
 }

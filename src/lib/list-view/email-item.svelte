@@ -124,6 +124,10 @@ let mailbox = $derived.by(() => {
     return page.params.mailbox
 })
 
+let is_sent_mailbox = $derived.by(() => {
+    return mailbox == "sent"
+})
+
 function open(e) {
     if(e.ctrlKey) {
         //console.log(events.get(email.event_id))
@@ -207,7 +211,7 @@ let read_event = $derived.by(() => {
 })
 
 $effect(() => {
-    if(!read_event) {
+    if(!read_event && !is_sent_mailbox) {
         read = false
     }
 })
