@@ -27,6 +27,7 @@ import {
 
 import { newAlert, updateAppStatus } from '$lib/store/app.svelte'
 
+import { session } from '$lib/store/session.svelte'
 import { createMatrixStore, mailbox_rooms } from '$lib/store/matrix.svelte'
 const store = createMatrixStore()
 
@@ -258,7 +259,7 @@ empty.`,
             room_id,
             "matrixbird.email.matrix",
             {
-                recipients: mxids,
+                recipients: mxids?.length > 0 ? mxids : [session.user_id],
                 from: {
                     name: store.user?.displayName,
                     address: mxid_to_email(store.user?.userId)

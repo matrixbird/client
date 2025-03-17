@@ -738,7 +738,6 @@ export function createMatrixStore() {
             });
 
             await buildThreadEvents(roomEventsMap);
-            console.log("thread events are", thread_events)
 
             status.threads_ready = true;
             status.thread_events_ready = true;

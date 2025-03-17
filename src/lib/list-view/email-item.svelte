@@ -199,7 +199,10 @@ $effect(() => {
     }
 
     if(email && active && !read) {
-        markRead()
+        read = true
+        setTimeout(() => {
+            markRead()
+        }, 1000)
     }
 
 })
@@ -239,8 +242,6 @@ let event_to_read = $derived.by(() => {
 })
 
 async function markRead() {
-
-    read = true
 
     await sendReadReceipt(
         email.room_id, 

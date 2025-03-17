@@ -9,7 +9,8 @@ import type {
 export function buildInboxEmails(session: Session, threads: Threads, thread_events: ThreadEvents) {
 
   function findLastNonUserEvent(threadEvents: MatrixEvent[]) {
-    const nonUserEvents = threadEvents.filter((event: MatrixEvent) => event.sender !== session.user_id);
+    //const nonUserEvents = threadEvents.filter((event: MatrixEvent) => event.sender !== session.user_id);
+    const nonUserEvents = threadEvents.filter((event: MatrixEvent) => event.content?.recipients?.includes(session.user_id) || event.sender !== session.user_id);
 
     if (nonUserEvents.length === 0) return null;
 
@@ -40,7 +41,7 @@ export function buildInboxEmails(session: Session, threads: Threads, thread_even
     // an email sent by this user or recieved from another user
     // add to inbox if it's not sent by this user
     if(!children) {
-      if(thread.sender != session.user_id) {
+      if(thread.content?.recipients?.includes(session.user_id) || thread.sender != session.user_id) {
         emails[threadId] = thread;
       }
     }

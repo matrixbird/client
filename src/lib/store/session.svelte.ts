@@ -36,3 +36,32 @@ export function clearSession() {
     session.device_id = undefined
     console.info('Session cleared', session)
 }
+
+export function createSessionStore() {
+
+  return {
+
+    get session() {
+      return session;
+    },
+
+    get session_id() {
+      return session.session_id;
+    },
+
+    get access_token() {
+      return session.access_token;
+    },
+
+    get user_id() {
+      return session.user_id;
+    },
+
+    get device_id() {
+      return session.device_id;
+    },
+
+
+  };
+}
+
