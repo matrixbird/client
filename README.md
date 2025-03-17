@@ -1,7 +1,3 @@
-### matrixbird client
+### Matrixbird client
 
-WIP. Don't use it yet.
-
-### LICENSE
-
-Haven't decided yet. 
+This is the WIP client powering [matrixbird.com](https://matrixbird.com).
