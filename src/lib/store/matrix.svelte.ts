@@ -182,6 +182,7 @@ export function createMatrixStore() {
             }
         }
 
+        /*
         try {
             const rooms = await client.getJoinedRooms();
             joined_rooms = rooms.joined_rooms;
@@ -200,23 +201,24 @@ export function createMatrixStore() {
             }
         } catch(e) {
         }
+        */
 
         try {
             const init_sync = await syncOnce();
-            console.log(init_sync);
 
-            /*
-      let mb_rooms = init_sync.account_data?.events?.find(e => e.type == "matrixbird.mailbox.rooms");
-      if(mb_rooms) {
-        for (const [key, value] of Object.entries(mb_rooms.content)) {
-          mailbox_rooms[key] = value;
-        }
-      }
-      */
+            let mb_rooms = init_sync.account_data?.events?.find(e => e.type == "matrixbird.mailbox.rooms");
+            if(mb_rooms) {
+                for (const [key, value] of Object.entries(mb_rooms.content)) {
+                    mailbox_rooms[key] = value;
+                }
+            }
+            console.log("Mailbox rooms:", $state.snapshot(mailbox_rooms))
 
             for (const [room_id, room] of Object.entries(init_sync.rooms.join)) {
 
                 //console.log(room_id)
+                //
+                joined_rooms.push(room_id)
 
                 let pending_event = room.state?.events?.find(e => e.type == "matrixbird.email.pending");
                 if(pending_event) {
@@ -240,6 +242,7 @@ export function createMatrixStore() {
                 }
 
             } 
+            console.log("Joined rooms: ", $state.snapshot(joined_rooms))
 
             if(init_sync.rooms.invite) {
                 for (const [room_id, room] of Object.entries(init_sync.rooms.invite)) {
