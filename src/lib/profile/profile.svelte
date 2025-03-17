@@ -59,7 +59,7 @@ $effect(() => {
 let url = $state(null);
 
 async function getAvatar() {
-    let con = await getThumbnail(store.session.access_token, avatar)
+    let con = await getThumbnail(avatar)
     if(con) {
         url = con
     }

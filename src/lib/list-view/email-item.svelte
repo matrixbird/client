@@ -239,7 +239,6 @@ async function markRead() {
     read = true
 
     await sendReadReceipt(
-        store.session.access_token, 
         email.room_id, 
         email.event_id,
         {
@@ -281,7 +280,7 @@ let access_token = $derived.by(() => {
 let content = $state(null)
 
 async function fetchContent() {
-    let _content = await downloadContent(access_token, content_uri)
+    let _content = await downloadContent(content_uri)
     if(_content) {
         content = _content
         large_email_content.set(email.event_id, _content)

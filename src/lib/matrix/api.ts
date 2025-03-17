@@ -1,8 +1,10 @@
 import { PUBLIC_HOMESERVER } from '$env/static/public';
+import { session } from '$lib/store/session.svelte';
 
-export const getThreads = async (token: string | undefined, roomId: string) => {
-    if(!token) {
-        throw new Error('No token provided');
+export const getThreads = async (roomId: string) => {
+
+    if(!session.access_token) {
+        throw new Error('Access token is missing.');
     }
 
     const url = `${PUBLIC_HOMESERVER}/_matrix/client/v1/rooms/${roomId}/threads?limit=50`;
@@ -10,7 +12,7 @@ export const getThreads = async (token: string | undefined, roomId: string) => {
     let options = {
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${session.access_token}`
         },
     }
 
@@ -24,9 +26,10 @@ export const getThreads = async (token: string | undefined, roomId: string) => {
 }
 
 
-export const getThreadRootEvent = async (token: string | undefined, roomId: string, eventId: string) => {
-    if(!token) {
-        throw new Error('No token provided');
+export const getThreadRootEvent = async (roomId: string, eventId: string) => {
+
+    if(!session.access_token) {
+        throw new Error('Access token is missing.');
     }
 
     const url = `${PUBLIC_HOMESERVER}/_matrix/client/v3/rooms/${roomId}/event/${eventId}`;
@@ -34,7 +37,7 @@ export const getThreadRootEvent = async (token: string | undefined, roomId: stri
     let options = {
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${session.access_token}`
         },
     }
 
@@ -47,9 +50,10 @@ export const getThreadRootEvent = async (token: string | undefined, roomId: stri
 
 }
 
-export const getThreadEvents = async (token: string | undefined, roomId: string, eventId: string) => {
-    if(!token) {
-        throw new Error('No token provided');
+export const getThreadEvents = async (roomId: string, eventId: string) => {
+
+    if(!session.access_token) {
+        throw new Error('Access token is missing.');
     }
 
     const url = `${PUBLIC_HOMESERVER}/_matrix/client/v1/rooms/${roomId}/relations/${eventId}/m.thread?limit=50`;
@@ -57,7 +61,7 @@ export const getThreadEvents = async (token: string | undefined, roomId: string,
     let options = {
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${session.access_token}`
         },
     }
 
@@ -71,11 +75,12 @@ export const getThreadEvents = async (token: string | undefined, roomId: string,
 }
 
 
-export const getStateEvent = async (token: string | undefined, roomId: string, eventType: string, stateKey: string | null) => {
+export const getStateEvent = async (roomId: string, eventType: string, stateKey: string | null) => {
 
-    if(!token) {
-        throw new Error('No token provided');
+    if(!session.access_token) {
+        throw new Error('Access token is missing.');
     }
+
 
     let url = `${PUBLIC_HOMESERVER}/_matrix/client/v3/rooms/${roomId}/state/${eventType}`;
     if(stateKey) {
@@ -85,7 +90,7 @@ export const getStateEvent = async (token: string | undefined, roomId: string, e
     let options = {
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            'Authorization': `Bearer ${session.access_token}`
         },
     }
 
@@ -98,9 +103,10 @@ export const getStateEvent = async (token: string | undefined, roomId: string, e
 
 }
 
-export const getEvent = async (token: string | undefined, roomId: string, eventId: string) => {
-    if(!token) {
-        throw new Error('No token provided');
+export const getEvent = async (roomId: string, eventId: string) => {
+
+    if(!session.access_token) {
+        throw new Error('Access token is missing.');
     }
 
     let url = `${PUBLIC_HOMESERVER}/_matrix/client/v3/rooms/${roomId}/event/${eventId}`;
@@ -108,7 +114,7 @@ export const getEvent = async (token: string | undefined, roomId: string, eventI
     let options = {
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            'Authorization': `Bearer ${session.access_token}`
         },
     }
 
@@ -121,12 +127,11 @@ export const getEvent = async (token: string | undefined, roomId: string, eventI
 
 }
 
-export const syncOnce = async (token: string | undefined) => {
+export const syncOnce = async () => {
 
-    if(!token) {
-        throw new Error('No token provided');
+    if(!session.access_token) {
+        throw new Error('Access token is missing.');
     }
-
 
     let filter = {
         account_data: {
@@ -158,7 +163,7 @@ export const syncOnce = async (token: string | undefined) => {
     let options = {
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            'Authorization': `Bearer ${session.access_token}`
         },
     }
 
@@ -171,9 +176,10 @@ export const syncOnce = async (token: string | undefined) => {
 
 }
 
-export const getRoomState = async (token: string | undefined, roomId: string ) => {
-    if(!token) {
-        throw new Error('No token provided');
+export const getRoomState = async (roomId: string ) => {
+
+    if(!session.access_token) {
+        throw new Error('Access token is missing.');
     }
 
     let url = `${PUBLIC_HOMESERVER}/_matrix/client/v3/rooms/${roomId}/state`;
@@ -181,7 +187,7 @@ export const getRoomState = async (token: string | undefined, roomId: string ) =
     let options = {
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            'Authorization': `Bearer ${session.access_token}`
         },
     }
 
@@ -194,18 +200,18 @@ export const getRoomState = async (token: string | undefined, roomId: string ) =
 
 }
 
-export const getAccountData = async (token: string | undefined, userId: string | undefined, type: string ) => {
+export const getAccountData = async (account_data_type: string ) => {
 
-    if(!token || !userId) {
-        throw new Error('No token provided');
+    if(!session.access_token || !session.user_id) {
+        throw new Error('Access token is missing.');
     }
 
-    let url = `${PUBLIC_HOMESERVER}/_matrix/client/v3/user/${userId}/account_data/${type}`;
+    let url = `${PUBLIC_HOMESERVER}/_matrix/client/v3/user/${session.user_id}/account_data/${account_data_type}`;
 
     let options = {
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            'Authorization': `Bearer ${session.access_token}`
         },
     }
 
@@ -228,14 +234,20 @@ interface FetchOptions {
 
 }
 
-export const sendReadReceipt = async (token: string, roomId: string, eventId: string, body: object | null ) => {
+export const sendReadReceipt = async (roomId: string, eventId: string, body: object | null ) => {
+
+    if(!session.access_token) {
+        throw new Error('Access token is missing.');
+    }
+
+
     let url = `${PUBLIC_HOMESERVER}/_matrix/client/v3/rooms/${roomId}/receipt/m.read/${eventId}`;
 
     let options: FetchOptions = {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            'Authorization': `Bearer ${session.access_token}`,
         },
     }
 
@@ -253,7 +265,11 @@ export const sendReadReceipt = async (token: string, roomId: string, eventId: st
 }
 
 
-export const downloadContent = async (token: string, mxcid: string ) => {
+export const downloadContent = async (mxcid: string ) => {
+
+    if(!session.access_token) {
+        throw new Error('Access token is missing.');
+    }
 
     let stripped = mxcid.replace('mxc://', '');
 
@@ -262,7 +278,7 @@ export const downloadContent = async (token: string, mxcid: string ) => {
     let options = {
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            'Authorization': `Bearer ${session.access_token}`,
         },
     }
 
@@ -274,7 +290,11 @@ export const downloadContent = async (token: string, mxcid: string ) => {
     }
 }
 
-export const getThumbnail = async (token: string, mxcid: string ) => {
+export const getThumbnail = async (mxcid: string ) => {
+
+    if(!session.access_token) {
+        throw new Error('Access token is missing.');
+    }
 
     let stripped = mxcid.replace('mxc://', '');
 
@@ -283,7 +303,7 @@ export const getThumbnail = async (token: string, mxcid: string ) => {
     let options = {
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            'Authorization': `Bearer ${session.access_token}`,
         },
     }
 

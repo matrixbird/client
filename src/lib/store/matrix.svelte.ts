@@ -26,8 +26,6 @@ import {
 } from '$app/navigation';
 
 import {
-    getEvent,
-    getStateEvent,
     getAccountData,
     getThreadRootEvent,
     getThreads,
@@ -192,8 +190,6 @@ export function createMatrixStore() {
 
         try {
             const mailboxes: {[key: string]: string} = await getAccountData(
-                session.access_token,
-                session.user_id,
                 "matrixbird.mailbox.rooms"
             );
             if(mailboxes) {
@@ -206,7 +202,7 @@ export function createMatrixStore() {
         }
 
         try {
-            const init_sync = await syncOnce(session.access_token);
+            const init_sync = await syncOnce();
             console.log(init_sync);
 
             /*
@@ -251,7 +247,7 @@ export function createMatrixStore() {
                     joined_rooms.push(joined.roomId)
                     let is_local = is_local_room(joined.roomId);
                     if(!is_local) {
-                        const state = await getRoomState(session.access_token, roomId);
+                        const state = await getRoomState(room_id);
                         console.log("remote room state", state)
                         const messagesResult = await client.createMessagesRequest(joined.roomId, null, 100, 'b', null);
                         const messages = messagesResult.chunk;
@@ -451,7 +447,7 @@ export function createMatrixStore() {
 
                 setTimeout(async () => {
 
-                    const state = await getRoomState(session.access_token, roomId);
+                    const state = await getRoomState(roomId);
                     console.log("remote room state", state)
 
                     const messagesResult = await client.createMessagesRequest(roomId, null, 100, 'b', null);
@@ -631,7 +627,7 @@ export function createMatrixStore() {
 
 
         async function buildThreadForJoinedRoom(roomId: string) {
-            let thread = await getThreads(session.access_token, roomId);
+            let thread = await getThreads(roomId);
             console.log("found threads", thread)
 
             if(thread.chunk.length > 0) {
@@ -658,7 +654,7 @@ export function createMatrixStore() {
             }
 
             const threadPromises = eventPairs.map(([roomId, eventId]) => 
-                getThreadEvents(session.access_token, roomId, eventId));
+                getThreadEvents(roomId, eventId));
             const allEvents = await Promise.allSettled(threadPromises);
 
             const updates = new Map();
@@ -716,7 +712,7 @@ export function createMatrixStore() {
       })
       */
 
-            const threadPromises = rooms.map(room => getThreads(session.access_token, room));
+            const threadPromises = rooms.map(room => getThreads(room));
             const allThreads = await Promise.allSettled(threadPromises);
 
             const roomEventsMap = {};
@@ -826,12 +822,12 @@ export function createMatrixStore() {
 
 
     async function get_new_thread(room_id: string, thread_id: string) {
-        let thread = await getThreadRootEvent(session.access_token, room_id, thread_id);
+        let thread = await getThreadRootEvent(room_id, thread_id);
         console.log("found thread root event", thread)
         events.set(thread_id, thread);
         threads.set(thread_id, thread);
 
-        let thread_children = await getThreadEvents(session.access_token, room_id, thread_id);
+        let thread_children = await getThreadEvents(room_id, thread_id);
         let _events = thread_children.chunk;
         if(_events) {
             console.log("found thread events", _events)
