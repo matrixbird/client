@@ -20,7 +20,6 @@ import ThemeToggle from '$lib/theme/toggle.svelte'
 import Navbar from '$lib/navbar/navbar.svelte';
 import Alert from '$lib/components/alert/alert.svelte'
 
-import { updateSession } from '$lib/store/session.svelte'
 import { userState, ui_state } from '$lib/store/app.svelte'
 import { createAppStore, dev_mode } from '$lib/store/app.svelte'
 const store = createAppStore()
@@ -44,7 +43,6 @@ $effect(() => {
 
 onMount(() => {
     if(data?.access_token && data?.device_id && data?.user_id) {
-        updateSession(data)
         matrixStore.createMatrixClient(data)
     }
 

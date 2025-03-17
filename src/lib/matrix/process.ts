@@ -1,19 +1,10 @@
-interface MatrixEvent {
-    event_id: string;
-    origin_server_ts: number;
-    sender: string;
-}
-
-interface Session {
-    user_id: string;
-    access_token: string;
-    device_id: string;
-}
-
-type Emails = Record<string, MatrixEvent>;
-
-type Threads = Map<string, MatrixEvent>;
-type ThreadEvents = Map<string, MatrixEvent[]>;
+import type { Session } from '$lib/store/session.svelte';
+import type { 
+    MatrixEvent,
+    Emails,
+    Threads,
+    ThreadEvents
+} from '$lib/types/matrixbird';
 
 export function buildInboxEmails(session: Session, threads: Threads, thread_events: ThreadEvents) {
 

@@ -15,11 +15,11 @@ import {
     hidePassword,
 } from '$lib/assets/icons';
 
-import {
-    goto,
-} from '$app/navigation';
+import { goto } from '$app/navigation';
 
 import { page } from '$app/state';
+
+import { updateSession } from '$lib/store/session.svelte'
 
 import { createMatrixStore } from '$lib/store/matrix.svelte'
 const store = createMatrixStore()
@@ -184,6 +184,12 @@ async function process() {
                 }),
             });
             userState.new_user = true
+
+            updateSession({
+                user_id: response.user_id,
+                access_token: response.access_token,
+                device_id: response.device_id,
+            })
 
             /*
             store.createMatrixClient({

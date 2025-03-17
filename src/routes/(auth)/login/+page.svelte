@@ -11,6 +11,8 @@ import {
     login as appservice_login,
 } from '$lib/appservice/api';
 
+import { updateSession } from '$lib/store/session.svelte'
+
 import { createMatrixStore } from '$lib/store/matrix.svelte'
 const store = createMatrixStore()
 
@@ -95,6 +97,12 @@ async function login() {
             const json = await res.json();
 
             console.log("resp", json)
+
+            updateSession({
+                user_id: response.user_id,
+                access_token: response.access_token,
+                device_id: response.device_id,
+            })
 
             store.createMatrixClient({
                 user_id: response.user_id,
