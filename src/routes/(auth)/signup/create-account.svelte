@@ -36,7 +36,7 @@ let {
 } = $props();
 
 let require_invite_code = $derived.by(() => {
-    return data?.features?.require_invite_code
+    return data?.require_invite_code
 })
 
 let code_valid = $derived.by(() => {

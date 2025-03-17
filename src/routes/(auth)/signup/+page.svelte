@@ -8,11 +8,11 @@ import CreateAccount from './create-account.svelte';
 let { data } = $props();
 
 let disabled = $derived.by(() => {
-    return !data?.features?.registration_enabled
+    return !data?.registration_enabled
 })
 
 let no_verification = $derived.by(() => {
-    return !data?.features?.require_verification
+    return !data?.require_verification
 })
 
 $effect(() => {
