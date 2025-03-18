@@ -253,7 +253,7 @@ async function markRead() {
 
 }
 
-let last_sync = $derived(sync_state.last_sync)
+let sync_started = $derived(sync_state.sync_started)
 
 let is_large = $derived.by(() => {
     return email?.content?.body?.content_uri != undefined
@@ -266,14 +266,13 @@ let content_uri = $derived.by(() => {
 let is_new = $state(false);
 
 onMount (() => {
-    if(email.origin_server_ts > last_sync) {
+    if(email.origin_server_ts > sync_started) {
         is_new = true
         setTimeout(() => {
             is_new = false
         }, 5000)
     }
     if(is_large && access_token) {
-        console.log('large', email)
         fetchContent()
     }
 })

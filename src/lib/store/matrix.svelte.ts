@@ -766,6 +766,8 @@ export function createMatrixStore() {
             }
 
             if(state === "PREPARED") {
+                sync_state.last_sync = Date.now();
+
                 buildThreads()
                 updateAppStatus("Connected.")
 
@@ -773,7 +775,6 @@ export function createMatrixStore() {
                     updateAppStatus(null)
                 }, 2000)
 
-                sync_state.last_sync = Date.now();
 
                 nextSyncToken = data.nextSyncToken;
 
