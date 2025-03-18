@@ -253,7 +253,7 @@ async function markRead() {
 
 }
 
-let sync_started = $derived(sync_state.sync_started)
+let sync_started = $derived(sync_state.started)
 
 let is_large = $derived.by(() => {
     return email?.content?.body?.content_uri != undefined
