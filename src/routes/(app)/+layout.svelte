@@ -102,10 +102,10 @@ function handleResize(e) {
 let is_dev_mode = $derived(dev_mode?.enabled);
 
 
-const events = $derived(matrixStore?.events)
+const threads = $derived(matrixStore?.threads)
 const first_event = $derived.by(() => {
     //return events?.values().next().value
-    return [...events.values()].pop();
+    return [...threads.values()].pop();
 })
 
 let new_user = $derived(userState?.new_user)

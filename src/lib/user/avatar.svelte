@@ -79,7 +79,7 @@ async function getAvatar() {
 
 </script>
 
-<div class="grid place-items-center text-xs bg-bird-700 rounded-[50%] pointer-events-none"
+<div class="grid place-items-center text-xs bg-bird-800 rounded-[50%] pointer-events-none"
     class:w-9={large}
     class:h-9={large}
     class:w-7={!small && !large}

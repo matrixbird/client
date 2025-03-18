@@ -35,13 +35,6 @@ $effect(() => {
     if(store?.inbox_items) {
         console.log("inbox items", store.inbox_items)
     }
-    if(inbox_emails) {
-        count.inbox = inbox_emails.length
-    }
-    if(page.params.mailbox && status.threads_ready &&
-        status.thread_events_ready) {
-        //console.log("Building mailbox email list.")
-    }
 })
 
 function findLastUserEvent(threadEvents) {

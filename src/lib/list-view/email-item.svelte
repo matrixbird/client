@@ -334,7 +334,7 @@ let el;
 
                 {#if native && is_matrixbird}
                     <div class="text-xs font-medium flex place-items-center">
-                        <span class="mr-2 bg-bird-700 text-white px-1
+                        <span class="mr-2 bg-bird-800 text-white px-1
                             rounded-[3px]">
                             Matrixbird
                         </span>

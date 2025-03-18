@@ -116,7 +116,6 @@ export let mailbox_rooms: {
 let pending_emails_event = $state(null);
 
 
-
 $effect.root(() => {
     $effect(() => {
         if(sessionExists()) {
