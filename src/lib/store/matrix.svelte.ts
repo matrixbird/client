@@ -84,7 +84,7 @@ export let sync_state: {
     last_sync: number | null,
     last_retry: number | null,
 } = $state({
-    started: 0,
+    started: Date.now(),
     synced: false,
     state: null,
     last_sync: null,
@@ -181,6 +181,8 @@ export function createMatrixStore() {
                 return
             }
         }
+
+        console.log("Sync started at", sync_state.started)
 
         /*
         try {
@@ -322,9 +324,6 @@ export function createMatrixStore() {
       console.log("no inbox room")
     }
     */
-
-
-        sync_state.started = Date.now();
 
 
         client.on(sdk.RoomEvent.MyMembership, function (room, membership, prev) {
@@ -498,7 +497,8 @@ export function createMatrixStore() {
             if (event.event.type == "matrixbird.email.reply") {
                 let origin_server_ts = event.event.origin_server_ts
                 if(origin_server_ts > sync_state.started) {
-                    console.log("new email reply, add it to the right place", event.event)
+                    console.log(origin_server_ts > sync_state.started)
+                    console.log("New email reply.", event.event)
                     let thread_id = event.event.content?.["m.relates_to"]?.event_id;
 
                     let exists = threads.get(thread_id);
@@ -812,7 +812,7 @@ export function createMatrixStore() {
         await client.startClient({
             filter: filter,
             //fullState: true,
-            initialSyncLimit: 1000,
+            initialSyncLimit: 1,
             lazyLoadMembers: false,
             //disablePresence: true,
             //threadSupport: true,
