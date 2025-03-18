@@ -494,6 +494,7 @@ let opts_close = $derived.by(() => {
     class:base={!expanded}
     class:rounded-b-3xl={expanded}
     class:border-b-[7px]={expanded}
+    class:max-w-[34rem]={!expanded}
     class:expand={expanded}>
 
     <div class="editor-header rounded-t-2xl flex bg-bird-900 text-white font-medium py-1"
@@ -604,7 +605,6 @@ button {
 
 .editor {
     z-index: 100;
-    max-width: 34rem;
 }
 
 .content {
