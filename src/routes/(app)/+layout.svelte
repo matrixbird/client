@@ -20,7 +20,9 @@ import ThemeToggle from '$lib/theme/toggle.svelte'
 import Navbar from '$lib/navbar/navbar.svelte';
 import Alert from '$lib/components/alert/alert.svelte'
 
-import { userState, ui_state } from '$lib/store/app.svelte'
+import { getFeatures } from '$lib/appservice/api'
+
+import { setFeatures, userState, ui_state } from '$lib/store/app.svelte'
 import { createAppStore, dev_mode } from '$lib/store/app.svelte'
 const store = createAppStore()
 
@@ -38,10 +40,24 @@ let ready = $derived(matrixStore?.ready)
 
 let created = $state(false);
 
+let features_loaded = $state(false);
+
 $effect(() => {
+    if(browser && !features_loaded) {
+        features_loaded = true
+        loadFeatures()
+    }
 })
 
+async function loadFeatures() {
+    let features = await getFeatures()
+    if(features) {
+        setFeatures(features)
+    }
+}
+
 onMount(() => {
+
     if(data?.access_token && data?.device_id && data?.user_id) {
         matrixStore.createMatrixClient(data)
     }

@@ -8,13 +8,20 @@ interface App {
     started_at: number,
     ready: boolean,
     status: string | null,
+    features: object | null,
 }
 
 export const app: App = $state({
     started_at: new Date().valueOf(),
     ready: false,
     status: null,
+    features: null,
 });
+
+export function setFeatures(features: object) {
+    app.features = features
+    console.log("Features updated:", $state.snapshot(app.features))
+}
 
 export const dev_mode = $state({
     enabled: false

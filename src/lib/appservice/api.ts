@@ -174,3 +174,21 @@ export const valid_email = async (email: string) => {
 
 }
 
+export const getFeatures = async () => {
+  const url = `${PUBLIC_APPSERVICE}/features`;
+
+  let options = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }
+
+  try {
+    const response = await fetch(url, options)
+    return response.json();
+  } catch (error) {
+    throw error
+  }
+
+}
+

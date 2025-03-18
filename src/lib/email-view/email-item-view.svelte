@@ -9,7 +9,9 @@ import {
 import UserAvatar from '$lib/user/avatar.svelte'
 import ReplyComposer from '$lib/editor/reply-composer.svelte'
 
-import { newAlert } from '$lib/store/app.svelte'
+import Recipient from '$lib/components/recipient/recipient.svelte';
+
+import { app, newAlert } from '$lib/store/app.svelte'
 
 import { createMatrixStore, large_email_content } from '$lib/store/matrix.svelte'
 const store = createMatrixStore()
@@ -18,6 +20,13 @@ import { reply_editors } from '$lib/store/editor.svelte'
 
 let { email, last } = $props();
 
+let features = $derived.by(() => {
+    return app.features
+})
+
+let outgoing_reply_allowed = $derived.by(() => {
+    return app.features?.email?.outgoing == true
+})
 
 let active = $derived.by(() => {
     return email?.event_id == page.params.event
@@ -114,7 +123,8 @@ let replying = $derived.by(() => {
 })
 
 function reply() {
-    if(email.type == "matrixbird.email.standard") {
+    if(email.type == "matrixbird.email.standard" && 
+        !outgoing_reply_allowed) {
         newAlert({
             message: "Replying to regular emails is disabled for now.",
         })
@@ -180,7 +190,14 @@ let is_large = $derived.by(() => {
                     </div>
                 {/if}
                 <div class="text-xs text-light">
-                    to {recepients}
+                    to 
+                    {#if recepients}
+                        {#each recepients as recipient}
+                            {#if recipient}
+                                <Recipient {recipient}/>
+                            {/if}
+                        {/each}
+                    {/if}
                 </div>
             </div>
 
