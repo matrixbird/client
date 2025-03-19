@@ -49,7 +49,7 @@
 		"dompurify": "^3.2.4",
 		"email-validator": "^2.0.4",
 		"emoji-picker-element": "^1.26.1",
-		"matrix-js-sdk": "^36.2.0",
+		"matrix-js-sdk": "^37.1.0",
 		"uuid": "^11.0.5"
 	}
 }
