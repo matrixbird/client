@@ -99,12 +99,14 @@ async function login() {
             console.log("resp", json)
 
             updateSession({
+                session_id: response.session_id,
                 user_id: response.user_id,
                 access_token: response.access_token,
                 device_id: response.device_id,
             })
 
             store.createMatrixClient({
+                session_id: response.session_id,
                 user_id: response.user_id,
                 access_token: response.access_token,
                 device_id: response.device_id,
