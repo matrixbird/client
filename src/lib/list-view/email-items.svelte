@@ -96,8 +96,8 @@ function buildInboxEmails(_threads) {
 
 let inbox_emails = $derived.by(() => {
     if(is_inbox && status.threads_ready && status.thread_events_ready) {
-        return buildInboxEmails(threads)
-        //return store.inbox_items
+        //return buildInboxEmails(threads)
+        return store.inbox_items
     }
 })
 

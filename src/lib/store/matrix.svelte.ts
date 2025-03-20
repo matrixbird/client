@@ -1,5 +1,11 @@
 import { PUBLIC_HOMESERVER } from '$env/static/public';
 import { MatrixClient } from 'matrix-js-sdk';
+import { 
+    SlidingSync, 
+    type MSC3575List,
+    type MSC3575Filter,
+    type MSC3575RoomSubscription,
+} from 'matrix-js-sdk/src/sliding-sync';
 import * as sdk from 'matrix-js-sdk';
 import { SvelteMap } from 'svelte/reactivity';
 import { browser } from '$app/environment';
@@ -7,6 +13,8 @@ import { untrack } from 'svelte';
 
 import { session, updateSession, sessionExists, type Session } from '$lib/store/session.svelte';
 
+
+import { newSlidingSync } from '$lib/store/sync.svelte'
 
 import type {
     Threads,
@@ -16,9 +24,10 @@ import type {
 import { updateAppStatus, ui_state } from '$lib/store/app.svelte';
 
 import { 
+    processSync,
     buildInboxEmails,
-    buildSentEmails
-} from '$lib/matrix/process'
+    buildSentEmails,
+} from '$lib/store/process.svelte'
 
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -31,12 +40,16 @@ import {
     getThreads,
     getThreadEvents,
     syncOnce,
+    slidingSync,
     getRoomState,
 } from '$lib/matrix/api'
 
 import {
     is_local_room
 } from '$lib/utils/matrix'
+
+
+let conn_id: string = $state(uuidv4());
 
 let ready = $state(false);
 let synced = $state(false);
@@ -49,21 +62,31 @@ let client: MatrixClient = $state(sdk.createClient({
     baseUrl: PUBLIC_HOMESERVER,
 }));
 
-let loaded = $state(false);
 
-let rooms = $state({});
-let members = $state(new SvelteMap());
+export let rooms = $state({});
+export let users = $state(new SvelteMap());
 
-let threads: Threads = $state(new SvelteMap());
-let thread_events: ThreadEvents = $state(new SvelteMap());
+
+export let events = $state(new SvelteMap());
+export let threads: Threads = $state(new SvelteMap());
+export let thread_events: ThreadEvents = $state(new SvelteMap());
+
+export let read_events = $state(new SvelteMap());
+
+export let store = $state({
+    rooms: new SvelteMap(),
+    users: new SvelteMap(),
+    events: new SvelteMap(),
+    threads: new SvelteMap(),
+    thread_events: new SvelteMap(),
+})
 
 export let email_requests = $state([]);
 
 export let large_email_content = $state(new SvelteMap());
 
-let events = $state(new SvelteMap());
+export let media_cache = $state(new SvelteMap());
 
-let read_events = $state(new SvelteMap());
 
 let joined_rooms: string[] = $state([]);
 
@@ -75,7 +98,6 @@ export let status = $state({
     thread_events_ready: false,
 });
 
-let created_rooms = $state({});
 
 export let sync_state: {
     started: number,
@@ -95,8 +117,14 @@ let requests = $derived.by(() =>{
     return email_requests;
 })
 
+let processed = $state(false);
+
+export function syncProcessed() {
+    processed = true;
+}
+
 let inbox_items = $derived.by(() =>{
-    if(!status.threads_ready || !status.thread_events_ready) {
+    if(!processed) {
         return []
     }
     return buildInboxEmails(session, threads, thread_events);
@@ -120,6 +148,11 @@ $effect.root(() => {
     $effect(() => {
         if(sessionExists()) {
             //console.log("We have session", session)
+        }
+        if(!ready && processed) {
+            status.threads_ready = true;
+            status.thread_events_ready = true;
+            ready = true;
         }
     })
 })
@@ -202,18 +235,21 @@ export function createMatrixStore() {
             }
         } catch(e) {
         }
+        try {
+            const sync = await slidingSync(conn_id);
+            await processSync(sync);
+
+        } catch(e) {
+            throw e
+        }
         */
+
+        let spoll = newSlidingSync()
+        spoll.start()
 
         try {
             const init_sync = await syncOnce();
 
-            let mb_rooms = init_sync.account_data?.events?.find(e => e.type == "matrixbird.mailbox.rooms");
-            if(mb_rooms) {
-                for (const [key, value] of Object.entries(mb_rooms.content)) {
-                    mailbox_rooms[key] = value;
-                }
-            }
-            console.log("Mailbox rooms:", $state.snapshot(mailbox_rooms))
 
             for (const [room_id, room] of Object.entries(init_sync.rooms.join)) {
 
@@ -226,24 +262,10 @@ export function createMatrixStore() {
                     pending_emails_event = pending_event;
                 }
 
-                // build read_events
-                let ephemeral = room.ephemeral?.events;
-                if(ephemeral) {
-                    for (const event of ephemeral) {
-                        if(event.type == "m.receipt") {
-                            for (const event_id in event.content) {
-                                let thread_id = event.content[event_id]?.["m.read"]?.[session.user_id]?.thread_id;
-                                if(thread_id && thread_id != "main") {
-                                    read_events.set(event_id, thread_id);
-                                    //console.log("read events", read_events)
-                                }
-                            }
-                        }
-                    }
-                }
 
             } 
-            console.log("Joined rooms: ", $state.snapshot(joined_rooms))
+            //console.log("read events are", read_events)
+            //console.log("Joined rooms: ", $state.snapshot(joined_rooms))
 
             if(init_sync.rooms.invite) {
                 for (const [room_id, room] of Object.entries(init_sync.rooms.invite)) {
@@ -438,6 +460,34 @@ export function createMatrixStore() {
             if(exists) {
                 return;
             }
+
+            try {
+
+                console.log("Joining room:", roomId);
+                let room = await client.joinRoom(roomId, {
+                    syncRoom: true,
+                });
+
+                setTimeout(async () => {
+
+                    const state = await getRoomState(roomId);
+                    console.log("remote room state", state)
+
+                    const messagesResult = await client.createMessagesRequest(roomId, null, 100, 'b', null);
+                    const messages = messagesResult.chunk;
+                    console.log(`Fetched ${messages.length} messages using createMessagesRequest`);
+                    joined_rooms.push(roomId);
+                    buildThreadForJoinedRoom(roomId)
+
+                }, 1000)
+
+
+            } catch (error) {
+                console.error("Error joining room:", roomId, error);
+            }
+        }
+
+        async function init_remote_room(roomId) {
 
             try {
 
@@ -728,6 +778,15 @@ export function createMatrixStore() {
                     result.value.chunk.forEach(thread => {
                         threadUpdates.set(thread.event_id, thread);
                     });
+
+                    // check if federated room with no local events
+                    // initate state/messages request if so
+                    let is_local = is_local_room(roomId);
+                    if (!is_local && result.value.chunk.length === 0) {
+                        console.log("no threads found, we should fetch it", roomId)
+                        init_remote_room(roomId);
+                    }
+
                 }
             });
 
@@ -742,8 +801,7 @@ export function createMatrixStore() {
             status.thread_events_ready = true;
 
 
-            ready = true
-
+            ready = true;
         }
 
 
@@ -767,7 +825,7 @@ export function createMatrixStore() {
             if(state === "PREPARED") {
                 sync_state.last_sync = Date.now();
 
-                buildThreads()
+                //buildThreads()
                 updateAppStatus("Connected.")
 
                 setTimeout(() => {
@@ -800,24 +858,57 @@ export function createMatrixStore() {
                 ephemeral: {
                     types: ["m.receipt"],
                     unread_thread_notifications: true,
-                    limit: 1000,
+                    limit: 0,
+                },
+                state: {
+                    unread_thread_notifications: true,
+                    limit: 0,
                 },
                 timeline: {
                     unread_thread_notifications: true,
-                    limit: 100,
+                    limit: 0,
                 }
             }
         })
 
+        let lists = new Map<string, MSC3575List>();
+        lists.set("emails", {
+            ranges: [[0, 50]],
+            filters: {
+                //tags: ["matrixbird.important"],
+                //"not_tags": ["matrixbird.ignore"]
+                is_dm: false
+            },
+            timeline_limit: 100,
+            sort: ["by_recency"],
+            required_state: [
+                ["*", "*"],
+                //["matrixbird.room.type", "*"],
+                //["m.room.member", "*"]
+            ],
+            //bump_event_types: [ "matrixbird.email.matrix", "matrixbird.email.standard", "matrixbird.email.reply", "matrixbird.thread.marker" ]
+        })
+
+        let sliding_sync = new SlidingSync(
+            PUBLIC_HOMESERVER,
+            lists,
+            {},
+            client,
+            3000
+        );
+
+        /*
         await client.startClient({
+            //slidingSync: sliding_sync,
             filter: filter,
             //fullState: true,
-            initialSyncLimit: 1,
+            initialSyncLimit: 0,
             lazyLoadMembers: false,
-            //disablePresence: true,
+            disablePresence: true,
             //threadSupport: true,
             resolveInvitesToProfiles: true,
         });
+        */
 
 
     }

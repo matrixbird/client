@@ -14,7 +14,7 @@ import {
     getThumbnail,
 } from '$lib/matrix/api'
 
-import { createMatrixStore } from '$lib/store/matrix.svelte'
+import { createMatrixStore, media_cache } from '$lib/store/matrix.svelte'
 const store = createMatrixStore()
 
 let { 
@@ -62,9 +62,16 @@ let is_matrixbird = $derived.by(() => {
 })
 
 $effect(() => {
-    if(avatar && !from) {
+    if(avatar && !from && !from_cache) {
         getAvatar()
     }
+    if(from_cache) {
+        url = from_cache
+    }
+})
+
+let from_cache = $derived.by(() => {
+    return media_cache.get(avatar)
 })
 
 let url = $state(null);
@@ -73,6 +80,7 @@ async function getAvatar() {
     let con = await getThumbnail(avatar)
     if(con) {
         url = con
+        media_cache.set(avatar, con)
     }
 }
 

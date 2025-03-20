@@ -176,6 +176,70 @@ export const syncOnce = async () => {
 
 }
 
+export const slidingSync = async (conn_id: string) => {
+
+    if(!session.access_token) {
+        throw new Error('Access token is missing.');
+    }
+
+    let body = {
+        conn_id: conn_id,
+        lists: {
+            emails: {
+                ranges: [[0, 50]],
+                filters: {
+                    //tags: ["matrixbird.important"],
+                    //"not_tags": ["matrixbird.ignore"]
+                    is_dm: false
+                },
+                timeline_limit: 100,
+                include_heroes: true,
+                sort: ["by_recency"],
+                required_state: [
+                    ["*", "*"],
+                    //["matrixbird.room.type", "*"],
+                    //["m.room.member", "*"]
+                ],
+                bump_event_types: [ "matrixbird.email.matrix", "matrixbird.email.standard", "matrixbird.email.reply", "matrixbird.thread.marker" ]
+            }
+        },
+        extensions: {
+            threads: {
+                enabled: true
+            },
+            to_device: {
+                enabled: true
+            },
+            receipts: {
+                enabled: true
+            },
+            account_data: {
+                enabled: true
+            }
+        }
+    }
+
+
+    let url = `${PUBLIC_HOMESERVER}/_matrix/client/unstable/org.matrix.simplified_msc3575/sync`;
+
+    let options = {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`
+        },
+        method: 'POST',
+        body: JSON.stringify(body)
+    }
+
+    try {
+        const response = await fetch(url, options)
+        return response.json();
+    } catch (error) {
+        throw error
+    }
+
+}
+
 export const getRoomState = async (roomId: string ) => {
 
     if(!session.access_token) {

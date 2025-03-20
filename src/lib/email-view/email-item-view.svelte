@@ -13,7 +13,7 @@ import Recipient from '$lib/components/recipient/recipient.svelte';
 
 import { app, newAlert } from '$lib/store/app.svelte'
 
-import { createMatrixStore, large_email_content } from '$lib/store/matrix.svelte'
+import { createMatrixStore, large_email_content, users } from '$lib/store/matrix.svelte'
 const store = createMatrixStore()
 
 import { reply_editors } from '$lib/store/editor.svelte'
@@ -103,16 +103,11 @@ const native = $derived.by(() => {
 })
 
 let user = $derived.by(() =>{
-    if(!email?.room_id) return
-    const room = store.rooms[email?.room_id]
-    if(room) {
-        const member = room.getMember(email.sender)
-        //console.log(member)
-        if(member) {
-            return {
-                name: member?.name || member?.rawDisplayName,
-                address: mxid_to_email(member.userId)
-            }
+    let _user = users.get(email?.sender)
+    if(_user) {
+        return {
+            name: _user.displayname,
+            address: mxid_to_email(email.sender)
         }
     }
 })

@@ -186,6 +186,7 @@ async function process() {
             userState.new_user = true
 
             updateSession({
+                session_id: response.session_id,
                 user_id: response.user_id,
                 access_token: response.access_token,
                 device_id: response.device_id,

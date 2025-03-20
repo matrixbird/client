@@ -7,12 +7,12 @@ import { page } from '$app/state';
 
 import { close } from '$lib/assets/icons'
 
-import { createMatrixStore, status } from '$lib/store/matrix.svelte'
-const store = createMatrixStore()
+import { createMatrixStore, status, store } from '$lib/store/matrix.svelte'
+const matrix_store = createMatrixStore()
 
-const events = $derived(store?.events)
-const threads = $derived(store?.threads)
-const thread_events = $derived(store?.thread_events)
+const events = $derived(matrix_store?.events)
+const threads = $derived(matrix_store?.threads)
+const thread_events = $derived(matrix_store?.thread_events)
 
 let ready = $derived(() => {
     return emails?.length > 0
