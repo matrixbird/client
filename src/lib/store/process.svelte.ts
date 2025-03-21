@@ -1,4 +1,7 @@
 import { session, type Session } from '$lib/store/session.svelte';
+import { SvelteMap } from 'svelte/reactivity';
+import { MatrixClient } from 'matrix-js-sdk/src/index';
+import type { IStore } from 'matrix-js-sdk/src/store';
 import type { 
     MatrixEvent,
     Emails,
@@ -8,6 +11,10 @@ import type {
 
 import type { MSC3575SlidingSyncResponse as SyncResponse } from 'matrix-js-sdk/src/sliding-sync';
 
+import {
+    is_local_room
+} from '$lib/utils/matrix'
+
 
 import { 
     syncProcessed,
@@ -16,7 +23,8 @@ import {
     thread_events,
     read_events, 
     mailbox_rooms,
-    users
+    users,
+    join_room
 } from '$lib/store/matrix.svelte'
 
 
@@ -149,7 +157,7 @@ export async function processSync(sync: SyncResponse) {
                 .forEach(([event_id, value]) => {
                     let thread_id = value?.["m.read"]?.[session.user_id]?.["thread_id"];
                     if(thread_id && thread_id != "main") {
-                        read_events.set(event_id, thread_id);
+                        //read_events.set(event_id, thread_id);
                     }
                 });
         });
@@ -202,5 +210,68 @@ export async function processSync(sync: SyncResponse) {
     }
     console.log("users are ", users)
 
+    syncProcessed()
+}
+
+export async function process(client: MatrixClient) {
+    console.log("Initial sync - process data.", client)
+
+
+
+    Object.keys(client.store.rooms).forEach((roomId) => {
+        const room = client.getRoom(roomId);
+
+        const isLocal = is_local_room(roomId);
+
+
+        let receipts = room.cachedThreadReadReceipts;
+
+        receipts.forEach((val, event_id) => {
+            val.forEach((e) => {
+                if(e.userId == session.user_id) {
+                    read_events.set(e.eventId, e?.receipt?.thread_id);
+                }
+            })
+
+        })
+
+
+        let _events = room.getLiveTimeline().getEvents();
+
+        let _threads = _events.filter((event) => {
+            return event.getType() === "matrixbird.email.matrix" || event.getType() === "matrixbird.email.standard";
+        })
+
+        if(!isLocal && _threads.length === 0) {
+            console.log("This is a joined remote room that hasn't been synced yet.")
+            //join_room(roomId);
+        }
+
+        _threads.forEach((event) => {
+            //console.log("Event", event);
+            events.set(event.getId(), event.event);
+            threads.set(event.getId(), event.event);
+
+        });
+
+        let replies = _events.filter((event) => {
+            return event.getType() === "matrixbird.email.reply";
+        })
+
+        replies.forEach((event) => {
+            let thread_id = event.event?.content?.["m.relates_to"]?.["event_id"];
+            if(thread_id) {
+                //console.log("reply event", thread_id, event)
+                events.set(event.event.event_id, event.event);
+
+                let eev = thread_events.get(thread_id) || [];
+                eev.push(event.event);
+                thread_events.set(thread_id, eev);
+            }
+        });
+    });
+    //console.log("threads are", _threads)
+    //console.log("threads events are", _thread_events)
+    //console.log("read events are", read_events)
     syncProcessed()
 }

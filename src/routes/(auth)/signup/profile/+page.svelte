@@ -1,5 +1,5 @@
 <script lang="ts">
-import * as sdk from 'matrix-js-sdk';
+import * as sdk from 'matrix-js-sdk/src/index';
 import { PUBLIC_HOMESERVER } from '$env/static/public';
 import logo from '$lib/logo/logo'
 import { onMount, tick } from 'svelte';

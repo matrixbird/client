@@ -1,12 +1,12 @@
 import { PUBLIC_HOMESERVER } from '$env/static/public';
-import { MatrixClient } from 'matrix-js-sdk';
+import { MatrixClient } from 'matrix-js-sdk/src/index';
 import { 
     SlidingSync, 
     type MSC3575List,
     type MSC3575Filter,
     type MSC3575RoomSubscription,
 } from 'matrix-js-sdk/src/sliding-sync';
-import * as sdk from 'matrix-js-sdk';
+import * as sdk from 'matrix-js-sdk/src/index';
 import { SvelteMap } from 'svelte/reactivity';
 import { browser } from '$app/environment';
 import { untrack } from 'svelte';
@@ -24,6 +24,7 @@ import type {
 import { updateAppStatus, ui_state } from '$lib/store/app.svelte';
 
 import { 
+    process,
     processSync,
     buildInboxEmails,
     buildSentEmails,
@@ -149,7 +150,7 @@ $effect.root(() => {
         if(sessionExists()) {
             //console.log("We have session", session)
         }
-        if(!ready && processed) {
+        if(!ready && processed && synced) {
             status.threads_ready = true;
             status.thread_events_ready = true;
             ready = true;
@@ -237,15 +238,14 @@ export function createMatrixStore() {
         }
         try {
             const sync = await slidingSync(conn_id);
-            await processSync(sync);
+            //await processSync(sync);
 
         } catch(e) {
             throw e
         }
-        */
 
-        let spoll = newSlidingSync()
-        spoll.start()
+        //let spoll = newSlidingSync()
+        //spoll.start()
 
         try {
             const init_sync = await syncOnce();
@@ -345,13 +345,32 @@ export function createMatrixStore() {
       console.log("no inbox room")
     }
     */
+        client.on(sdk.RoomStateEvent.NewMember, function (event, state, member) {
+            //if(!synced) return;
+            if(member.userId !== session.user_id) {
+                //console.log("new member", event, state, member)
+            }
+        });
 
 
         client.on(sdk.RoomEvent.MyMembership, function (room, membership, prev) {
 
+            if(!synced) return;
+
             if (membership === sdk.KnownMembership.Join) {
                 //console.log("joined", room.roomId)
                 //joined_rooms.push(room.roomId)
+                console.log("let's see new room", room)
+                let is_local = is_local_room(room.roomId);
+                if(is_local) {
+                    setTimeout(() => {
+                        //join_local_room(room.roomId)
+                    }, 100)
+                } else {
+                    setTimeout(() => {
+                        //join_room(room.roomId);
+                    }, 1000)
+                }
             }
 
             if (membership === sdk.KnownMembership.Invite) {
@@ -367,11 +386,11 @@ export function createMatrixStore() {
                 let is_local = is_local_room(room.roomId);
                 if(is_local) {
                     setTimeout(() => {
-                        join_local_room(room.roomId)
+                        //join_local_room(room.roomId)
                     }, 100)
                 } else {
                     setTimeout(() => {
-                        join_room(room.roomId);
+                        //join_room(room.roomId);
                     }, 1000)
                 }
             }
@@ -569,20 +588,15 @@ export function createMatrixStore() {
         });
 
         client.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
-            let exists = joined_rooms.find(r => r === room.roomId);
-            if(!exists) {
-                console.log("not in room", room.roomId)
-                return;
-            }
-            if(event.event.type === "matrixbird.thread.marker") {
+            if(!synced) return;
+            if(event.event.type === "matrixbird.thread.marker" || 
+            event.event.type === "matrixbird.thread.sync") {
 
                 let origin_server_ts = event.event.origin_server_ts
                 if(origin_server_ts > sync_state.started) {
-                    console.log("new thread marker, pull it in")
+                    console.log("new thread marker, pull it in", event.event.type)
                     let thread_id = event.event.content?.["m.relates_to"]?.event_id;
                     get_new_thread(event.event.room_id, thread_id)
-
-                    refresh(room);
 
                 }
 
@@ -590,6 +604,20 @@ export function createMatrixStore() {
         });
 
         /*
+        client.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
+            if(!synced) return;
+            if(event.event.type === "matrixbird.email.matrix" || 
+            event.event.type === "matrixbird.email.standard") {
+
+                let origin_server_ts = event.event.origin_server_ts
+                if(origin_server_ts > sync_state.started) {
+                    console.log("New email event.", event.event.type)
+                    get_new_thread(event.event.room_id, event.getId())
+
+                }
+            }
+        });
+
     client.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
       if(event.event.type === "matrixbird.receipt" && 
         event.event.sender == session.user_id) {
@@ -805,7 +833,7 @@ export function createMatrixStore() {
         }
 
 
-        client.on("sync", (state, prevState, data) => {
+        client.on("sync", async (state, prevState, data) => {
 
             sync_state.state = state;
 
@@ -823,6 +851,12 @@ export function createMatrixStore() {
             }
 
             if(state === "PREPARED") {
+
+                if(!synced) {
+                    await process(client)
+                }
+
+
                 sync_state.last_sync = Date.now();
 
                 //buildThreads()
@@ -894,21 +928,20 @@ export function createMatrixStore() {
             lists,
             {},
             client,
-            3000
+            30000
         );
 
-        /*
+
         await client.startClient({
-            //slidingSync: sliding_sync,
-            filter: filter,
+            slidingSync: sliding_sync,
+            //filter: filter,
             //fullState: true,
-            initialSyncLimit: 0,
-            lazyLoadMembers: false,
-            disablePresence: true,
+            //initialSyncLimit: 0,
+            //lazyLoadMembers: false,
+            //disablePresence: true,
             //threadSupport: true,
-            resolveInvitesToProfiles: true,
+            //resolveInvitesToProfiles: true,
         });
-        */
 
 
     }
@@ -926,7 +959,8 @@ export function createMatrixStore() {
             console.log("found thread events", _events)
 
             let filtered = _events?.filter(event => {
-                return event.type != "matrixbird.thread.marker";
+                return event.type != "matrixbird.thread.marker" && 
+                    event.type != "matrixbird.thread.sync";
             })
 
             if(filtered.length > 0) {
@@ -1176,4 +1210,35 @@ export function createMatrixStore() {
 export async function updateClientSettings(settings_type, data) {
     await client.setAccountData(`matrixbird.client.settings.${settings_type}`, data)
     console.log("Client settings updated in account data.", data)
+}
+
+
+export async function join_room(roomId: string) {
+
+    try {
+
+        console.log("Joining room:", roomId);
+        let room = await client.joinRoom(roomId, {
+            syncRoom: true,
+        });
+
+        await client.scrollback(room, 1000);
+
+        let init = await client.roomInitialSync(roomId, 100);
+        console.log("Initial sync", init)
+
+        setTimeout(async () => {
+
+            const state = await getRoomState(roomId);
+            console.log("remote room state", state)
+
+            const messagesResult = await client.createMessagesRequest(roomId, null, 100, 'b', null);
+            const messages = messagesResult.chunk;
+            console.log(`Fetched ${messages.length} messages using createMessagesRequest`);
+
+        }, 1000)
+
+    } catch (error) {
+        console.error("Error joining room:", roomId, error);
+    }
 }

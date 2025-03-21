@@ -103,15 +103,19 @@ const native = $derived.by(() => {
 })
 
 let user = $derived.by(() =>{
-    let _user = users.get(email?.sender)
-    if(_user) {
+    if(!email?.room_id) return
+
+    let users = store.client.getUsers()
+    let user = users.find(user => user.userId == email.sender)
+
+    if(user) {
         return {
-            name: _user.displayname,
-            address: mxid_to_email(email.sender)
+            name: user?.name || user?.rawDisplayName,
+            address: mxid_to_email(user.userId),
+            localpart: get_localpart(user.userId)
         }
     }
 })
-
 
 let replying = $derived.by(() => {
     return reply_editors.get(email?.event_id) != undefined

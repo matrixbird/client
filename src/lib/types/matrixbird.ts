@@ -1,4 +1,5 @@
-import { type IEvent as MatrixEvent} from 'matrix-js-sdk'
+import type { MatrixEvent } from 'matrix-js-sdk/lib/models/event'
+
 export type { MatrixEvent };
 
 export type Emails = Record<string, MatrixEvent>;

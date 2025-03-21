@@ -289,6 +289,35 @@ empty.`,
         );
         console.log('Thread marker event:', thr)
 
+        setTimeout(async () => {
+            //store.client.sendReadReceipt(room_id, msg.event_id)
+            const thr = await store.client.sendEvent(
+                room_id,
+                "matrixbird.thread.sync",
+                {
+                    msgtype: "thread_sync",
+                    "m.relates_to": {
+                        "event_id": msg.event_id,
+                        "m.in_reply_to": msg.event_id,
+                        "rel_type": "m.thread"
+                    },
+                },
+                uuidv4()
+            );
+            console.log('Thread sync event:', thr)
+        }, 2000)
+
+        /*
+        const ste = await store.client.sendStateEvent(
+            room_id,
+            "matrixbird.thread.ready",
+            {
+                ready: true,
+            },
+            uuidv4()
+        );
+        console.log('State event:', ste)
+
         /*
         let outbox_room_id = mailbox_rooms["OUTBOX"]
         if(outbox_room_id) {
