@@ -10,4 +10,7 @@ declare global {
 	}
 }
 
+declare const COMMIT: string
+declare const LINK: string
+
 export {};
