@@ -1,8 +1,9 @@
 <script lang="ts">
 import * as sdk from 'matrix-js-sdk/src/index';
+import { MatrixClient } from 'matrix-js-sdk/src/client';
 import { PUBLIC_HOMESERVER } from '$env/static/public';
 import logo from '$lib/logo/logo'
-import { onMount, tick } from 'svelte';
+import { onMount, onDestroy, tick } from 'svelte';
 import UploadAvatar from '$lib/user/upload-avatar.svelte';
 
 import {
@@ -40,12 +41,18 @@ onMount(() => {
     }
 });
 
+onDestroy(() => {
+    client?.stopClient()
+})
+
 let mailbox_rooms_ready = $state(false);
 let event_count = $state(0);
 
+let client: MatrixClient | null = $state(null);
+
 async function sync(data) {
     console.log('syncing with data', data)
-    let client =  sdk.createClient({
+    client =  sdk.createClient({
         baseUrl: PUBLIC_HOMESERVER,
         accessToken: data.access_token,
         userId: data.user_id,
