@@ -121,7 +121,7 @@
 
 }
 
-:root.dark {
+:root.black {
     --bg: hsla(0, 0%, 10%, 1);
     --background: hsla(0, 0%, 18%, 1);
     --text: white;
