@@ -15,6 +15,8 @@ async function logout() {
     }
     form.submit();
     goto('/logout')
+    // sometimes goto doesn't work, fix later
+    window.location.replace('/logout')
 }
 
 </script>
