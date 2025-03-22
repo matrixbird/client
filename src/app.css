@@ -248,6 +248,7 @@ button {
     color: var(--button-text);
     transition: background-color 0.1s;
     user-select: none;
+    cursor: pointer;
 }
 
 button.primary {
