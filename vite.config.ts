@@ -1,3 +1,4 @@
+import tailwindcss from '@tailwindcss/vite';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 
@@ -17,7 +18,7 @@ let link = `https://github.com/matrixbird/client/commit/${short}`
 link = link.replace(/['"]+/g, '')
 
 export default defineConfig({
-	plugins: [sveltekit()],
+	plugins: [tailwindcss(), sveltekit()],
     server: {
         fs: {
             allow: ['..'],

@@ -446,16 +446,16 @@ function resize(e) {
 }
 
 .boxed-alt {
-    border-left: 1px solid theme('colors.bird.700');
-    border-right: 1px solid theme('colors.bird.700');
-    border-bottom: 1px solid theme('colors.bird.700');
+    border-left: 1px solid var(--bird-700);
+    border-right: 1px solid var(--bird-700);
+    border-bottom: 1px solid var(--bird-700);
 }
 
 .grabber {
     height: 20px;
     width: 20px;
     border-radius: 0 0 20px 0;
-    border-right: 7px solid theme('colors.bird.400');
-    border-bottom: 7px solid theme('colors.bird.400');
+    border-right: 7px solid var(--bird-400);
+    border-bottom: 7px solid var(--bird-400);
 }
 </style>

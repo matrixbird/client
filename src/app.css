@@ -1,6 +1,25 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@import 'tailwindcss';
+
+@theme inline {
+    --color-bg: var(--bg);
+    --color-background: var(--background);
+    --color-primary: var(--primary);
+    --color-secondary: var(--secondary);
+    --color-light: var(--light);
+    --color-logo: var(--logo);
+    --color-border: var(--border);
+    --color-bird-50: var(--bird-50);
+    --color-bird-100: var(--bird-100);
+    --color-bird-200: var(--bird-200);
+    --color-bird-300: var(--bird-300);
+    --color-bird-400: var(--bird-400);
+    --color-bird-500: var(--bird-500);
+    --color-bird-600: var(--bird-600);
+    --color-bird-700: var(--bird-700);
+    --color-bird-800: var(--bird-800);
+    --color-bird-900: var(--bird-900);
+    --color-bird-950: var(--bird-950);
+}
 
 
 @font-face {
@@ -38,10 +57,10 @@
     --logo-fill: hsla(0, 0%, 100%, 1);
     --logo-fill-inactive: hsla(0, 100%, 41.6%, 1);
 
-    --icon-fill: theme('colors.bird.800');
-    --icon-hover-fill: theme('colors.bird.800');
-    --icon-active-fill: theme('colors.bird.800');
-    --icon-active-hover-fill: theme('colors.bird.800');
+    --icon-fill: var(--bird-800);
+    --icon-hover-fill: var(--bird-800);
+    --icon-active-fill: var(--bird-800);
+    --icon-active-hover-fill: var(--bird-800);
 
     --pattern: blue;
 
@@ -63,19 +82,19 @@
 
     --button-background: white;
     --button-text: hsla(0, 0%, 0%, 1);
-    --button-hover: theme('colors.bird.100');
+    --button-hover: var(--bird-100);
     --button-focus: white;
-    --button-active: theme('colors.bird.200');
-    --button-border: theme('colors.bird.400');
-    --button-box-shadow: theme('colors.bird.100');
+    --button-active: var(--bird-200);
+    --button-border: var(--bird-400);
+    --button-box-shadow: var(--bird-100);
 
-    --button-primary-background: theme('colors.bird.800');
+    --button-primary-background: var(--bird-800);
     --button-primary-text: hsla(0, 0%, 100%, 1);
-    --button-primary-hover: theme('colors.bird.800');
-    --button-primary-focus: theme('colors.bird.900');
-    --button-primary-active: theme('colors.bird.950');
+    --button-primary-hover: var(--bird-800);
+    --button-primary-focus: var(--bird-90);
+    --button-primary-active: var(--bird-950);
     --button-primary-border: transparent;
-    --button-primary-box-shadow: theme('colors.bird.800');
+    --button-primary-box-shadow: var(--bird-800);
 
     --input-background: hsla(0, 0%, 100%, 1);
     --input-border: hsla(0, 0%, 20%, 1);
@@ -85,12 +104,12 @@
 
     --alert: hsla(0, 100%, 50%, 1);
 
-    --scrollbar-thumb: theme('colors.bird.700');
-    --scrollbar-track: theme('colors.bird.100');
+    --scrollbar-thumb: var(--bird-700);
+    --scrollbar-track: var(--bird-100);
 
     --tooltip-background: hsla(0, 0%, 100%, 1);
     --tooltip-text: hsla(0, 0%, 0%, 1);
-    --tooltip-background-dark: theme('colors.bird.800');
+    --tooltip-background-dark: var(--bird-800);
     --tooltip-text-dark: hsla(0, 0%, 100%, 1);
 
     --popup-background: hsla(0, 0%, 100%, 1);
@@ -102,7 +121,7 @@
 
 }
 
-:root.black {
+:root.dark {
     --bg: hsla(0, 0%, 10%, 1);
     --background: hsla(0, 0%, 18%, 1);
     --text: white;
@@ -160,12 +179,12 @@
 
     --alert: hsla(0, 100%, 50%, 1);
 
-    --scrollbar-thumb: theme('colors.bird.700');
+    --scrollbar-thumb: var(--bird-700);
     --scrollbar-track: transparent;
 
     --tooltip-background: hsla(0, 0%, 100%, 1);
     --tooltip-text: hsla(0, 0%, 0%, 1);
-    --tooltip-background-dark: theme('colors.bird.800');
+    --tooltip-background-dark: var(--bird-800);
     --tooltip-text-dark: hsla(0, 0%, 100%, 1);
 
     --popup-background: hsla(0, 0%, 10%, 1);
@@ -343,7 +362,7 @@ input::placeholder {
 
 .box {
     background: var(--background);
-    border: 7px solid theme('colors.bird.200');
+    border: 7px solid theme('color.bird.200');
     border-radius: 1.5rem;
 }
 
@@ -408,7 +427,7 @@ input::placeholder {
     position: fixed;
     background: var(--tooltip-background);
     border: 1px solid var(--border);
-    box-shadow: 4px 4px 0 theme('colors.bird.600');
+    box-shadow: 4px 4px 0 theme('color.bird.600');
     color: var(--tooltip-text);
     padding: 0.25rem 0.5rem;
     border-radius: 2px;
@@ -424,7 +443,7 @@ input::placeholder {
     background: var(--tooltip-background-dark);
     border: none;
     color: var(--tooltip-text-dark);
-    box-shadow: 4px 4px 0 theme('colors.bird.300');
+    box-shadow: 4px 4px 0 theme('color.bird.300');
     padding: 0.25rem 0.5rem;
     border-radius: 2px;
     font-size: 14px;
@@ -445,7 +464,7 @@ input::placeholder {
 
 .popup-decoration {
     background: var(--popup-background);
-    border: 7px solid theme('colors.bird.200');
+    border: 7px solid theme('color.bird.200');
     border-radius: 1.5rem;
     transform: translate(0, 0);
 }
@@ -469,12 +488,12 @@ input::placeholder {
 emoji-picker {
     height: 300px;
     z-index: 10000;
-    --background: theme('colors.bird.900');
+    --background: theme('color.bird.900');
     --emoji-font-family: Twemoji;
     --emoji-size: 1.2rem;
     --emoji-padding: 0.35rem;
     --border-radius: 1rem;
-    --indicator-color: theme('colors.bird.200');
+    --indicator-color: theme('color.bird.200');
     --input-font-size: 0.9rem;
     --input-padding: 0.125rem 0.6rem;
     --input-border-radius: 500px;
@@ -484,11 +503,11 @@ emoji-picker {
 @keyframes bobble {
 0%, 100% {
     transform: translateY(0);
-    box-shadow: 6px 6px 0 theme('colors.bird.200');
+    box-shadow: 6px 6px 0 theme('color.bird.200');
 }
 50% {
     transform: translateY(-10px);
-    box-shadow: 10px 10px 0 theme('colors.bird.400');
+    box-shadow: 10px 10px 0 theme('color.bird.400');
 }
 }
 

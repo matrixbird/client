@@ -140,7 +140,7 @@ let opts = $derived.by(() => {
 <style lang="postcss">
 @reference "tailwindcss/theme";
 .active {
-    outline: 4px solid theme('colors.bird.300');
+    outline: 4px solid var(--bird-300);
 }
 
 img {

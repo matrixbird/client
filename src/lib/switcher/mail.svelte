@@ -49,9 +49,9 @@ onclick={open} use:tooltip={opts}>
 <style lang="postcss">
 @reference "tailwindcss/theme";
 .active {
-    background-color: theme('colors.bird.200');
+    background-color: var(--bird-200);
 }
 .active:hover {
-    background-color: theme('colors.bird.200');
+    background-color: var(--bird-200);
 }
 </style>

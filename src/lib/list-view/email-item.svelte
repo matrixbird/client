@@ -414,7 +414,7 @@ let el;
 .email-item {
 }
 .active {
-    border-left: 3px solid theme('colors.bird.700');
+    border-left: 3px solid var(--bird-700);
 }
 
 .inactive {

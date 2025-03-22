@@ -20,7 +20,7 @@ let left = $derived(position?.x || init?.left)
     position: fixed;
     pointer-events: none;
     z-index: 1000;
-    border: 2px solid theme('colors.bird.700');
+    border: 2px solid var(--bird-700);
     width: var(--width);
     height: var(--height);
     top: var(--top);

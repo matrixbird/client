@@ -42,15 +42,15 @@ onclick={open} use:tooltip={opts}>
 @reference "tailwindcss/theme";
 .active {
     fill: white;
-    background-color: theme('colors.bird.200');
+    background-color: var(--bird-200);
 }
 .icon {
-    fill: theme('colors.bird.700');
+    fill: var(--bird-700);
 }
 .icon:hover {
-    background-color: theme('colors.bird.100');
+    background-color: var(--bird-100);
 }
 .active:hover {
-    background-color: theme('colors.bird.200');
+    background-color: var(--bird-200);
 }
 </style>
