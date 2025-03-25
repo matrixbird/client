@@ -278,18 +278,19 @@ empty.`,
             }
         }
 
-        let timeout =  federated ? 5000 : 10
+        const msg = await store.client.sendEvent(
+            room_id,
+            "matrixbird.email.matrix",
+            email_request,
+            uuidv4()
+        );
+        console.log('Email event: ', msg)
 
+        for (const mxid of mxids) {
+            let invite = await store.client.invite(room_id, mxid, "Email request.")
+            console.log('Invite:', invite)
+        }
 
-        setTimeout(async () => {
-            const msg = await store.client.sendEvent(
-                room_id,
-                "matrixbird.email.matrix",
-                email_request,
-                uuidv4()
-            );
-            console.log('Email event: ', msg)
-        }, timeout)
 
 
         /*

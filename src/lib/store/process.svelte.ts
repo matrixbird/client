@@ -289,3 +289,14 @@ export async function processNewEmail(event: any) {
     // Add empty thread events
     thread_events.set(event.getId(), []);
 }
+
+export async function processNewEmailRoom(client: MatrixClient, roomId: string) {
+    console.log("Processing new email room.", roomId)
+    try {
+        const messagesResult = await client.createMessagesRequest(roomId, null, 100, 'b', null);
+        const messages = messagesResult.chunk;
+        console.log(`Fetched ${messages.length} messages using createMessagesRequest`, messages);
+    } catch (error) {
+        console.error("Error processing new email room:", roomId, error);
+    }
+}
