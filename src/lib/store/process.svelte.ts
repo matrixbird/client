@@ -218,7 +218,7 @@ export async function process(client: MatrixClient) {
 
 
 
-    Object.keys(client.store.rooms).forEach((roomId) => {
+    Object.keys(client.store.rooms).forEach(async (roomId) => {
         const room = client.getRoom(roomId);
 
         const isLocal = is_local_room(roomId);
@@ -244,7 +244,15 @@ export async function process(client: MatrixClient) {
 
         if(!isLocal && _threads.length === 0) {
             console.log("This is a joined remote room that hasn't been synced yet.")
+
             //join_room(roomId);
+            try {
+                const res = await processNewEmailRoom(client, roomId);
+                console.log("Processed remote email room", res)
+
+            } catch (error) {
+                console.error("Error fetching messages:", roomId, error);
+            }
         }
 
         _threads.forEach((event) => {
