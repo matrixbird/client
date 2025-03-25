@@ -267,7 +267,7 @@ let is_new = $state(false);
 
 onMount (() => {
     if(email.origin_server_ts > sync_started) {
-        is_new = true
+        //is_new = true
         setTimeout(() => {
             is_new = false
         }, 5000)

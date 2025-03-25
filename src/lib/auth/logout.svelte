@@ -24,6 +24,7 @@ async function logout() {
 <form bind:this={form} method="POST" action="/logout">
 </form>
 
+<a href="/logout">
 <div onclick={logout} class="logout flex place-items-center px-3 py-2 
     hover:bg-bird-100 rounded-b-2xl
     gap-2 cursor-pointer">
@@ -34,6 +35,7 @@ async function logout() {
         Log out
     </div>
 </div>
+</a>
 
 <style>
 </style>

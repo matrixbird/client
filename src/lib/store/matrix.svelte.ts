@@ -26,6 +26,7 @@ import { updateAppStatus, ui_state } from '$lib/store/app.svelte';
 import { 
     process,
     processSync,
+    processNewEmail,
     buildInboxEmails,
     buildSentEmails,
 } from '$lib/store/process.svelte'
@@ -589,6 +590,21 @@ export function createMatrixStore() {
 
         client.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
             if(!synced) return;
+            if(event.event.type === "matrixbird.email.matrix" || 
+            event.event.type === "matrixbird.email.standard") {
+
+                let origin_server_ts = event.event.origin_server_ts
+                if(origin_server_ts > sync_state.started) {
+                    processNewEmail(event)
+                }
+
+            }
+        });
+
+
+        /*
+        client.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
+            if(!synced) return;
             if(event.event.type === "matrixbird.thread.marker" || 
             event.event.type === "matrixbird.thread.sync") {
 
@@ -603,7 +619,6 @@ export function createMatrixStore() {
             }
         });
 
-        /*
         client.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
             if(!synced) return;
             if(event.event.type === "matrixbird.email.matrix" || 

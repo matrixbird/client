@@ -275,3 +275,17 @@ export async function process(client: MatrixClient) {
     //console.log("read events are", read_events)
     syncProcessed()
 }
+
+export async function processNewEmail(event: any) {
+    console.log("Processing new email.", event)
+
+    // We want events that have fully transactioned
+    if(!event?.event?.unsigned) return
+
+    // Add to events and threads
+    events.set(event.getId(), event.event);
+    threads.set(event.getId(), event.event);
+
+    // Add empty thread events
+    thread_events.set(event.getId(), []);
+}

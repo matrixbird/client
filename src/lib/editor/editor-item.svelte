@@ -7,7 +7,8 @@ import Recipient from './recipient.svelte'
 
 import {
     email_to_mxid,
-    mxid_to_email
+    mxid_to_email,
+    is_federated
 } from '$lib/utils/matrix'
 
 import { tooltip } from '$lib/components/tooltip/tooltip'
@@ -185,6 +186,15 @@ empty.`,
         let domain = get_email_domain(email)
     }
 
+    let federated = false;
+
+    for(let mxid of mxids) {
+        if(is_federated(mxid)) {
+            federated = true
+        }
+    }
+
+    console.log("federated?", federated)
 
     //return
 
@@ -255,25 +265,34 @@ empty.`,
 
         let room_id = await store.createEmailRoom(mxids, preview)
 
-        const msg = await store.client.sendEvent(
-            room_id,
-            "matrixbird.email.matrix",
-            {
-                recipients: mxids?.length > 0 ? mxids : [session.user_id],
-                from: {
-                    name: store.user?.displayName,
-                    address: mxid_to_email(store.user?.userId)
-                },
-                subject: subject,
-                body: {
-                    text: body.text,
-                    html: body.html
-                }
+        let email_request = {
+            recipients: mxids?.length > 0 ? mxids : [session.user_id],
+            from: {
+                name: store.user?.displayName,
+                address: mxid_to_email(store.user?.userId)
             },
-            uuidv4()
-        );
-        console.log('Email event: ', msg)
+            subject: subject,
+            body: {
+                text: body.text,
+                html: body.html
+            }
+        }
 
+        let timeout =  federated ? 5000 : 10
+
+
+        setTimeout(async () => {
+            const msg = await store.client.sendEvent(
+                room_id,
+                "matrixbird.email.matrix",
+                email_request,
+                uuidv4()
+            );
+            console.log('Email event: ', msg)
+        }, timeout)
+
+
+        /*
         const thr = await store.client.sendEvent(
             room_id,
             "matrixbird.thread.marker",
@@ -288,8 +307,10 @@ empty.`,
             uuidv4()
         );
         console.log('Thread marker event:', thr)
+        */
 
         setTimeout(async () => {
+            /*
             //store.client.sendReadReceipt(room_id, msg.event_id)
             const thr = await store.client.sendEvent(
                 room_id,
@@ -305,6 +326,7 @@ empty.`,
                 uuidv4()
             );
             console.log('Thread sync event:', thr)
+            */
         }, 2000)
 
         /*
