@@ -12,6 +12,7 @@ import {
 } from '$lib/utils/matrix'
 
 import type { 
+    ComposerData,
     EmailEventContent, 
     ThreadMarkerContent 
 } from '$lib/types/matrixbird'
@@ -105,7 +106,12 @@ let to = $state('');
 let to_input: HTMLInputElement | null = $state(null);
 let subject = $state('');
 let subject_input: HTMLInputElement | null = $state(null);
-let body = $state('');
+let body = $state({
+    text: '',
+    html: '',
+    json: '',
+    selection: 0,
+} as ComposerData);
 
 let hidden = $state(false)
 
@@ -186,10 +192,6 @@ empty.`,
 
     let mxids = emails.map(e => email_to_mxid(e.email))
 
-    for(let email of emails) {
-        let domain = get_email_domain(email)
-    }
-
     let federated = false;
 
     for(let mxid of mxids) {
@@ -200,12 +202,6 @@ empty.`,
 
     console.log("federated?", federated)
 
-    //return
-
-    /*
-    const resp = await store.client.getProfileInfo(mxid)
-    console.log('resp', resp)
-    */
 
     if(!subject) {
     }
@@ -314,7 +310,7 @@ empty.`,
     }
 }
 
-function updateComposer(data) {
+function updateComposer(data: ComposerData) {
     body = data
 }
 

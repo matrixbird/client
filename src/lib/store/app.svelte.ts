@@ -2,7 +2,9 @@ import { browser } from '$app/environment';
 
 import { session } from '$lib/store/session.svelte'
 
-import { updateClientSettings } from './matrix.svelte'
+import { updateClientUISettings } from './matrix.svelte'
+
+import type { UIState } from '$lib/types/matrixbird'
 
 interface App {
     started_at: number,
@@ -31,11 +33,6 @@ export const userState = $state({
     new_user: false
 });
 
-interface UIState {
-    expanded: boolean,
-    sidebar_hidden: boolean,
-}
-
 export const ui_state: UIState = $state({
     expanded: false,
     sidebar_hidden: false,
@@ -54,10 +51,10 @@ export const count = $state({
 });
 
 
-interface Alert {
-    title: string | null,
+export interface Alert {
+    title?: string | null,
     message: string | null,
-    active: boolean,
+    active?: boolean,
 }
 
 export const alert: Alert = $state({
@@ -131,7 +128,7 @@ export async function toggleExpand() {
         localStorage.setItem('expanded', 'true')
     }
     if(session) {
-        await updateClientSettings('ui', ui_state)
+        await updateClientUISettings(ui_state)
     }
 }
 
@@ -144,7 +141,7 @@ export async function toggleSidebar() {
         localStorage.removeItem('sidebar_hidden')
     }
     if(session) {
-        await updateClientSettings('ui', ui_state)
+        await updateClientUISettings(ui_state)
     }
 }
 

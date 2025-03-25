@@ -1,10 +1,12 @@
-<script>
+<script lang="ts">
 import { onMount, onDestroy } from 'svelte';
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image'
 
 import { ui_state } from '$lib/store/app.svelte'
+
+import type { ComposerData } from '$lib/types/matrixbird'
 
 let expanded = $derived(ui_state?.expanded)
 
@@ -36,7 +38,7 @@ onMount(() => {
         //autofocus: true,
         onTransaction: ({ editor }) => {
             editor = editor;
-            let data = {
+            let data: ComposerData = {
                 html: editor.getHTML(),
                 json: editor.getJSON(),
                 text: editor.getText(),

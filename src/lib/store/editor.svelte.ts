@@ -1,12 +1,12 @@
 import { SvelteMap } from 'svelte/reactivity';
 import { v4 as uuidv4 } from 'uuid';
 
-interface Editor {
+export interface Editor {
     id: string,
     state: any
 }
 
-interface Editors {
+export interface Editors {
     editors: Editor[]
 }
 

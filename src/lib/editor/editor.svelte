@@ -8,7 +8,6 @@ let editors = $derived.by(() => {
     return store.editor?.editors
 })
 
-
 let active = $derived.by(() => {
     return editors?.length > 0
 })

@@ -34,3 +34,15 @@ export type ThreadMarkerContent = {
         rel_type: "m.thread";
     };
 }
+
+export interface UIState {
+    expanded: boolean;
+    sidebar_hidden: boolean;
+}
+
+export interface ComposerData {
+    html: string;
+    json: string;
+    text: string;
+    selection: number;
+}

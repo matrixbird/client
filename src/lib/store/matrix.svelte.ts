@@ -8,6 +8,9 @@ import {
     type MSC3575Filter,
     type MSC3575RoomSubscription,
 } from 'matrix-js-sdk/src/sliding-sync';
+
+import type { UIState } from '$lib/types/matrixbird'
+
 import * as sdk from 'matrix-js-sdk/src/index';
 import { SvelteMap } from 'svelte/reactivity';
 import { browser } from '$app/environment';
@@ -372,18 +375,6 @@ export function createMatrixStore() {
 
 
 
-        async function init_remote_room(roomId) {
-            try {
-                const messagesResult = await client.createMessagesRequest(roomId, null, 100, 'b', null);
-                const messages = messagesResult.chunk;
-                console.log(`Fetched ${messages.length} messages using createMessagesRequest`, messages);
-                joined_rooms.push(roomId);
-                //buildThreadForJoinedRoom(roomId)
-            } catch (error) {
-                console.error("Error joining room:", roomId, error);
-            }
-        }
-
 
 
         client.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
@@ -424,67 +415,6 @@ export function createMatrixStore() {
 
             }
         });
-        /*
-
-        client.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
-            if(!synced) return;
-            if(event.event.type === "matrixbird.email.sync" ) {
-
-                let origin_server_ts = event.event.origin_server_ts
-                if(origin_server_ts > sync_state.started) {
-                    console.log("Email sync state event. We should fetch this.")
-                    init_remote_room(event.event.room_id)
-
-                }
-
-            }
-        });
-        */
-
-
-        /*
-        client.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
-            if(!synced) return;
-            if(event.event.type === "matrixbird.thread.marker" || 
-            event.event.type === "matrixbird.thread.sync") {
-
-                let origin_server_ts = event.event.origin_server_ts
-                if(origin_server_ts > sync_state.started) {
-                    console.log("new thread marker, pull it in", event.event.type)
-                    let thread_id = event.event.content?.["m.relates_to"]?.event_id;
-                    get_new_thread(event.event.room_id, thread_id)
-
-                }
-
-            }
-        });
-
-        client.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
-            if(!synced) return;
-            if(event.event.type === "matrixbird.email.matrix" || 
-            event.event.type === "matrixbird.email.standard") {
-
-                let origin_server_ts = event.event.origin_server_ts
-                if(origin_server_ts > sync_state.started) {
-                    console.log("New email event.", event.event.type)
-                    get_new_thread(event.event.room_id, event.getId())
-
-                }
-            }
-        });
-
-    client.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
-      if(event.event.type === "matrixbird.receipt" && 
-        event.event.sender == session.user_id) {
-
-          let _event_id = event.event.content?.["m.relates_to"]?.["m.in_reply_to"];
-          if(_event_id) {
-            read_events.set(_event_id, event.event);
-          }
-
-      }
-    });
-    */
 
         client.on(sdk.RoomEvent.Receipt, function (event, room, toStartOfTimeline) {
             for (const event_id in event.event.content) {
@@ -496,199 +426,8 @@ export function createMatrixStore() {
         });
 
 
-        async function refresh(room) {
-            //room.setTimelineNeedsRefresh(true);
-            //await room.refreshLiveTimeline();
-            //console.log("refreshed live timeline")
-        }
 
-
-        /*
-    client.on(sdk.RoomEvent.Timeline, async function (event, room, toStartOfTimeline) {
-      if(event?.event) {
-        //console.log(event.event.origin_server_ts > sync_state.started, event.event)
-
-        let event_type = event.event.type;
-
-        if (event_type.includes("matrixbird.email")) {
-
-          let isSending = event.isSending();
-
-          if(isSending) {
-            setTimeout(() => {
-              //events.set(event.event.event_id, event.event);
-            }, 1000)
-          }
-
-          if(!isSending) {
-            //events.set(event.event.event_id, event.event);
-          }
-
-        }
-      }
-
-      if(event.event.type == "m.room.member" &&
-        event.event.content?.membership == "join") {
-
-        let exists = members.get(event.event.state_key);
-        if(!exists) {
-          members.set(event.event.state_key, event.event);
-        } else {
-
-        }
-
-      }
-
-      if(event.event.type == "matrixbird.thread.marker") {
-        //console.log("new thread marker, pull it in")
-      }
-    });
-    */
-
-        /*
-    client.on(sdk.RoomStateEvent.Events, function (event, room, toStartOfTimeline) {
-      if(event?.event) {
-        let event_type = event.event.type;
-        if (event_type === "matrixbird.email.matrix") {
-          let exists = events.find((e) => e.event_id === event.event.event_id);
-          if(!exists) {
-            events.push(event.event);
-          }
-        }
-        //console.log(event.event)
-      }
-    });
-    */
-
-
-        async function buildThreadForJoinedRoom(roomId: string) {
-            let thread = await getThreads(roomId);
-            console.log("found threads", thread)
-
-            if(thread.chunk.length > 0) {
-                for (const event of thread.chunk) {
-                    //threads.set(event.event_id, event);
-                    get_new_thread(event.room_id, event.event_id)
-                }
-            }
-        }
-
-        async function buildThreadEvents(roomEventsMap) {
-
-            const eventPairs = [];
-
-            for (const [roomId, events] of Object.entries(roomEventsMap)) {
-                const filteredEvents = events.filter(event => {
-                    let latest_event = event?.unsigned?.["m.relations"]?.["m.thread"]?.latest_event;
-                    return latest_event.type != "matrixbird.thread.marker";
-                });
-
-                filteredEvents.forEach(event => {
-                    eventPairs.push([roomId, event.event_id]);
-                });
-            }
-
-            const threadPromises = eventPairs.map(([roomId, eventId]) => 
-                getThreadEvents(roomId, eventId));
-            const allEvents = await Promise.allSettled(threadPromises);
-
-            const updates = new Map();
-
-            allEvents.forEach((result) => {
-                if (result.status === 'fulfilled') {
-                    const items = result.value;
-
-                    // add all events to events map
-                    for (const event of items.chunk) {
-                        events.set(event.event_id, event);
-
-                        /*
-            if(event.type == "matrixbird.receipt" && 
-              event.sender == session.user_id) {
-
-              let _event_id = event.content?.["m.relates_to"]?.["m.in_reply_to"];
-              if(_event_id) {
-                read_events.set(_event_id, event);
-              }
-
-            }
-            */
-
-                    }
-
-                    let thread_root = items.chunk[0]?.content?.["m.relates_to"]?.event_id;
-
-                    if (thread_root) {
-                        let filtered = items.chunk.filter(event => {
-                            return event.type != "matrixbird.thread.marker";
-                        });
-                        filtered = filtered.filter(event => {
-                            return event.type != "matrixbird.receipt";
-                        });
-                        updates.set(thread_root, filtered);
-                    }
-                }
-            });
-
-            updates.forEach((value, key) => {
-                thread_events.set(key, value);
-            });
-
-        }
-
-
-        async function buildThreads() {
-            let rooms = joined_rooms;
-            /*
-      rooms = rooms.filter(room => {
-        let roomType = room.currentState.getStateEvents("matrixbird.room.type")[0]?.event?.state_key;
-        console.log(roomType, room)
-        return roomType == "INBOX" || roomType == "EMAIL"
-      })
-      */
-
-            const threadPromises = rooms.map(room => getThreads(room));
-            const allThreads = await Promise.allSettled(threadPromises);
-
-            const roomEventsMap = {};
-            const threadUpdates = new Map();
-
-            allThreads.forEach((result, index) => {
-                if (result.status === 'fulfilled') {
-                    const roomId = rooms[index];
-                    roomEventsMap[roomId] = result.value.chunk;
-
-                    result.value.chunk.forEach(thread => {
-                        threadUpdates.set(thread.event_id, thread);
-                    });
-
-                    // check if federated room with no local events
-                    // initate state/messages request if so
-                    let is_local = is_local_room(roomId);
-                    if (!is_local && result.value.chunk.length === 0) {
-                        console.log("no threads found, we should fetch it", roomId)
-                        init_remote_room(roomId);
-                    }
-
-                }
-            });
-
-            threadUpdates.forEach((value, key) => {
-                events.set(key, value);
-                threads.set(key, value);
-            });
-
-            await buildThreadEvents(roomEventsMap);
-
-            status.threads_ready = true;
-            status.thread_events_ready = true;
-
-
-            ready = true;
-        }
-
-
-        client.on("sync", async (state, prevState, data) => {
+        client.on(sdk.ClientEvent.Sync, async (state, prevState, data) => {
 
             sync_state.state = state;
 
@@ -1079,42 +818,13 @@ export function createMatrixStore() {
         doesRoomExist,
         createEmailRoom,
         getDraftsRoom,
-        updateClientSettings
+        updateClientUISettings
     };
 }
 
-export async function updateClientSettings(settings_type, data) {
-    await client.setAccountData(`matrixbird.client.settings.${settings_type}`, data)
+export async function updateClientUISettings(data: UIState) {
+    await client.setAccountData(`matrixbird.client.settings.ui`, data)
     console.log("Client settings updated in account data.", data)
 }
 
 
-export async function join_room(roomId: string) {
-
-    try {
-
-        console.log("Joining room:", roomId);
-        let room = await client.joinRoom(roomId, {
-            syncRoom: true,
-        });
-
-        await client.scrollback(room, 1000);
-
-        let init = await client.roomInitialSync(roomId, 100);
-        console.log("Initial sync", init)
-
-        setTimeout(async () => {
-
-            const state = await getRoomState(roomId);
-            console.log("remote room state", state)
-
-            const messagesResult = await client.createMessagesRequest(roomId, null, 100, 'b', null);
-            const messages = messagesResult.chunk;
-            console.log(`Fetched ${messages.length} messages using createMessagesRequest`);
-
-        }, 1000)
-
-    } catch (error) {
-        console.error("Error joining room:", roomId, error);
-    }
-}
