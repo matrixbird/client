@@ -17,6 +17,7 @@ import { session, updateSession, sessionExists, type Session } from '$lib/store/
 import { newSlidingSync } from '$lib/store/sync.svelte'
 
 import type {
+    EmailRoomCreationResponse,
     Threads,
     ThreadEvents
 } from '$lib/types/matrixbird';
@@ -409,7 +410,6 @@ export function createMatrixStore() {
             }
         });
 
-        /*
         client.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
             if(!synced) return;
             if(event.event.type === "matrixbird.email.matrix" || 
@@ -422,6 +422,7 @@ export function createMatrixStore() {
 
             }
         });
+        /*
 
         client.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
             if(!synced) return;
@@ -896,23 +897,32 @@ export function createMatrixStore() {
         return null;
     }
 
-    const createEmailRoom = async (userIds: string[] | null, preview: object) => {
+    const createEmailRoom = async (userIds: string[] | null): Promise<EmailRoomCreationResponse> => {
 
         const existingRoomId = await doesRoomExist(userIds);
 
         if (existingRoomId) {
             console.log(`Found existing email room with ${userIds}: ${existingRoomId}`);
-            return existingRoomId;
+            return {
+                exists: true,
+                room_id: existingRoomId,
+            }
         }
 
         console.log(`No existing email room found with ${userIds}, creating one...`);
 
-        let users = {
-            [session.user_id]: 100,
+        let users: {
+            [key: string]: number
+        } = {}
+
+        if(session.user_id) {
+            users[session.user_id] =  100
         }
 
-        for (const userId of userIds) {
-            users[userId] = 100;
+        if(userIds) {
+            for (const userId of userIds) {
+                users[userId] = 100;
+            }
         }
 
         // Create a new DM room
@@ -920,23 +930,15 @@ export function createMatrixStore() {
             preset: sdk.Preset.PrivateChat,
             //invite: userIds ? userIds : [],
             visibility: sdk.Visibility.Private,
-            //power_level_content_override: {
-                //users: users,
-            //},
+            power_level_content_override: {
+                users: users,
+            },
             initial_state: [
                 {
                     type: 'm.room.guest_access',
                     state_key: '',
                     content: {
                         guest_access: 'can_join'
-                    }
-                },
-                {
-                    type: 'm.room.topic',
-                    state_key: '',
-                    content: {
-                        topic: 'screen',
-                        preview: preview
                     }
                 },
                 {
@@ -951,13 +953,15 @@ export function createMatrixStore() {
 
         const newRoomId = createRoomResult.room_id;
 
-        //created_rooms[userId] = newRoomId;
         joined_rooms.push(newRoomId)
         console.log("Added to joined rooms", joined_rooms)
 
         console.log(`Created new email room with ${userIds}: ${newRoomId}`);
 
-        return newRoomId;
+        return {
+            exists: false,
+            room_id: newRoomId,
+        }
     };
 
     const updateMailboxRoomsAccountData = async () => {

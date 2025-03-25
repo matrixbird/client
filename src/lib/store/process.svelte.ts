@@ -296,7 +296,30 @@ export async function processNewEmailRoom(client: MatrixClient, roomId: string) 
         const messagesResult = await client.createMessagesRequest(roomId, null, 100, 'b', null);
         const messages = messagesResult.chunk;
         console.log(`Fetched ${messages.length} messages using createMessagesRequest`, messages);
+
+        if(messages) {
+            processMessages(messages);
+        }
+
+
     } catch (error) {
         console.error("Error processing new email room:", roomId, error);
     }
+}
+
+function processMessages(messages: MatrixEvent[]) {
+    console.log("Processing messages.", messages)
+
+    let filtered: MatrixEvent[] = messages.filter((event) => {
+        return event?.type === "matrixbird.email.matrix";
+    })
+
+    filtered.forEach((event) => {
+        // Add to events and threads
+        events.set(event.event_id, event);
+        threads.set(event.event_id, event);
+
+        // Add empty thread events
+        thread_events.set(event.event_id, []);
+    });
 }

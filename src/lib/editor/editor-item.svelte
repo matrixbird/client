@@ -91,8 +91,7 @@ function toggleMinimize() {
 }
 
 async function closeWindow() {
-
-    let drafts = await store.getDraftsRoom()
+    //let drafts = await store.getDraftsRoom()
     editorStore.killEditor(editor.id)
 }
 
@@ -263,7 +262,7 @@ empty.`,
             }
         }
 
-        let room_id = await store.createEmailRoom(mxids, preview)
+        let room = await store.createEmailRoom(mxids)
 
         let email_request = {
             recipients: mxids?.length > 0 ? mxids : [session.user_id],
@@ -279,17 +278,35 @@ empty.`,
         }
 
         const msg = await store.client.sendEvent(
-            room_id,
+            room.room_id,
             "matrixbird.email.matrix",
             email_request,
             uuidv4()
         );
         console.log('Email event: ', msg)
 
-        for (const mxid of mxids) {
-            let invite = await store.client.invite(room_id, mxid, "Email request.")
-            console.log('Invite:', invite)
+        const thr = await store.client.sendEvent(
+            room.room_id,
+            "matrixbird.thread.marker",
+            {
+                msgtype: "thread_marker",
+                "m.relates_to": {
+                    "event_id": msg.event_id,
+                    "m.in_reply_to": msg.event_id,
+                    "rel_type": "m.thread"
+                },
+            },
+            uuidv4()
+        );
+        console.log('Thread marker event:', thr)
+
+        if(!room.exists) {
+            for (const mxid of mxids) {
+                let invite = await store.client.invite(room.room_id, mxid, "Email request.")
+                console.log('Invite:', invite)
+            }
         }
+
 
 
 
@@ -310,60 +327,7 @@ empty.`,
         console.log('Thread marker event:', thr)
         */
 
-        setTimeout(async () => {
-            /*
-            //store.client.sendReadReceipt(room_id, msg.event_id)
-            const thr = await store.client.sendEvent(
-                room_id,
-                "matrixbird.thread.sync",
-                {
-                    msgtype: "thread_sync",
-                    "m.relates_to": {
-                        "event_id": msg.event_id,
-                        "m.in_reply_to": msg.event_id,
-                        "rel_type": "m.thread"
-                    },
-                },
-                uuidv4()
-            );
-            console.log('Thread sync event:', thr)
-            */
-        }, 2000)
-
-        /*
-        const ste = await store.client.sendStateEvent(
-            room_id,
-            "matrixbird.thread.ready",
-            {
-                ready: true,
-            },
-            uuidv4()
-        );
-        console.log('State event:', ste)
-
-        /*
-        let outbox_room_id = mailbox_rooms["OUTBOX"]
-        if(outbox_room_id) {
-            let rev = await store.client.sendEvent(
-                outbox_room_id,
-                "matrixbird.email.review",
-                {
-                    from: store.user?.userId,
-                    to: mxids,
-                    subject: subject,
-                    body: {
-                        text: body.text,
-                        html: body.html
-                    },
-                    invite_room_id: room_id,
-                },
-                uuidv4()
-            );
-            console.log('review event', rev)
-        }
-        */
-
-        updateAppStatus(null)
+        updateAppStatus('')
         closeWindow()
 
     } catch(e) {

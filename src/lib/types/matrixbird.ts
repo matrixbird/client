@@ -8,3 +8,7 @@ export type Threads = Map<string, MatrixEvent>;
 export type ThreadEvents = Map<string, MatrixEvent[]>;
 
 
+export type EmailRoomCreationResponse = {
+    exists: boolean,
+    room_id: string,
+}
