@@ -263,13 +263,14 @@ let content_uri = $derived.by(() => {
     return email?.content?.body?.content_uri
 })
 
-let is_new = $state(false);
+let new_email = $derived(email?.new);
+let _new_email = $state(true);
+let is_new = $derived(new_email && _new_email);
 
 onMount (() => {
-    if(email.origin_server_ts > sync_started) {
-        //is_new = true
+    if(is_new) {
         setTimeout(() => {
-            is_new = false
+            _new_email = false
         }, 5000)
     }
     if(is_large && access_token) {

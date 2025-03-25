@@ -282,6 +282,8 @@ export async function processNewEmail(event: any) {
     // We want events that have fully transactioned
     if(!event?.event?.unsigned) return
 
+    event.event.new = true
+
     // Add to events and threads
     events.set(event.getId(), event.event);
     threads.set(event.getId(), event.event);
@@ -314,7 +316,9 @@ function processMessages(messages: MatrixEvent[]) {
         return event?.type === "matrixbird.email.matrix";
     })
 
+
     filtered.forEach((event) => {
+        event.new = true
         // Add to events and threads
         events.set(event.event_id, event);
         threads.set(event.event_id, event);
