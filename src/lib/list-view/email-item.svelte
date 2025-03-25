@@ -58,7 +58,7 @@ let replies = $derived.by(() => {
     }
 
     for (const event of events.values()) {
-        if(event.type != "matrixbird.receipt" && event.content["m.relates_to"]?.event_id == email.event_id) {
+        if(event.type != "matrixbird.receipt" && event?.content?.["m.relates_to"]?.event_id == email.event_id) {
             count++
         }
     }

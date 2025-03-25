@@ -102,9 +102,9 @@ async function closeWindow() {
 
 
 let to = $state('');
-let to_input;
+let to_input: HTMLInputElement | null = $state(null);
 let subject = $state('');
-let subject_input;
+let subject_input: HTMLInputElement | null = $state(null);
 let body = $state('');
 
 let hidden = $state(false)
@@ -115,12 +115,12 @@ onMount(() => {
 
 async function focusTo() {
     await tick()
-    to_input.focus()
+    to_input?.focus()
 }
 
 async function focusSubject() {
     await tick()
-    subject_input.focus()
+    subject_input?.focus()
 }
 
 async function process() {
@@ -333,13 +333,20 @@ function composer_focus(e) {
     }
 }
 
-let emails = $state([]);
+interface EmailAddress {
+    email: string;
+    valid: boolean;
+    domain_valid?: boolean;
+    highlight?: boolean;
+}
 
-function processInput(event) {
+let emails: EmailAddress[] = $state([]);
+
+function processInput(event: KeyboardEvent) {
 
     if(event.code == 'Backspace' && to.length == 0 && emails?.length > 0) {
         emails[emails.length - 1].highlight = true
-        to_input.blur()
+        to_input?.blur()
         return
     }
 
@@ -352,7 +359,7 @@ function processInput(event) {
             emails.push({
                 email: to,
                 valid: false,
-            })
+            } as EmailAddress)
             to = ''
             event.preventDefault()
         }
@@ -363,29 +370,29 @@ function processInput(event) {
 
 }
 
-function removeEmail(email) {
+function removeEmail(email: string) {
     let i = emails.findIndex(e => e.email == email)
     if(i != -1) {
         emails.splice(i, 1)
     }
-    to_input.focus()
+    to_input?.focus()
 }
 
-function validateEmail(email) {
+function validateEmail(email: string) {
     let i = emails.findIndex(e => e.email == email)
     if(i != -1) {
         emails[i].valid = true
     }
 }
 
-function validateEmailDomain(email) {
+function validateEmailDomain(email: string) {
     let i = emails.findIndex(e => e.email == email)
     if(i != -1) {
         emails[i].domain_valid = true
     }
 }
 
-function processEmailField(event) {
+function processEmailField() {
     if(emails?.length > 0) {
         emails[emails.length - 1].highlight = false
     }
@@ -409,17 +416,17 @@ function processEmailField(event) {
 
 }
 
-function processPaste(event) {
+function processPaste(event: ClipboardEvent) {
     let clipboardData, pastedData;
 
     event.stopPropagation();
 
-    clipboardData = event.clipboardData || window.clipboardData;
-    pastedData = clipboardData.getData('Text');
+    clipboardData = event.clipboardData 
+    pastedData = clipboardData?.getData('Text');
 
-    let pasted = pastedData.split(/[\s,]+/)
+    let pasted = pastedData?.split(/[\s,]+/)
 
-    pasted.forEach(email => {
+    pasted?.forEach((email: string) => {
         let email_valid = validate(email);
         let exists = emails.find(e => e.email == email)
         if(email_valid && !exists) {

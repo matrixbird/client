@@ -1088,3 +1088,33 @@ export async function updateClientSettings(settings_type, data) {
     console.log("Client settings updated in account data.", data)
 }
 
+
+export async function join_room(roomId: string) {
+
+    try {
+
+        console.log("Joining room:", roomId);
+        let room = await client.joinRoom(roomId, {
+            syncRoom: true,
+        });
+
+        await client.scrollback(room, 1000);
+
+        let init = await client.roomInitialSync(roomId, 100);
+        console.log("Initial sync", init)
+
+        setTimeout(async () => {
+
+            const state = await getRoomState(roomId);
+            console.log("remote room state", state)
+
+            const messagesResult = await client.createMessagesRequest(roomId, null, 100, 'b', null);
+            const messages = messagesResult.chunk;
+            console.log(`Fetched ${messages.length} messages using createMessagesRequest`);
+
+        }, 1000)
+
+    } catch (error) {
+        console.error("Error joining room:", roomId, error);
+    }
+}
