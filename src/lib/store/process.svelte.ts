@@ -24,7 +24,6 @@ import {
     read_events, 
     mailbox_rooms,
     users,
-    join_room
 } from '$lib/store/matrix.svelte'
 
 

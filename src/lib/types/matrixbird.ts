@@ -12,3 +12,25 @@ export type EmailRoomCreationResponse = {
     exists: boolean,
     room_id: string,
 }
+
+export type EmailEventContent = {
+    recipients: string[];
+    from: {
+        name?: string;
+        address: string;
+    };
+    subject: string;
+    body: {
+        text: string;
+        html: string;
+    };
+}
+
+export type ThreadMarkerContent = {
+    msgtype: "thread_marker";
+    "m.relates_to": {
+        event_id: string;
+        "m.in_reply_to": string;
+        rel_type: "m.thread";
+    };
+}

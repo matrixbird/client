@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 import { onMount, tick } from 'svelte';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -10,6 +10,11 @@ import {
     mxid_to_email,
     is_federated
 } from '$lib/utils/matrix'
+
+import type { 
+    EmailEventContent, 
+    ThreadMarkerContent 
+} from '$lib/types/matrixbird'
 
 import { tooltip } from '$lib/components/tooltip/tooltip'
 
@@ -251,24 +256,14 @@ empty.`,
 
 
     try {
-        //const resp = await store.testRooms()
-        //console.log("dm rooms", resp)
-
-        let preview = {
-            subject: subject,
-            body: {
-                //text: body.text,
-                html: body.html
-            }
-        }
 
         let room = await store.createEmailRoom(mxids)
 
-        let email_request = {
+        let email_content: EmailEventContent = {
             recipients: mxids?.length > 0 ? mxids : [session.user_id],
             from: {
                 name: store.user?.displayName,
-                address: mxid_to_email(store.user?.userId)
+                address: mxid_to_email(session?.user_id)
             },
             subject: subject,
             body: {
@@ -277,25 +272,28 @@ empty.`,
             }
         }
 
-        const msg = await store.client.sendEvent(
+        const sent = await store.client.sendEvent(
             room.room_id,
             "matrixbird.email.matrix",
-            email_request,
+            email_content,
             uuidv4()
         );
-        console.log('Email event: ', msg)
+
+        console.log('Email event: ', sent)
+
+        let marker_content: ThreadMarkerContent = {
+            msgtype: "thread_marker",
+            "m.relates_to": {
+                "event_id": sent.event_id,
+                "m.in_reply_to": sent.event_id,
+                "rel_type": "m.thread"
+            }
+        }
 
         const thr = await store.client.sendEvent(
             room.room_id,
             "matrixbird.thread.marker",
-            {
-                msgtype: "thread_marker",
-                "m.relates_to": {
-                    "event_id": msg.event_id,
-                    "m.in_reply_to": msg.event_id,
-                    "rel_type": "m.thread"
-                },
-            },
+            marker_content,
             uuidv4()
         );
         console.log('Thread marker event:', thr)
@@ -307,31 +305,11 @@ empty.`,
             }
         }
 
-
-
-
-        /*
-        const thr = await store.client.sendEvent(
-            room_id,
-            "matrixbird.thread.marker",
-            {
-                msgtype: "thread_marker",
-                "m.relates_to": {
-                    "event_id": msg.event_id,
-                    "m.in_reply_to": msg.event_id,
-                    "rel_type": "m.thread"
-                },
-            },
-            uuidv4()
-        );
-        console.log('Thread marker event:', thr)
-        */
-
         updateAppStatus('')
         closeWindow()
 
     } catch(e) {
-        console.log('error', e)
+        console.error('Error:', e)
         hidden = false
     }
 }

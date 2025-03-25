@@ -1,5 +1,7 @@
 import { PUBLIC_HOMESERVER } from '$env/static/public';
 import { MatrixClient } from 'matrix-js-sdk/src/index';
+import type { User } from 'matrix-js-sdk/src/models/user';
+import type { WhoamiResponse } from '$lib/types/matrix'
 import { 
     SlidingSync, 
     type MSC3575List,
@@ -58,7 +60,7 @@ let conn_id: string = $state(uuidv4());
 let ready = $state(false);
 let synced = $state(false);
 
-let user = $state(null);
+let user: User | null = $state(null);
 
 let nextSyncToken = $state(null);
 
@@ -207,7 +209,7 @@ export function createMatrixStore() {
         });
 
         try {
-            const whoami = await client.whoami()
+            const whoami: WhoamiResponse  = await client.whoami()
             console.log(whoami);
             updateAppStatus("Verified user.")
         } catch(e) {
@@ -716,17 +718,21 @@ export function createMatrixStore() {
                 updateAppStatus("Connected.")
 
                 setTimeout(() => {
-                    updateAppStatus(null)
+                    updateAppStatus('')
                 }, 2000)
 
 
                 nextSyncToken = data.nextSyncToken;
 
                 synced = true
-                //console.log(client.store)
 
-                let logged_in_user = client.store.getUser(client.getUserId());
-                user = logged_in_user;
+
+                if(session?.user_id) {
+                    let logged_in_user = client.store.getUser(session.user_id);
+                    console.log("logged in user", logged_in_user)
+                    user = logged_in_user;
+                }
+
 
 
                 Object.keys(client.store.rooms).forEach((roomId) => {
@@ -925,8 +931,7 @@ export function createMatrixStore() {
             }
         }
 
-        // Create a new DM room
-        const createRoomResult = await client.createRoom({
+        let room_opts = {
             preset: sdk.Preset.PrivateChat,
             //invite: userIds ? userIds : [],
             visibility: sdk.Visibility.Private,
@@ -949,19 +954,23 @@ export function createMatrixStore() {
                     }
                 },
             ]
-        });
-
-        const newRoomId = createRoomResult.room_id;
-
-        joined_rooms.push(newRoomId)
-        console.log("Added to joined rooms", joined_rooms)
-
-        console.log(`Created new email room with ${userIds}: ${newRoomId}`);
-
-        return {
-            exists: false,
-            room_id: newRoomId,
         }
+
+        try {
+            const createRoomResult = await client.createRoom(room_opts);
+
+            const newRoomId = createRoomResult.room_id;
+
+            joined_rooms.push(newRoomId)
+            console.log(`Created new email room with ${userIds}: ${newRoomId}`);
+            return {
+                exists: false,
+                room_id: newRoomId,
+            }
+        } catch (error) {
+            throw error;
+        }
+
     };
 
     const updateMailboxRoomsAccountData = async () => {
@@ -1079,33 +1088,3 @@ export async function updateClientSettings(settings_type, data) {
     console.log("Client settings updated in account data.", data)
 }
 
-
-export async function join_room(roomId: string) {
-
-    try {
-
-        console.log("Joining room:", roomId);
-        let room = await client.joinRoom(roomId, {
-            syncRoom: true,
-        });
-
-        await client.scrollback(room, 1000);
-
-        let init = await client.roomInitialSync(roomId, 100);
-        console.log("Initial sync", init)
-
-        setTimeout(async () => {
-
-            const state = await getRoomState(roomId);
-            console.log("remote room state", state)
-
-            const messagesResult = await client.createMessagesRequest(roomId, null, 100, 'b', null);
-            const messages = messagesResult.chunk;
-            console.log(`Fetched ${messages.length} messages using createMessagesRequest`);
-
-        }, 1000)
-
-    } catch (error) {
-        console.error("Error joining room:", roomId, error);
-    }
-}
