@@ -1,6 +1,6 @@
 import { session, type Session } from '$lib/store/session.svelte';
 import { SvelteMap } from 'svelte/reactivity';
-import { MatrixClient } from 'matrix-js-sdk/src/index';
+import { MatrixClient, EventTimeline } from 'matrix-js-sdk/src/index';
 import type { IStore } from 'matrix-js-sdk/src/store';
 import type { 
     MatrixEvent,
@@ -224,16 +224,29 @@ export async function processMailboxRooms(event: MatrixEvent) {
 
 export async function process(client: MatrixClient) {
 
+    const rooms = client.store.getRooms();
 
-    Object.keys(client.store.rooms).forEach(async (roomId) => {
-        const room = client.getRoom(roomId);
+    Object.values(rooms).forEach(async (room) => {
 
-        const isLocal = is_local_room(roomId);
+        const room_state = room?.getLiveTimeline().getState(EventTimeline.FORWARDS) 
+        const room_type = room_state?.getStateEvents("matrixbird.room.type")?.[0]?.getContent()?.type;
 
 
-        let receipts = room.cachedThreadReadReceipts;
+        const is_inbox = room_type === "INBOX";
+        const is_email = room_type === "EMAIL";
+        const is_drafts = room_type === "DRAFTS";
 
-        receipts.forEach((val, event_id) => {
+        if(is_drafts) {
+            console.log("Skipping drafts room.")
+            return
+        }
+
+
+        const isLocal = is_local_room(room.roomId);
+
+        let receipts = room?.cachedThreadReadReceipts;
+
+        receipts?.forEach((val, event_id) => {
             val.forEach((e) => {
                 if(e.userId == session.user_id) {
                     read_events.set(e.eventId, e?.receipt?.thread_id);
@@ -254,18 +267,20 @@ export async function process(client: MatrixClient) {
 
             //join_room(roomId);
             try {
-                const res = await processNewEmailRoom(client, roomId);
+                const res = await processNewEmailRoom(client, room.roomId);
                 console.log("Processed remote email room", res)
 
             } catch (error) {
-                console.error("Error fetching messages:", roomId, error);
+                console.error("Error fetching messages:", room.roomId, error);
             }
         }
 
         _threads.forEach((event) => {
-            //console.log("Event", event);
-            events.set(event.getId(), event.event);
-            threads.set(event.getId(), event.event);
+            let event_id = event.getId();
+            if(typeof event_id === "string") {
+                events.set(event_id, event.event);
+                threads.set(event_id, event.event);
+            }
 
         });
 
@@ -280,7 +295,7 @@ export async function process(client: MatrixClient) {
                 events.set(event.event.event_id, event.event);
 
                 let eev = thread_events.get(thread_id) || [];
-                eev.push(event.event);
+                eev.push(event?.event);
                 thread_events.set(thread_id, eev);
             }
         });
