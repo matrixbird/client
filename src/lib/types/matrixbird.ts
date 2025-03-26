@@ -1,4 +1,4 @@
-import type { MatrixEvent } from 'matrix-js-sdk/lib/models/event'
+import type { MatrixEvent } from 'matrix-js-sdk/src/index'
 
 export type { MatrixEvent };
 
@@ -7,6 +7,10 @@ export type Emails = Record<string, MatrixEvent>;
 export type Threads = Map<string, MatrixEvent>;
 export type ThreadEvents = Map<string, MatrixEvent[]>;
 
+
+export interface MailboxRooms {
+    [key: string]: string;
+}
 
 export type EmailRoomCreationResponse = {
     exists: boolean,

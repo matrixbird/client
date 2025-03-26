@@ -9,7 +9,7 @@ import {
     type MSC3575RoomSubscription,
 } from 'matrix-js-sdk/src/sliding-sync';
 
-import type { UIState } from '$lib/types/matrixbird'
+import type { UIState, MailboxRooms } from '$lib/types/matrixbird'
 
 import * as sdk from 'matrix-js-sdk/src/index';
 import { SvelteMap } from 'svelte/reactivity';
@@ -31,9 +31,9 @@ import { updateAppStatus, ui_state } from '$lib/store/app.svelte';
 
 import { 
     process,
-    processSync,
     processNewEmail,
     processNewEmailRoom,
+    processMailboxRooms,
     buildInboxEmails,
     buildSentEmails,
 } from '$lib/store/process.svelte'
@@ -146,9 +146,11 @@ let sent_items = $derived.by(() =>{
     return buildSentEmails(session, threads, thread_events);
 })
 
-export let mailbox_rooms: {
-    [key: string]: string
-} = $state({});
+export let mailbox_rooms: MailboxRooms = $state({});
+
+let drafts_mailbox = $derived.by(() => {
+    return mailbox_rooms["DRAFTS"];
+})
 
 let pending_emails_event = $state(null);
 
@@ -162,6 +164,11 @@ $effect.root(() => {
             status.threads_ready = true;
             status.thread_events_ready = true;
             ready = true;
+        }
+        if(ready && !drafts_mailbox) {
+            setTimeout(() => {
+                //createDraftsMailboxRoom()
+            }, 2000)
         }
     })
 })
@@ -366,7 +373,6 @@ export function createMatrixStore() {
             if(!synced) return;
 
             if (membership === sdk.KnownMembership.Join) {
-                console.log("Joined new email room. Fetch messages.", room)
                 processNewEmailRoom(client, room.roomId);
             }
 
@@ -426,6 +432,14 @@ export function createMatrixStore() {
         });
 
 
+        client.on(sdk.ClientEvent.AccountData, function (event, lastEvent) {
+            let event_type = event.getType();
+            let is_mailbox_data = event_type == "matrixbird.mailbox.rooms"
+            if(is_mailbox_data) {
+                processMailboxRooms(event);
+            }
+        });
+
 
         client.on(sdk.ClientEvent.Sync, async (state, prevState, data) => {
 
@@ -468,7 +482,6 @@ export function createMatrixStore() {
 
                 if(session?.user_id) {
                     let logged_in_user = client.store.getUser(session.user_id);
-                    console.log("logged in user", logged_in_user)
                     user = logged_in_user;
                 }
 
@@ -827,4 +840,33 @@ export async function updateClientUISettings(data: UIState) {
     console.log("Client settings updated in account data.", data)
 }
 
+
+export async function createDraftsMailboxRoom() {
+    console.log("Creating drafts mailbox room.")
+
+    const createRoomResult = await client.createRoom({
+        preset: sdk.Preset.PrivateChat,
+        visibility: sdk.Visibility.Private,
+        initial_state: [
+            {
+                type: 'matrixbird.room.type',
+                state_key: 'DRAFTS',
+                content: {
+                    type: 'DRAFTS'
+                }
+            },
+        ]
+    });
+
+    const newRoomId = createRoomResult.room_id;
+
+    joined_rooms.push(newRoomId)
+
+    console.log(`Created new Drafts room: ${newRoomId}`);
+
+    mailbox_rooms["DRAFTS"] = newRoomId;
+
+    let ac = await client.setAccountData("matrixbird.mailbox.rooms", mailbox_rooms)
+    console.log("Mailbox rooms updated in account data.", ac)
+}
 

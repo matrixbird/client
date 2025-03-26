@@ -35,7 +35,11 @@ import {
 import { newAlert, updateAppStatus } from '$lib/store/app.svelte'
 
 import { session } from '$lib/store/session.svelte'
-import { createMatrixStore, mailbox_rooms } from '$lib/store/matrix.svelte'
+
+import { 
+    createMatrixStore, 
+} from '$lib/store/matrix.svelte'
+
 const store = createMatrixStore()
 
 import { createEditorStore } from '$lib/store/editor.svelte'

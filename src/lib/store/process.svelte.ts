@@ -207,14 +207,22 @@ export async function processSync(sync: SyncResponse) {
                 }
             });
     }
-    console.log("users are ", users)
 
     syncProcessed()
 }
 
-export async function process(client: MatrixClient) {
-    console.log("Initial sync - process data.", client)
+export async function processMailboxRooms(event: MatrixEvent) {
+    let content = event.getOriginalContent();
+    Object.entries(content)
+        .forEach(([key, value]) => {
+            if(typeof value === "string") {
+                mailbox_rooms[key] = value;
+            }
+        });
+    console.log("Mailbox rooms processed:", $state.snapshot(mailbox_rooms))
+}
 
+export async function process(client: MatrixClient) {
 
 
     Object.keys(client.store.rooms).forEach(async (roomId) => {
@@ -281,6 +289,7 @@ export async function process(client: MatrixClient) {
     //console.log("threads events are", _thread_events)
     //console.log("read events are", read_events)
     syncProcessed()
+    console.log("Initial sync processed.")
 }
 
 export async function processNewEmail(event: any) {
