@@ -10,7 +10,7 @@ function validateLocalhostEmail(email: string) {
   return localhostEmailRegex.test(email);
 }
 
-export function validate(email: string) {
+export function validate(email: string): boolean {
   let email_valid = EmailValidator.validate(email);
   if (!email_valid) {
     email_valid = validateLocalhostEmail(email);
@@ -18,16 +18,16 @@ export function validate(email: string) {
   return email_valid;
 }
 
-function localhost_replace(original: string, pos: number = 0) {
+function localhost_replace(original: string, pos: number = 0): string {
   const regex = /^(.+:)(\d)(\d)(\d+)$/;
   return original.replace(regex, (_match, domain, first, _second, rest) => {
     return `${domain}${first}${pos}${rest}`;
   });
 }
 
-export function get_email_domain(email: string) {
+export function get_email_domain(email: string): string | undefined {
   if (!email || typeof email !== 'string' || !email.includes('@')) {
-    return null;
+    return;
   }
 
   const [, domain] = email.split('@');

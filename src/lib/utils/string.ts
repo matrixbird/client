@@ -1,4 +1,4 @@
-export function create_initials(displayName: string | undefined) {
+export function create_initials(displayName: string | undefined): string {
   if (!displayName) return '';
   const words: string[] = displayName.trim().split(/\s+/);
   if (words.length === 1) {
@@ -9,7 +9,7 @@ export function create_initials(displayName: string | undefined) {
   return (firstInitial + lastInitial).toUpperCase();
 }
 
-export function get_first_line(input: string) {
+export function get_first_line(input: string): string | undefined {
   if(!input) return
     const isHTML = /<\/?[a-z][\s\S]*>/i.test(input);
 
