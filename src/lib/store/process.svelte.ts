@@ -1,6 +1,7 @@
 import { session, type Session } from '$lib/store/session.svelte';
 import { SvelteMap } from 'svelte/reactivity';
-import { MatrixClient, EventTimeline } from 'matrix-js-sdk/src/index';
+import { MatrixClient, EventTimeline, Direction } from 'matrix-js-sdk/src/index';
+import type { IRoomEvent } from 'matrix-js-sdk/src/sync-accumulator';
 import type { IStore } from 'matrix-js-sdk/src/store';
 import type { 
     MatrixEvent,
@@ -29,9 +30,9 @@ import {
 
 export function buildInboxEmails(session: Session, threads: Threads, thread_events: ThreadEvents) {
 
-    function findLastNonUserEvent(threadEvents: MatrixEvent[]) {
+    function findLastNonUserEvent(threadEvents: IRoomEvent[]) {
         //const nonUserEvents = threadEvents.filter((event: MatrixEvent) => event.sender !== session.user_id);
-        const nonUserEvents = threadEvents.filter((event: MatrixEvent) => event.content?.recipients?.includes(session.user_id) || event.sender !== session.user_id);
+        const nonUserEvents = threadEvents.filter((event: IRoomEvent) => event.content?.recipients?.includes(session.user_id) || event.sender !== session.user_id);
 
         if (nonUserEvents.length === 0) return null;
 
@@ -131,86 +132,6 @@ export function buildSentEmails(
 }
 
 
-export async function processSync(sync: SyncResponse) {
-    // Build Mailbox Rooms
-    let globalAccountData = sync?.extensions?.account_data?.global || {};
-    Object.values(globalAccountData)
-        .filter(data => data?.type === "matrixbird.mailbox.rooms")
-        .flatMap(data => {
-            const content = data?.content || {};
-            Object.entries(content)
-                .forEach(([key, value]) => {
-                    if(typeof value === "string") {
-                        mailbox_rooms[key] = value;
-                    }
-                });
-        });
-
-    // Build read events
-    let receipts = sync?.extensions?.receipts?.rooms || {};
-    Object.values(receipts)
-        .filter(data => data?.type === "m.receipt")
-        .flatMap(data => {
-            const content = data?.content || {};
-            Object.entries(content)
-                .forEach(([event_id, value]) => {
-                    let thread_id = value?.["m.read"]?.[session.user_id]?.["thread_id"];
-                    if(thread_id && thread_id != "main") {
-                        //read_events.set(event_id, thread_id);
-                    }
-                });
-        });
-
-    // Build threads
-    let rooms = sync?.rooms || {};
-    for (const [roomId, roomData] of Object.entries(rooms)) {
-
-        let state = roomData?.required_state || [];
-        state.forEach(event => {
-            if(event.type === "m.room.member") {
-                let content = {
-                    displayname: event.content?.displayname,
-                    avatar_url: event.content?.avatar_url
-                }
-                users.set(event.state_key, content);
-            }
-        });
-
-        let timeline = roomData?.timeline || [];
-        let types = [
-            "matrixbird.email.matrix",
-            "matrixbird.email.standard",
-        ]
-
-        Object.values(timeline)
-            .filter(event => types.includes(event?.type))
-            .forEach(event => {
-                event.room_id = roomId;
-                events.set(event.event_id, event);
-                threads.set(event.event_id, event);
-            });
-
-        Object.values(timeline)
-            .filter(event => event.type === "matrixbird.email.reply")
-            .forEach(event => {
-                event.room_id = roomId;
-                let thread_id = event?.content?.["m.relates_to"]?.["event_id"];
-                if(thread_id) {
-                    //console.log("reply event", thread_id, event)
-                    events.set(event.event_id, event);
-
-                    let thread_event = threads.get(thread_id);
-
-                    let _events = thread_events.get(thread_id) || [];
-                    _events.push(event);
-                    thread_events.set(thread_id, _events);
-                }
-            });
-    }
-
-    syncProcessed()
-}
-
 export async function processMailboxRooms(event: MatrixEvent) {
     let content = event.getOriginalContent();
     Object.entries(content)
@@ -222,23 +143,24 @@ export async function processMailboxRooms(event: MatrixEvent) {
     console.log("Mailbox rooms processed:", $state.snapshot(mailbox_rooms))
 }
 
+// Process initial sync response
 export async function process(client: MatrixClient) {
 
     const rooms = client.store.getRooms();
 
-    Object.values(rooms).forEach(async (room) => {
+    for (const room of Object.values(rooms)) {
 
         const room_state = room?.getLiveTimeline().getState(EventTimeline.FORWARDS) 
         const room_type = room_state?.getStateEvents("matrixbird.room.type")?.[0]?.getContent()?.type;
 
 
-        const is_inbox = room_type === "INBOX";
-        const is_email = room_type === "EMAIL";
+        //const is_inbox = room_type === "INBOX";
+        //const is_email = room_type === "EMAIL";
         const is_drafts = room_type === "DRAFTS";
 
         if(is_drafts) {
             console.log("Skipping drafts room.")
-            return
+            continue;
         }
 
 
@@ -299,10 +221,8 @@ export async function process(client: MatrixClient) {
                 thread_events.set(thread_id, eev);
             }
         });
-    });
-    //console.log("threads are", _threads)
-    //console.log("threads events are", _thread_events)
-    //console.log("read events are", read_events)
+    };
+
     syncProcessed()
     console.log("Initial sync processed.")
 }
@@ -326,7 +246,7 @@ export async function processNewEmail(event: any) {
 export async function processNewEmailRoom(client: MatrixClient, roomId: string) {
     console.log("Processing new email room.", roomId)
     try {
-        const messagesResult = await client.createMessagesRequest(roomId, null, 100, 'b', null);
+        const messagesResult = await client.createMessagesRequest(roomId, null, 100, Direction.Backward, undefined);
         const messages = messagesResult.chunk;
         console.log(`Fetched ${messages.length} messages using createMessagesRequest`, messages);
 
@@ -340,10 +260,10 @@ export async function processNewEmailRoom(client: MatrixClient, roomId: string) 
     }
 }
 
-function processMessages(messages: MatrixEvent[]) {
+function processMessages(messages: IRoomEvent[]) {
     console.log("Processing messages.", messages)
 
-    let filtered: MatrixEvent[] = messages.filter((event) => {
+    let filtered: IRoomEvent[] = messages.filter((event) => {
         return event?.type === "matrixbird.email.matrix";
     })
 

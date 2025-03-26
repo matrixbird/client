@@ -19,8 +19,6 @@ import { untrack } from 'svelte';
 import { session, updateSession, sessionExists, type Session } from '$lib/store/session.svelte';
 
 
-import { newSlidingSync } from '$lib/store/sync.svelte'
-
 import type {
     EmailRoomCreationResponse,
     Threads,
