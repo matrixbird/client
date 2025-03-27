@@ -21,6 +21,7 @@ import { session, updateSession, sessionExists, type Session } from '$lib/store/
 
 import type {
     EmailRoomCreationResponse,
+    Drafts,
     Threads,
     ThreadEvents
 } from '$lib/types/matrixbird';
@@ -77,6 +78,8 @@ export let users = $state(new SvelteMap());
 export let events = $state(new SvelteMap());
 export let threads: Threads = $state(new SvelteMap());
 export let thread_events: ThreadEvents = $state(new SvelteMap());
+
+export let drafts: Drafts = $state([]);
 
 export let read_events = $state(new SvelteMap());
 
@@ -289,6 +292,19 @@ export function createMatrixStore() {
 
             }
         });
+
+        client.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
+            if(!synced) return;
+            if(event.event.type === "matrixbird.email.draft") {
+
+                let origin_server_ts = event.event.origin_server_ts
+                if(origin_server_ts > sync_state.started) {
+                    console.log("Received new draft email.", event.event)
+                }
+
+            }
+        });
+
 
         client.on(sdk.RoomEvent.Receipt, function (event, room, toStartOfTimeline) {
             for (const event_id in event.event.content) {
@@ -598,13 +614,15 @@ export function createMatrixStore() {
         console.log("Mailbox rooms updated in account data.", ac)
     }
 
-    const getDraftsRoom = async () => {
+    const getDraftsRoom = async (): Promise<string | undefined> => {
 
         let drafts_room = mailbox_rooms["DRAFTS"];
         if(!drafts_room) {
             console.log(mailbox_rooms)
             console.log("no drafts room in mailbox rooms")
         }
+
+        return drafts_room;
 
         const rooms = client.getRooms();
         for (const room of rooms) {

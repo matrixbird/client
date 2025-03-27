@@ -14,6 +14,7 @@ import {
 import type { 
     ComposerData,
     EmailEventContent, 
+    DraftEventContent,
     ThreadMarkerContent 
 } from '$lib/types/matrixbird'
 
@@ -132,6 +133,64 @@ async function focusSubject() {
     await tick()
     subject_input?.focus()
 }
+
+let has_content = $derived.by(() => {
+    return subject != '' ||
+        body.text != '' || 
+        emails?.length > 0
+})
+
+let draft_event_id: string | undefined = $state(undefined);
+
+$effect(() => {
+    if(has_content && !draft_event_id) {
+        saveDraft()
+    }
+})
+
+async function saveDraft() {
+    console.log("Should save draft.")
+    let drafts_room_id = await store.getDraftsRoom()
+    if(!drafts_room_id) {
+        console.error("Drafts room not found.")
+        return
+    }
+    console.log("Drafts mailbox room ID is: ", drafts_room_id)
+
+    let email_content: DraftEventContent = {}
+    if(emails?.length > 0) {
+        email_content.recipients = emails.map(e => e.email)
+    }
+    if(subject) {
+        email_content.subject = subject
+    }
+    if(body.text || body.html) {
+        email_content.body = {
+            text: body.text,
+            html: body.html
+        }
+    }
+
+    const sent = await store.client.sendEvent(
+        drafts_room_id,
+        "matrixbird.email.draft",
+        email_content,
+        uuidv4()
+    );
+
+    console.log('Draft event saved: ', sent)
+}
+
+async function saveAndClose() {
+    if(has_content) {
+        console.log("Saving draft...")
+        let drafts_room = await store.getDraftsRoom()
+        console.log("drafts room is", drafts_room)
+    } else {
+        closeWindow()
+    }
+}
+
 
 async function process() {
 
@@ -529,7 +588,7 @@ let opts_close = $derived.by(() => {
 
         <div class="cursor-pointer flex place-items-center mr-2"
         use:tooltip={opts_close}
-            onclick={closeWindow}>
+            onclick={saveAndClose}>
             {@html close}
         </div>
     </div>

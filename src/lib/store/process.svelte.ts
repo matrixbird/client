@@ -1,11 +1,12 @@
 import { session, type Session } from '$lib/store/session.svelte';
 import { SvelteMap } from 'svelte/reactivity';
-import { MatrixClient, EventTimeline, Direction } from 'matrix-js-sdk/src/index';
+import { MatrixClient, EventTimeline, Direction, Room } from 'matrix-js-sdk/src/index';
 import type { IRoomEvent } from 'matrix-js-sdk/src/sync-accumulator';
 import type { IStore } from 'matrix-js-sdk/src/store';
 import type { 
     MatrixEvent,
     Emails,
+    Drafts,
     Threads,
     ThreadEvents
 } from '$lib/types/matrixbird';
@@ -21,6 +22,7 @@ import {
     syncProcessed,
     events,
     threads,
+    drafts,
     thread_events,
     read_events, 
     mailbox_rooms,
@@ -159,7 +161,7 @@ export async function process(client: MatrixClient) {
         const is_drafts = room_type === "DRAFTS";
 
         if(is_drafts) {
-            console.log("Skipping drafts room.")
+            processDrafts(room);
             continue;
         }
 
@@ -225,6 +227,26 @@ export async function process(client: MatrixClient) {
 
     syncProcessed()
     console.log("Initial sync processed.")
+}
+
+export async function processDrafts(room: Room) {
+    console.log("Processing drafts room events.", room)
+
+    let _drafts = room.getLiveTimeline().getEvents();
+
+    _drafts = _drafts.filter((event) => {
+        return event.getType() === "matrixbird.email.draft";
+    })
+
+
+    _drafts.forEach((event) => {
+        let event_id = event.getId();
+        if(typeof event_id === "string") {
+            drafts.push(event.event);
+        }
+
+    });
+    console.log("Drafts events", $state.snapshot(drafts))
 }
 
 export async function processNewEmail(event: any) {

@@ -1,11 +1,14 @@
-import type { MatrixEvent } from 'matrix-js-sdk/src/index'
+import type { MatrixEvent, IEvent } from 'matrix-js-sdk/src/index'
 
 export type { MatrixEvent };
 
 export type Emails = Record<string, MatrixEvent>;
 
+export type Drafts = Partial<IEvent>[];
+
 export type Threads = Map<string, MatrixEvent>;
 export type ThreadEvents = Map<string, MatrixEvent[]>;
+
 
 
 export interface MailboxRooms {
@@ -16,6 +19,20 @@ export type EmailRoomCreationResponse = {
     exists: boolean,
     room_id: string,
 }
+
+export type DraftEventContent = {
+    recipients?: string[];
+    from?: {
+        name?: string;
+        address?: string;
+    };
+    subject?: string;
+    body?: {
+        text?: string;
+        html?: string;
+    };
+}
+
 
 export type EmailEventContent = {
     recipients: string[];

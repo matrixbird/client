@@ -1,6 +1,7 @@
 import type { AccountDataEvents, TimelineEvents } from "matrix-js-sdk/src/@types/event";
 
 import type { 
+    DraftEventContent,
     EmailEventContent, 
     ThreadMarkerContent,
     UIState,
@@ -14,6 +15,7 @@ declare module "matrix-js-sdk/src/@types/event" {
     }
     interface TimelineEvents {
         "matrixbird.email.matrix": EmailEventContent;
+        "matrixbird.email.draft": DraftEventContent,
         "matrixbird.thread.marker": ThreadMarkerContent;
     }
 }
