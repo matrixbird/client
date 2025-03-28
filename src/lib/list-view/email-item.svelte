@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 import { onMount } from 'svelte';
 import { goto } from '$app/navigation';
 import { page } from '$app/state';
@@ -45,7 +45,10 @@ const read_events = $derived(store?.read_events)
 const threads = $derived(store?.threads)
 const thread_events = $derived(store?.thread_events)
 
-let { email } = $props();
+let { email, draft }: {
+    email: any,
+    draft: boolean
+} = $props();
 
 let replies = $derived.by(() => {
     let count = 0
@@ -383,7 +386,7 @@ let el;
                 </div>
                 {/if}
 
-                {#if !read}
+                {#if !read && !draft}
                 <div class="flex place-items-center">
                     <div class="h-2 w-2 rounded-[50%] bg-green-600">
                     </div>

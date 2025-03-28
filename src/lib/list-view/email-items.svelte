@@ -101,6 +101,13 @@ let inbox_emails = $derived.by(() => {
     }
 })
 
+let draft_emails = $derived.by(() => {
+    if(is_drafts && status.threads_ready && status.thread_events_ready) {
+        //return buildInboxEmails(threads)
+        return store.draft_items
+    }
+})
+
 function buildSentEmails(_threads) {
 
     let emails = {};
@@ -159,6 +166,12 @@ let sent_emails = $derived.by(() => {
     {#if is_sent && sent_emails}
         {#each sent_emails as email (email.event_id)}
             <EmailItem {email} />
+        {/each}
+    {/if}
+
+    {#if is_drafts && draft_emails}
+        {#each draft_emails as email (email.event_id)}
+            <EmailItem {email} draft={true} />
         {/each}
     {/if}
 

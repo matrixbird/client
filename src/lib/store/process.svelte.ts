@@ -79,6 +79,13 @@ export function buildInboxEmails(session: Session, threads: Threads, thread_even
     return sorted
 }
 
+export function buildDraftEmails(drafts: Drafts) {
+    let sorted = Object.values(drafts).sort((a, b) => {
+        return b.origin_server_ts - a.origin_server_ts
+    })
+    return sorted
+}
+
 export function buildSentEmails(
     session: Session, 
     threads: Threads, 

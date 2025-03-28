@@ -18,7 +18,6 @@ import { untrack } from 'svelte';
 
 import { session, updateSession, sessionExists, type Session } from '$lib/store/session.svelte';
 
-
 import type {
     EmailRoomCreationResponse,
     Drafts,
@@ -34,6 +33,7 @@ import {
     processNewEmailRoom,
     processMailboxRooms,
     buildInboxEmails,
+    buildDraftEmails,
     buildSentEmails,
 } from '$lib/store/process.svelte'
 
@@ -145,6 +145,13 @@ let sent_items = $derived.by(() =>{
         return []
     }
     return buildSentEmails(session, threads, thread_events);
+})
+
+let draft_items = $derived.by(() =>{
+    if(!status.threads_ready || !status.thread_events_ready) {
+        return []
+    }
+    return buildDraftEmails(drafts);
 })
 
 export let mailbox_rooms: MailboxRooms = $state({});
@@ -710,6 +717,14 @@ export function createMatrixStore() {
 
         get inbox_items() {
             return inbox_items;
+        },
+
+        get sent_items() {
+            return sent_items;
+        },
+
+        get draft_items() {
+            return draft_items;
         },
 
         createMatrixClient,
