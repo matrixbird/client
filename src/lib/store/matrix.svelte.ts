@@ -30,6 +30,7 @@ import { updateAppStatus, ui_state } from '$lib/store/app.svelte';
 import { 
     process,
     processNewEmail,
+    processNewEmailReply,
     processNewEmailRoom,
     processMailboxRooms,
     buildInboxEmails,
@@ -265,24 +266,7 @@ export function createMatrixStore() {
             if (event.event.type == "matrixbird.email.reply") {
                 let origin_server_ts = event.event.origin_server_ts
                 if(origin_server_ts > sync_state.started) {
-                    console.log(origin_server_ts > sync_state.started)
-                    console.log("New email reply.", event.event)
-                    let thread_id = event.event.content?.["m.relates_to"]?.event_id;
-
-                    let exists = threads.get(thread_id);
-                    if(!exists) {
-                        get_new_thread(event.event.room_id, thread_id)
-                        return
-                    }
-
-                    let children = thread_events.get(thread_id);
-                    //console.log("children", children)
-                    if(children) {
-                        thread_events.set(thread_id, [...children, event.event]);
-                    } else {
-                        thread_events.set(thread_id, [event.event]);
-                    }
-                    events.set(event.event.event_id, event.event);
+                    processNewEmailReply(event)
                 }
             }
         });

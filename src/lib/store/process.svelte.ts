@@ -11,6 +11,11 @@ import type {
     ThreadEvents
 } from '$lib/types/matrixbird';
 
+import {
+    getThreadRootEvent,
+    getThreadEvents,
+} from '$lib/matrix/api'
+
 import type { MSC3575SlidingSyncResponse as SyncResponse } from 'matrix-js-sdk/src/sliding-sync';
 
 import {
@@ -270,6 +275,57 @@ export async function processNewEmail(event: any) {
 
     // Add empty thread events
     thread_events.set(event.getId(), []);
+}
+
+export async function processNewEmailReply(event: any) {
+    console.log("Processing new email reply.", event)
+
+    event.event.new = true
+
+    let thread_id = event.event.content?.["m.relates_to"]?.event_id;
+
+    let exists = threads.get(thread_id);
+    if(!exists) {
+        console.log("thread does not exist, fetching new thread.")
+        get_new_thread(event.event.room_id, thread_id)
+        return
+    }
+
+    let children = thread_events.get(thread_id);
+
+    if(children) {
+        thread_events.set(thread_id, [...children, event.event]);
+    } else {
+        thread_events.set(thread_id, [event.event]);
+    }
+    events.set(event.event.event_id, event.event);
+}
+
+async function get_new_thread(room_id: string, thread_id: string) {
+    let thread = await getThreadRootEvent(room_id, thread_id);
+    console.log("found thread root event", thread)
+    events.set(thread_id, thread);
+    threads.set(thread_id, thread);
+
+    let thread_children = await getThreadEvents(room_id, thread_id);
+    let _events = thread_children.chunk;
+    if(_events) {
+        console.log("found thread events", _events)
+
+        let filtered = _events?.filter(event => {
+            return event.type != "matrixbird.thread.marker" && 
+                event.type != "matrixbird.thread.sync";
+        })
+
+        if(filtered.length > 0) {
+            thread_events.set(thread_id, filtered);
+            for (const child of filtered) {
+                events.set(child.event_id, child);
+            }
+        }
+    } else {
+        thread_events.set(thread_id, []);
+    }
 }
 
 export async function processNewEmailRoom(client: MatrixClient, roomId: string) {
