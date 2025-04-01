@@ -38,6 +38,43 @@ export const ui_state: UIState = $state({
     sidebar_hidden: false,
 });
 
+let mobile = $state(false);
+
+export function is_mobile() {
+    return mobile
+}
+
+if(browser) {
+    isMobile()
+}
+
+function isMobile() {
+
+    if(navigator.userAgentData.mobile) {
+        mobile = true
+        return
+    }
+
+    const userAgent = navigator.userAgent 
+    const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+
+    const isSmallScreen = window.innerWidth <= 768;
+
+    const hasTouchScreen = (
+        ('ontouchstart' in window) ||
+            (navigator.maxTouchPoints > 0) 
+    );
+
+    mobile = mobileRegex.test(userAgent) || (isSmallScreen && hasTouchScreen);
+}
+
+$effect.root(() => {
+    $effect(() => {
+        //console.log("Mobile:", mobile)
+    })
+})
+
+
 export const route_state = $state({});
 
 export const email_context_menu = $state({
@@ -94,26 +131,26 @@ if(browser) {
 }
 
 export function updateAppStatus(status: string) {
-  app.status = status;
+    app.status = status;
 }
 
 export function createAppStore() {
 
-  function appIsReady() {
-    app.ready = true;
-  }
+    function appIsReady() {
+        app.ready = true;
+    }
 
 
-  return {
+    return {
 
-    get app() {
-      return app;
-    },
+        get app() {
+            return app;
+        },
 
 
-    appIsReady,
-    updateAppStatus
-  };
+        appIsReady,
+        updateAppStatus
+    };
 }
 
 export function sidebar_hidden() {
