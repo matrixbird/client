@@ -66,7 +66,9 @@ export let users = $state(new SvelteMap());
 
 export let events = $state(new SvelteMap());
 export let threads: Threads = $state(new SvelteMap());
+(globalThis as any).threads = threads;
 export let thread_events: ThreadEvents = $state(new SvelteMap());
+(globalThis as any).thread_events = thread_events;
 
 export let drafts: Drafts = $state([]);
 
@@ -254,8 +256,8 @@ export function createMatrixStore() {
                 let origin_server_ts = event.event.origin_server_ts
                 if(origin_server_ts > sync_state.started) {
                     setTimeout(() => {
-                        console.log("I created this room. Should add.")
-                        processNewEmailRoom(client, room.roomId);
+                        //console.log("I created this room. Should add.")
+                        //processNewEmailRoom(client, room.roomId);
                     }, 3000)
                 }
             }
@@ -273,12 +275,22 @@ export function createMatrixStore() {
 
         client.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
             if(!synced) return;
+
             if(event.event.type === "matrixbird.email.matrix" || 
             event.event.type === "matrixbird.email.standard") {
 
                 let origin_server_ts = event.event.origin_server_ts
                 if(origin_server_ts > sync_state.started) {
                     processNewEmail(event)
+                }
+
+            }
+
+            if(event.event.type === "matrixbird.thread.marker") {
+
+                let origin_server_ts = event.event.origin_server_ts
+                if(origin_server_ts > sync_state.started) {
+                    processNewEmailRoom(client, room.roomId)
                 }
 
             }

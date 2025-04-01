@@ -39,7 +39,14 @@ export function buildInboxEmails(session: Session, threads: Threads, thread_even
 
     function findLastNonUserEvent(threadEvents: IRoomEvent[]) {
         //const nonUserEvents = threadEvents.filter((event: MatrixEvent) => event.sender !== session.user_id);
-        const nonUserEvents = threadEvents.filter((event: IRoomEvent) => event.content?.recipients?.includes(session.user_id) || event.sender !== session.user_id);
+        const nonUserEvents = threadEvents.filter((event: IRoomEvent) => {
+
+            let is_by_me = event.content?.recipients?.includes(session.user_id) && event.content?.recipients?.length === 1 && event.sender === session.user_id;
+
+            let is_for_me = event.sender !== session.user_id && event.content?.recipients?.includes(session.user_id);
+
+            return is_for_me || is_by_me;
+        });
 
         if (nonUserEvents.length === 0) return null;
 
@@ -70,7 +77,11 @@ export function buildInboxEmails(session: Session, threads: Threads, thread_even
         // an email sent by this user or recieved from another user
         // add to inbox if it's not sent by this user
         if(!children) {
-            if(thread.content?.recipients?.includes(session.user_id) || thread.sender != session.user_id) {
+
+            let is_by_me = thread.content?.recipients?.includes(session.user_id) && thread.content?.recipients?.length === 1 && thread.sender === session.user_id;
+            let is_for_me = thread.sender !== session.user_id && thread.content?.recipients?.includes(session.user_id);
+
+            if(is_by_me || is_for_me) {
                 emails[threadId] = thread;
             }
         }
@@ -235,6 +246,7 @@ export async function process(client: MatrixClient) {
                 thread_events.set(thread_id, eev);
             }
         });
+
     };
 
     syncProcessed()
@@ -265,10 +277,12 @@ export async function processNewEmail(event: MatrixEvent) {
     console.log("Processing new email.", event)
 
     // We want events that have fully transactioned
+
     if(!event?.event?.unsigned) {
         console.log("no unsigned data, returning")
         return
     }
+
 
     event.event.new = true
 
@@ -277,8 +291,7 @@ export async function processNewEmail(event: MatrixEvent) {
     threads.set(event.getId(), event.event);
 
     // Add empty thread events
-    thread_events.set(event.getId(), []);
-    console.log("did we get hree?")
+    // thread_events.set(event.getId(), []);
 }
 
 export async function processNewEmailReply(event: any) {
@@ -328,7 +341,7 @@ async function get_new_thread(room_id: string, thread_id: string) {
             }
         }
     } else {
-        thread_events.set(thread_id, []);
+        //thread_events.set(thread_id, []);
     }
 }
 
@@ -364,6 +377,6 @@ function processMessages(messages: IRoomEvent[]) {
         threads.set(event.event_id, event);
 
         // Add empty thread events
-        thread_events.set(event.event_id, []);
+        //thread_events.set(event.event_id, []);
     });
 }
