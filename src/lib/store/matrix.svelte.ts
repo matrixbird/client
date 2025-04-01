@@ -39,23 +39,11 @@ import {
 } from '$lib/store/process.svelte'
 
 import { v4 as uuidv4 } from 'uuid';
-import {
-    goto,
-} from '$app/navigation';
 
 import {
-    getAccountData,
     getThreadRootEvent,
-    getThreads,
     getThreadEvents,
-    syncOnce,
-    slidingSync,
-    getRoomState,
 } from '$lib/matrix/api'
-
-import {
-    is_local_room
-} from '$lib/utils/matrix'
 
 
 let conn_id: string = $state(uuidv4());
@@ -259,6 +247,18 @@ export function createMatrixStore() {
                 processNewEmailRoom(client, room.roomId);
             }
 
+        });
+
+        client.on(sdk.RoomEvent.Timeline, function (event, room, toStartOfTimeline) {
+            if (event.event.type == "m.room.create" && event.event.sender === session.user_id) {
+                let origin_server_ts = event.event.origin_server_ts
+                if(origin_server_ts > sync_state.started) {
+                    setTimeout(() => {
+                        console.log("I created this room. Should add.")
+                        processNewEmailRoom(client, room.roomId);
+                    }, 3000)
+                }
+            }
         });
 
 

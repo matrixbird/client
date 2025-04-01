@@ -1,6 +1,6 @@
 import { session, type Session } from '$lib/store/session.svelte';
 import { SvelteMap } from 'svelte/reactivity';
-import { MatrixClient, EventTimeline, Direction, Room } from 'matrix-js-sdk/src/index';
+import { MatrixClient, EventTimeline, Direction, Room, MatrixEventEvent } from 'matrix-js-sdk/src/index';
 import type { IRoomEvent } from 'matrix-js-sdk/src/sync-accumulator';
 import type { IStore } from 'matrix-js-sdk/src/store';
 import type { 
@@ -261,11 +261,14 @@ export async function processDrafts(room: Room) {
     console.log("Drafts events", $state.snapshot(drafts))
 }
 
-export async function processNewEmail(event: any) {
+export async function processNewEmail(event: MatrixEvent) {
     console.log("Processing new email.", event)
 
     // We want events that have fully transactioned
-    if(!event?.event?.unsigned) return
+    if(!event?.event?.unsigned) {
+        console.log("no unsigned data, returning")
+        return
+    }
 
     event.event.new = true
 
@@ -275,6 +278,7 @@ export async function processNewEmail(event: any) {
 
     // Add empty thread events
     thread_events.set(event.getId(), []);
+    console.log("did we get hree?")
 }
 
 export async function processNewEmailReply(event: any) {
