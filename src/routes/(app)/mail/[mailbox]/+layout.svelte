@@ -10,13 +10,16 @@ let event_open = $derived.by(() => {
 
 import { ui_state } from '$lib/store/app.svelte'
 let expanded = $derived(ui_state?.expanded)
+let mobile = $derived(ui_state?.mobile)
 
 </script>
 
 <div class="grid grid-cols-[1fr] w-full h-full overflow-hidden" 
-class:open={expanded || event_open}>
+class:open={(expanded || event_open) && !mobile}>
 
-    <ListView />
+    {#if !mobile || (mobile && !event_open)}
+        <ListView />
+    {/if}
 
     {#if event_open || expanded}
         <div class="overflow-hidden border-l border-border">
