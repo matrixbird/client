@@ -1,4 +1,7 @@
 import { browser } from '$app/environment';
+import { 
+    debounce
+} from '$lib/utils/utils';
 
 import { session } from '$lib/store/session.svelte'
 
@@ -36,22 +39,18 @@ export const userState = $state({
 export const ui_state: UIState = $state({
     expanded: false,
     sidebar_hidden: false,
+    mobile: false
 });
 
-let mobile = $state(false);
-
-export function is_mobile() {
-    return mobile
-}
-
 if(browser) {
-    isMobile()
+    checkIfMobile()
+    setUpListener()
 }
 
-function isMobile() {
+function checkIfMobile() {
 
     if(navigator.userAgentData.mobile) {
-        mobile = true
+        ui_state.mobile = true
         return
     }
 
@@ -65,14 +64,22 @@ function isMobile() {
             (navigator.maxTouchPoints > 0) 
     );
 
-    mobile = mobileRegex.test(userAgent) || (isSmallScreen && hasTouchScreen);
+    ui_state.mobile = mobileRegex.test(userAgent) || (isSmallScreen && hasTouchScreen);
 }
 
 $effect.root(() => {
     $effect(() => {
-        //console.log("Mobile:", mobile)
+        if(ui_state.mobile) {
+            //console.log("Mobile detected")
+        }
     })
 })
+
+function setUpListener() {
+    window.addEventListener('resize', () => {
+        checkIfMobile()
+    })
+}
 
 
 export const route_state = $state({});

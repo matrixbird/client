@@ -65,6 +65,7 @@ export interface ClientUISettings {
 export interface UIState {
     expanded: boolean;
     sidebar_hidden: boolean;
+    mobile: boolean;
 }
 
 export interface ComposerData {
