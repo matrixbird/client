@@ -9,7 +9,7 @@ import {
     type MSC3575RoomSubscription,
 } from 'matrix-js-sdk/src/sliding-sync';
 
-import type { UIState, MailboxRooms } from '$lib/types/matrixbird'
+import type { ClientUISettings, MailboxRooms } from '$lib/types/matrixbird'
 
 import * as sdk from 'matrix-js-sdk/src/index';
 import { SvelteMap } from 'svelte/reactivity';
@@ -732,7 +732,7 @@ export function createMatrixStore() {
     };
 }
 
-export async function updateClientUISettings(data: UIState) {
+export async function updateClientUISettings(data: ClientUISettings) {
     await client.setAccountData(`matrixbird.client.settings.ui`, data)
     console.log("Client settings updated in account data.", data)
 }

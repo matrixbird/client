@@ -4,7 +4,7 @@ import { session } from '$lib/store/session.svelte'
 
 import { updateClientUISettings } from './matrix.svelte'
 
-import type { UIState } from '$lib/types/matrixbird'
+import type { UIState, ClientUISettings } from '$lib/types/matrixbird'
 
 interface App {
     started_at: number,
@@ -165,7 +165,11 @@ export async function toggleExpand() {
         localStorage.setItem('expanded', 'true')
     }
     if(session) {
-        await updateClientUISettings(ui_state)
+        let data: ClientUISettings =  {
+            expanded: ui_state.expanded,
+            sidebar_hidden: ui_state.sidebar_hidden
+        }
+        await updateClientUISettings(data)
     }
 }
 
@@ -178,7 +182,11 @@ export async function toggleSidebar() {
         localStorage.removeItem('sidebar_hidden')
     }
     if(session) {
-        await updateClientUISettings(ui_state)
+        let data: ClientUISettings =  {
+            expanded: ui_state.expanded,
+            sidebar_hidden: ui_state.sidebar_hidden
+        }
+        await updateClientUISettings(data)
     }
 }
 

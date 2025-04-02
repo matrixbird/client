@@ -56,6 +56,12 @@ export type ThreadMarkerContent = {
     };
 }
 
+export interface ClientUISettings {
+    expanded: boolean;
+    sidebar_hidden: boolean;
+}
+
+
 export interface UIState {
     expanded: boolean;
     sidebar_hidden: boolean;
