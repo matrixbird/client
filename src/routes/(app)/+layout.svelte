@@ -198,6 +198,7 @@ function calcPosition() {
 let mb;
 
 let expanded = $derived(ui_state?.expanded)
+let mobile = $derived(ui_state?.mobile)
 
 let dragging = $state(false);
 
@@ -217,7 +218,7 @@ let resizing = $state(false);
 let dragopts = $derived.by(() => {
     return {
         handle: '.window-header',
-        disabled: expanded || resizing,
+        disabled: expanded || mobile || resizing,
         legacyTranslate: false, 
         gpuAcceleration: true,
         position: position,
@@ -343,13 +344,13 @@ function resize(e) {
 {#if new_user}
 {/if}
 
-{#if !expanded && ready}
+{#if !expanded && !mobile && ready}
     <Switcher />
 {/if}
 
 
 <div class="grid h-screen w-screen overflow-hidden select-none relative" >
-{#if !expanded && ready}
+{#if !expanded && !mobile && ready}
     <Navbar />
 {/if}
 
@@ -358,12 +359,12 @@ function resize(e) {
         select-none absolute"
         style="--width:{width}px; --height:{height}px;--offsetX:{position?.x}px;--offsetY:{position?.y}px;"
         class:drag-shadow={dragging}
-        class:rounded-3xl={!expanded}
-        class:border-[7px]={!expanded}
-        class:border-bird-200={!expanded}
+        class:rounded-3xl={!expanded && !mobile}
+        class:border-[7px]={!expanded && !mobile}
+        class:border-bird-200={!expanded && !mobile}
         class:border-bird-300={dragging}
-        class:nexp={!expanded}
-        class:expanded={expanded} 
+        class:nexp={!expanded && !mobile}
+        class:expanded={expanded || mobile} 
         use:draggable={dragopts}
         bind:this={mb}>
 
@@ -386,7 +387,7 @@ function resize(e) {
 
         </div>
 
-        {#if !expanded}
+        {#if !expanded && !mobile}
         <div class="group absolute bottom-[-10px] right-[-10px] pr-1 pb-1 cursor-nwse-resize"
                 onmousedown={startResize}
                 onmouseup={stopResize}>
