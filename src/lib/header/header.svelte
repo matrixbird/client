@@ -1,6 +1,6 @@
 <script>
 import { page } from '$app/state';
-import { expand, circle, collapse, inbox, fullscreen } from '$lib/assets/icons'
+import { expand, menu, circle, collapse, inbox, fullscreen } from '$lib/assets/icons'
 import { tooltip } from '$lib/components/tooltip/tooltip'
 
 import Mailbox from './mailbox.svelte'
@@ -61,6 +61,13 @@ let mailbox_title = $derived.by(() => {
 <div class="flex bg-bird-900 pr-2 text-white font-medium h-8"
         class:rounded-t-2xl={!expanded && !mobile}
 ondblclick={toggleExpand}>
+
+    {#if mobile}
+        <div class="flex place-items-center ml-2">
+            {@html menu}
+        </div>
+    {/if}
+
 
     {#if !expanded && sidebar_hidden}
         <Mailbox />
