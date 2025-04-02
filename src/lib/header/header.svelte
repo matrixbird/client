@@ -12,6 +12,7 @@ let sidebar_hidden = $derived(ui_state?.sidebar_hidden)
 let { dragging, dragStart, dragEnd } = $props();
 
 let expanded = $derived(ui_state?.expanded)
+let mobile = $derived(ui_state?.mobile)
 
 let placement = $derived.by(() => {
     return expanded ? "bottom" : "top-end"
@@ -58,7 +59,7 @@ let mailbox_title = $derived.by(() => {
 </script>
 
 <div class="flex bg-bird-900 pr-2 text-white font-medium h-8"
-        class:rounded-t-2xl={!expanded}
+        class:rounded-t-2xl={!expanded && !mobile}
 ondblclick={toggleExpand}>
 
     {#if !expanded && sidebar_hidden}
@@ -82,6 +83,7 @@ ondblclick={toggleExpand}>
 
     </div>
 
+    {#if !mobile}
     <div class="flex place-items-center mr-1 cursor-pointer"
     onclick={toggleExpand}
     use:tooltip={opts}>
@@ -91,6 +93,7 @@ ondblclick={toggleExpand}>
             {@html expand}
         {/if}
     </div>
+    {/if}
 
 </div>
 
