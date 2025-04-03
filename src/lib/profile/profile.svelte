@@ -12,6 +12,7 @@ import {
 
 import { ui_state } from '$lib/store/app.svelte'
 let expanded = $derived(ui_state?.expanded)
+let mobile = $derived(ui_state?.mobile)
 
 let user = $derived.by(() => {
     if(!store?.synced) return null
@@ -79,6 +80,7 @@ function toggle(status) {
 }
 
 let placement = $derived.by(() => {
+    if(mobile) return 'bottom-end'
     if(expanded) return 'right-start'
     return 'right-start'
 })
@@ -90,6 +92,7 @@ let mask = $derived.by(() => {
 
 
 let offset = $derived.by(() => {
+    if(mobile) return [0, 10]
     if(expanded) return [-6, 6]
     return [0, 20]
 })
@@ -120,10 +123,10 @@ let opts = $derived.by(() => {
         bg-bird-900" 
     class:mb-2={expanded}
     class:active={popup_active}
-    class:w-10={!expanded}
-    class:h-10={!expanded}
-    class:w-8={expanded}
-    class:h-8={expanded}>
+    class:w-10={!expanded && !mobile}
+    class:h-10={!expanded && !mobile}
+    class:w-8={expanded || mobile}
+    class:h-8={expanded || mobile}>
         <div class="font-semibold text-md text-white uppercase"
             class:text-xs={expanded}>
             {#if !avatar}

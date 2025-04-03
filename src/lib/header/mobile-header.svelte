@@ -3,6 +3,10 @@ import { page } from '$app/state';
 import { expand, menu, circle, collapse, inbox, fullscreen } from '$lib/assets/icons'
 import { tooltip } from '$lib/components/tooltip/tooltip'
 
+import Profile from '$lib/profile/profile.svelte';
+
+import Search from '$lib/search/search.svelte';
+
 import Mailbox from './mailbox.svelte'
 
 import { ui_state, toggleExpand } from '$lib/store/app.svelte'
@@ -58,8 +62,7 @@ let mailbox_title = $derived.by(() => {
 
 </script>
 
-<div class="flex pr-2 font-medium h-12"
-        class:rounded-t-2xl={!expanded && !mobile}
+<div class="mx-1 my-2 flex pr-2 font-medium h-12 border-3 border-bird-200 rounded-[500px]"
 ondblclick={toggleExpand}>
 
     <div class="flex place-items-center px-3 cursor-pointer">
@@ -67,38 +70,14 @@ ondblclick={toggleExpand}>
     </div>
 
 
-    {#if !expanded && sidebar_hidden}
-        <Mailbox />
-    {/if}
-
-    {#if expanded || !sidebar_hidden}
-        <div class="flex place-items-center silk cursor-pointer text-sm " 
-            class:py-1={expanded}
-            class:ml-2={expanded}
-            class:ml-3={!expanded && !sidebar_hidden}>
-            matrixbird
-        </div>
-    {/if}
-
-    <div class="flex-1 flex place-items-center ml-3"
-        onmousedown={start}
-        onmouseup={end}
-    class:cursor-grab={!expanded}
-    class:cursor-grabbing={(dragging || mousedown) && !expanded}>
-
+    <div class="flex place-items-center flex-1">
+        <Search />
     </div>
 
-    {#if !mobile}
-    <div class="flex place-items-center mr-1 cursor-pointer"
-    onclick={toggleExpand}
-    use:tooltip={opts}>
-        {#if expanded}
-            {@html collapse}
-        {:else}
-            {@html expand}
-        {/if}
+    <div class="flex place-items-center">
+        <Profile />
     </div>
-    {/if}
+
 
 </div>
 

@@ -1,6 +1,9 @@
 <script>
 import { glass } from '$lib/assets/icons'
 
+import { ui_state } from '$lib/store/app.svelte'
+let mobile = $derived(ui_state?.mobile)
+
 let searchInput;
 let search = $state('')
 
@@ -16,9 +19,13 @@ let focused = $state(false);
 <div class="search flex place-items-center flex-1"
     class:border-bird-800={focused}
     onclick={focus}>
+
+    {#if !mobile}
     <div class="flex place-items-center px-2 opacity-70">
         {@html glass}
     </div>
+    {/if}
+
     <div class="text-sm flex-1 w-full">
         <input 
             bind:value={search}
