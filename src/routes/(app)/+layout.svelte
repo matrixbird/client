@@ -365,12 +365,15 @@ function resize(e) {
         class:border-bird-300={dragging}
         class:nexp={!expanded && !mobile}
         class:expanded={expanded || mobile} 
+        class:grid-rows-[1fr_auto]={mobile} 
         use:draggable={dragopts}
         bind:this={mb}>
 
+        {#if !mobile}
         <div class="window-header">
             <Header {dragging} {dragStart} {dragEnd} />
         </div>
+        {/if}
 
 
         <div class="overflow-hidden grid rounded-b-3xl"
