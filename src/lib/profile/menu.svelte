@@ -8,6 +8,9 @@ let { kill } = $props();
 import { createMatrixStore } from '$lib/store/matrix.svelte'
 const matrix = createMatrixStore()
 
+import { ui_state } from '$lib/store/app.svelte'
+let mobile = $derived(ui_state?.mobile)
+
 let user = $derived(matrix?.user)
 
 let displayName = $derived.by(() => {
@@ -25,7 +28,8 @@ let email = $derived.by(() => {
 </script>
 
 
-<div class="menu grid grid-rows-[auto_1fr]">
+<div class="menu grid grid-rows-[auto_1fr]"
+class:mobile={mobile}>
 
     <div class="flex flex-col p-3 border-b border-border select-text">
 
@@ -51,5 +55,8 @@ let email = $derived.by(() => {
 @reference "tailwindcss/theme";
 .menu {
     min-width: 300px;
+}
+.mobile {
+    min-width: calc(100dvw - 2rem);
 }
 </style>

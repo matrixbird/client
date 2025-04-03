@@ -92,7 +92,7 @@ let mask = $derived.by(() => {
 
 
 let offset = $derived.by(() => {
-    if(mobile) return [0, 10]
+    if(mobile) return [5, 20]
     if(expanded) return [-6, 6]
     return [0, 20]
 })
