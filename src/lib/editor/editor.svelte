@@ -4,6 +4,9 @@ import EditorItem from './editor-item.svelte';
 import { createEditorStore } from '$lib/store/editor.svelte'
 const store = createEditorStore()
 
+import { ui_state } from '$lib/store/app.svelte';
+const mobile = $derived(ui_state.mobile)
+
 let editors = $derived.by(() => {
     return store.editor?.editors
 })

@@ -22,6 +22,8 @@ import ThemeToggle from '$lib/theme/toggle.svelte'
 import Navbar from '$lib/navbar/navbar.svelte';
 import Alert from '$lib/components/alert/alert.svelte'
 
+import MobileNewMessage from '$lib/editor/mobile-new-message.svelte';
+
 import { getFeatures } from '$lib/appservice/api'
 
 import { setFeatures, userState, ui_state } from '$lib/store/app.svelte'
@@ -346,6 +348,10 @@ let event_open = $derived.by(() => {
 
 {#if mobile_sidebar_visible}
     <MobileSidebar />
+{/if}
+
+{#if mobile}
+    <MobileNewMessage />
 {/if}
 
 

@@ -43,6 +43,9 @@ import {
 
 const store = createMatrixStore()
 
+import { ui_state } from '$lib/store/app.svelte';
+const mobile = $derived(ui_state.mobile)
+
 import { createEditorStore } from '$lib/store/editor.svelte'
 const editorStore = createEditorStore()
 
@@ -555,10 +558,11 @@ let opts_close = $derived.by(() => {
     class:rounded-b-3xl={expanded}
     class:border-b-[7px]={expanded}
     class:max-w-[34rem]={!expanded}
-    class:expand={expanded}>
+    class:expand={expanded}
+    class:mobile={mobile}>
 
-    <div class="editor-header rounded-t-2xl flex bg-bird-900 text-white font-medium py-1"
-    >
+    <div class="editor-header flex bg-bird-900 text-white font-medium py-1"
+    class:rounded-t-2xl={!mobile}>
 
         <div class="flex px-3 flex-1 place-items-center cursor-pointer text-sm ml-1 tracking-wide"
             onclick={toggleMinimize}>
@@ -566,25 +570,29 @@ let opts_close = $derived.by(() => {
         </div>
 
 
-        <div class="cursor-pointer flex place-items-center mr-1"
-        use:tooltip={opts_min}
-            onclick={toggleMinimize}>
-            {#if minimized}
-                {@html maximize}
-            {:else}
-                {@html minimize}
-            {/if}
-        </div>
+        {#if !mobile}
 
-        <div class="cursor-pointer flex place-items-center mr-1"
-        use:tooltip={opts_exp}
-            onclick={expandWindow}>
-            {#if expanded}
-                {@html collapse}
-            {:else}
-                {@html expand}
-            {/if}
-        </div>
+            <div class="cursor-pointer flex place-items-center mr-1"
+            use:tooltip={opts_min}
+                onclick={toggleMinimize}>
+                {#if minimized}
+                    {@html maximize}
+                {:else}
+                    {@html minimize}
+                {/if}
+            </div>
+
+            <div class="cursor-pointer flex place-items-center mr-1"
+            use:tooltip={opts_exp}
+                onclick={expandWindow}>
+                {#if expanded}
+                    {@html collapse}
+                {:else}
+                    {@html expand}
+                {/if}
+            </div>
+
+        {/if}
 
         <div class="cursor-pointer flex place-items-center mr-2"
         use:tooltip={opts_close}
@@ -681,6 +689,18 @@ button {
     bottom: 4rem;
     right: 10rem;
     left: 10rem;
+}
+
+.mobile {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    border: none;
+    min-width: 100dvw;
+    max-height: 100dvh;
+    border-radius: 0;
 }
 
 
