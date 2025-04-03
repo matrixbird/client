@@ -17,12 +17,11 @@ let mobile = $derived(ui_state?.mobile)
 <div class="grid grid-cols-[1fr] w-full h-full overflow-hidden" 
 class:open={(expanded || event_open) && !mobile}>
 
-    {#if !mobile || (mobile && !event_open)}
-        <ListView />
-    {/if}
+    <ListView />
 
     {#if event_open || expanded}
-        <div class="overflow-hidden border-l border-border">
+        <div class="overflow-hidden border-l border-border" 
+        class:full={mobile}>
             {@render children()}
         </div>
     {/if}
@@ -31,6 +30,17 @@ class:open={(expanded || event_open) && !mobile}>
 <style>
 .open {
     grid-template-columns: 45% 55%;
+}
+.full {
+    background: var(--background);
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
 }
 </style>
 
