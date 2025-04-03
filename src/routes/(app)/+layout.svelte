@@ -16,6 +16,7 @@ import Header from '$lib/header/header.svelte'
 import MobileHeader from '$lib/header/mobile-header.svelte'
 import Switcher from '$lib/switcher/switcher.svelte'
 import Editor from '$lib/editor/editor.svelte'
+import MobileSidebar from '$lib/sidebar/mobile-sidebar.svelte'
 import EmailContextMenu from '$lib/components/email/context-menu.svelte'
 import ThemeToggle from '$lib/theme/toggle.svelte'
 import Navbar from '$lib/navbar/navbar.svelte';
@@ -200,6 +201,7 @@ let mb;
 
 let expanded = $derived(ui_state?.expanded)
 let mobile = $derived(ui_state?.mobile)
+let mobile_sidebar_visible = $derived(ui_state?.mobile_sidebar_visible)
 
 let dragging = $state(false);
 
@@ -341,6 +343,11 @@ let event_open = $derived.by(() => {
         </div>
     </div>
 {/if}
+
+{#if mobile_sidebar_visible}
+    <MobileSidebar />
+{/if}
+
 
 <Listeners />
 <Editor />
