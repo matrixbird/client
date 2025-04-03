@@ -9,7 +9,11 @@ import Search from '$lib/search/search.svelte';
 
 import Mailbox from './mailbox.svelte'
 
-import { ui_state, toggleExpand } from '$lib/store/app.svelte'
+import { 
+    ui_state, 
+    toggleMobileSidebar,
+    toggleExpand 
+} from '$lib/store/app.svelte'
 
 let sidebar_hidden = $derived(ui_state?.sidebar_hidden)
 
@@ -60,12 +64,17 @@ let mailbox_title = $derived.by(() => {
     }
 })
 
+function toggleSidebar() {
+    toggleMobileSidebar()
+}
+
 </script>
 
 <div class="mx-1 my-2 flex pr-2 font-medium h-12 border-3 border-bird-200 rounded-[500px]"
 ondblclick={toggleExpand}>
 
-    <div class="flex place-items-center px-3 cursor-pointer">
+    <div class="flex place-items-center px-3 cursor-pointer"
+    onclick={toggleSidebar}>
         {@html menu}
     </div>
 

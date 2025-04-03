@@ -39,7 +39,8 @@ export const userState = $state({
 export const ui_state: UIState = $state({
     expanded: false,
     sidebar_hidden: false,
-    mobile: false
+    mobile: false,
+    mobile_sidebar_visible: false,
 });
 
 if(browser) {
@@ -197,3 +198,6 @@ export async function toggleSidebar() {
     }
 }
 
+export function toggleMobileSidebar() {
+    ui_state.mobile_sidebar_visible = !ui_state.mobile_sidebar_visible
+}

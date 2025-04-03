@@ -66,6 +66,7 @@ export interface UIState {
     expanded: boolean;
     sidebar_hidden: boolean;
     mobile: boolean;
+    mobile_sidebar_visible: boolean;
 }
 
 export interface ComposerData {
