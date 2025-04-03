@@ -13,6 +13,7 @@ import logo from '$lib/logo/logo'
 import Matrix from '$lib/matrix/matrix.svelte'
 import Listeners from '$lib/app/listeners.svelte'
 import Header from '$lib/header/header.svelte'
+import MobileHeader from '$lib/header/mobile-header.svelte'
 import Switcher from '$lib/switcher/switcher.svelte'
 import Editor from '$lib/editor/editor.svelte'
 import EmailContextMenu from '$lib/components/email/context-menu.svelte'
@@ -321,6 +322,10 @@ function resize(e) {
     }
 }
 
+let event_open = $derived.by(() => {
+    return page.params.event !== undefined
+})
+
 </script>
 
 <svelte:head>
@@ -365,7 +370,6 @@ function resize(e) {
         class:border-bird-300={dragging}
         class:nexp={!expanded && !mobile}
         class:expanded={expanded || mobile} 
-        class:grid-rows-[1fr_auto]={mobile} 
         use:draggable={dragopts}
         bind:this={mb}>
 
@@ -374,6 +378,13 @@ function resize(e) {
             <Header {dragging} {dragStart} {dragEnd} />
         </div>
         {/if}
+
+        {#if mobile && !event_open}
+            <div class="mobile-header">
+                <MobileHeader />
+            </div>
+        {/if}
+
 
 
         <div class="overflow-hidden grid rounded-b-3xl"
