@@ -118,7 +118,7 @@ let height = $state(750);
 
 $effect(() => {
 
-    if(new_user && first_event) {
+    if(new_user && first_event && !mobile) {
         userState.new_user = false
         goto(`/mail/inbox/${first_event.event_id}`)
     }
