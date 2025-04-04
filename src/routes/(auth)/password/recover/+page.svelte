@@ -107,9 +107,8 @@ let focused = $state(false);
     </div>
 
     <div class="content flex-1 flex flex-col p-4 mt-2 mb-2">
-        <div class="flex leading-6">
-            Please enter the email address connected to your account. We'll send
-            you a verification code.
+        <div class="leading-6">
+            Please enter your <strong>{PUBLIC_HOMESERVER_NAME}</strong> address. We'll send a verification code to the recovery email connected to your account.
         </div>
 
         <div class="mt-4 relative">

@@ -166,7 +166,7 @@ function setAvatarUrl(url: string) {
         </div>
         <div class="mt-4">
             <input 
-                class="py-3 pl-3 pr-[164px]"
+                class="py-3 pl-3"
                 bind:this={nameInput} 
                 bind:value={name} 
                 disabled={busy}

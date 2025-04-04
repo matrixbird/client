@@ -182,7 +182,7 @@ async function reset() {
         Enter the code we sent to your email address.
     </div>
 
-    <div class="con mt-4">
+    <div class="con mt-4 relative">
         <input 
             class="py-3 pl-3 pr-[164px]"
             type="email" 
@@ -191,6 +191,10 @@ async function reset() {
             bind:value={code} 
             onkeydown={handleEnter}
             placeholder="verification code" />
+
+        {#if busy}
+            <div class="spinner-sm absolute right-4 top-4"></div>
+        {/if}
 
     </div>
 
@@ -205,8 +209,7 @@ async function reset() {
     <div class="mt-6">
         <button 
             onclick={verifyCode}
-            class="bg-bird-900 text-white px-2 w-full py-3 uppercase
-            text-base font-medium" >
+            class="primary px-2 w-full py-3 text-base" >
                 Verify Code
         </button>
     </div>
@@ -218,23 +221,22 @@ async function reset() {
 <div class="content flex-1 flex flex-col p-4 mt-4">
 
     <div class="leading-6 mb-4">
-        We'll need to verify your email first.
-        Please enter your email address. 
+        Please enter an email address where we can send you a verification code. 
     </div>
 
     <div class="relative">
         <input 
-            class="py-3 pl-3 pr-[164px]"
+            class="py-3 pl-3"
             type="email" 
-            maxlength="30"
             bind:this={emailInput} 
             bind:value={email} 
             onkeydown={handleEnter}
-            placeholder="you@work.com" />
+            disabled={busy}
+            placeholder="your@email.com" />
 
-        {#if busy}
-            <div class="spinner-sm"></div>
-        {/if}
+            {#if busy}
+                <div class="spinner-sm absolute right-4 top-4"></div>
+            {/if}
 
     </div>
 
@@ -261,8 +263,8 @@ async function reset() {
     <div class="mt-6">
         <button 
             onclick={verify}
-            class="bg-bird-900 text-white px-2 w-full py-3 uppercase
-            text-base font-medium" >
+            disabled={busy}
+            class="primary px-2 w-full py-3 text-base" >
             Send code
         </button>
     </div>
