@@ -350,7 +350,7 @@ let event_open = $derived.by(() => {
     <MobileSidebar />
 {/if}
 
-{#if mobile}
+{#if mobile && !event_open}
     <MobileNewMessage />
 {/if}
 
