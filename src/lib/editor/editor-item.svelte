@@ -152,6 +152,7 @@ $effect(() => {
 })
 
 async function saveDraft() {
+    return
     console.log("Should save draft.")
     let drafts_room_id = await store.getDraftsRoom()
     if(!drafts_room_id) {

@@ -424,6 +424,14 @@ input::placeholder {
     outline: none;
 }
 
+.tiptap p.is-editor-empty:first-child::before {
+  color: var(--input-placeholder);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
 .tooltip {
     position: fixed;
     background: var(--tooltip-background);
