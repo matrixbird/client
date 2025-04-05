@@ -127,7 +127,7 @@ let focused = $state(false);
             <div class:focus={focused} 
                 onclick={() => emailInput.focus()}
                 class="server pointer-events-none
-    select-none flex items-center px-3 ml-[-1px] border border-bird-900">
+    select-none flex items-center px-3 ml-[-1px] border-l border-bird-900">
                 @{PUBLIC_HOMESERVER_NAME}
             </div>
 

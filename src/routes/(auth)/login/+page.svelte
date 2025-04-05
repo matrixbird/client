@@ -168,7 +168,7 @@ let focused = $state(false);
             <div class:focus={focused} 
                 onclick={() => usernameInput.focus()}
                 class="server pointer-events-none
- select-none flex items-center px-3 ml-[-1px] border border-bird-900">
+ select-none flex items-center px-3 ml-[-1px] border-l border-bird-900">
                 @{PUBLIC_HOMESERVER_NAME}
             </div>
 
@@ -223,9 +223,7 @@ let focused = $state(false);
 </div>
 
 <style>
-input {
-    border-radius: 2px;
-}
+
 .focus {
     border-left: 2px solid #464646;
     border-radius: 0 4px 4px 0;
