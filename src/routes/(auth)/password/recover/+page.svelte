@@ -6,6 +6,10 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { goto } from '$app/navigation';
 
+import { updateSession } from '$lib/store/session.svelte'
+import { createMatrixStore } from '$lib/store/matrix.svelte'
+const store = createMatrixStore()
+
 import { 
     request_password_reset,
     verify_password_reset_code,
@@ -108,6 +112,8 @@ let code = $state('');
 
 let bad_code = $state(false);
 
+let success = $state(true);
+
 async function verifyCode() {
 
     if(code.length === 0) {
@@ -198,14 +204,39 @@ async function updatePassword() {
             password: password
         })
 
-        if(response?.error) {
-            console.log('error', response.error)
-        }
+        if(response?.session_id && response?.access_token) {
 
-        if(response?.updated) {
-            console.log('updated', response)
-            console.log("Password updated successfully")
-            goto('/login')
+            success = true
+
+            const res = await fetch('/api/auth/session', {
+                method: 'POST',
+                body: JSON.stringify({
+                    session_id: response.session_id,
+                    access_token: response.access_token,
+                    device_id: response.device_id,
+                    user_id: response.user_id,
+                }),
+            });
+
+            const json = await res.json();
+
+            console.log("resp", json)
+
+            updateSession({
+                session_id: response.session_id,
+                user_id: response.user_id,
+                access_token: response.access_token,
+                device_id: response.device_id,
+            })
+
+            store.createMatrixClient({
+                session_id: response.session_id,
+                user_id: response.user_id,
+                access_token: response.access_token,
+                device_id: response.device_id,
+            })
+
+            goto('/mail/inbox')
         }
 
 
@@ -231,7 +262,15 @@ function handlePasswordEnter(event) {
     <div class="flex p-4 border-b border-border">
 
         <div class="flex items-center flex-1 font-medium">
-            Recover your account
+            {#if !sent && !verified && !success}
+                Recover your account
+            {:else if sent && !verified && !success}
+                Verify your email
+            {:else if verified && !success}
+                Set a new password
+            {:else if success}
+                Password updated
+            {/if}
         </div>
 
         <div class="flex place-items-center">
@@ -244,7 +283,7 @@ function handlePasswordEnter(event) {
 
 
 
-    {#if !sent && !verified}
+    {#if !sent && !verified && !success}
 
     <div class="content flex-1 flex flex-col p-4 mt-2 mb-2">
         <div class="leading-6">
@@ -298,7 +337,7 @@ function handlePasswordEnter(event) {
     </div>
     {/if}
 
-    {#if sent && !verified}
+    {#if sent && !verified && !success}
 
     <div class="content flex-1 flex flex-col p-4 mt-2 mb-2">
         <div class="leading-6">
@@ -340,7 +379,7 @@ function handlePasswordEnter(event) {
     </div>
     {/if}
 
-    {#if verified}
+    {#if verified && !success}
 
     <div class="content flex-1 flex flex-col p-4 mt-2 mb-2">
         <div class="leading-6">
@@ -376,6 +415,16 @@ function handlePasswordEnter(event) {
                 class="primary px-2 w-full py-3 text-base" >
                     Reset Password
             </button>
+        </div>
+
+    </div>
+    {/if}
+
+    {#if success}
+
+    <div class="content flex-1 flex flex-col p-4 mt-2 mb-2">
+        <div class="leading-6">
+            Your password has been updated. We'll log you in now...
         </div>
 
     </div>
