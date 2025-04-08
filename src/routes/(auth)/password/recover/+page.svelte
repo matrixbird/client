@@ -1,10 +1,12 @@
-<script>
+<script lang="ts">
 import { PUBLIC_HOMESERVER_NAME } from '$env/static/public';
 import logo from '$lib/logo/logo'
 import { onMount, tick } from 'svelte';
+import { v4 as uuidv4 } from 'uuid';
 
 import { 
-    request_invite,
+    request_password_reset,
+    verify_password_reset_code,
 } from '$lib/appservice/api';
 
 import { 
@@ -13,15 +15,21 @@ import {
 
 
 onMount(() => {
-    emailInput.focus();
+    usernameInput.focus();
 });
 
-let emailInput;
-let email = $state('');
+let usernameInput: HTMLInputElement;
+let username = $state('');
 
 let busy = $state(false);
+let client_secret: string | undefined = $state(undefined);
+let session: string | undefined = $state(undefined);
 
-function validate(event) {
+function validate(event: KeyboardEvent) {
+
+    if(event.key === 'Enter') {
+        process();
+    }
 
     if (event.key.length > 1) return;
 
@@ -30,39 +38,34 @@ function validate(event) {
       event.preventDefault();
     }
 
-    if(email.length === 0) {
+    if(username.length === 0) {
         return;
     }
 
-    if(event.key === 'Enter') {
-        process();
-    }
 
-
-}
-
-function onKeydown(event) {
-    if(event.key === 'Enter') {
-        process();
-    }
 }
 
 let bad_login = $state(false);
 let server_down = $state(false);
 
-let success = $state(false);
+let sent = $state(false);
+let verified = $state(false);
 
 async function process() {
 
-    if(email.length === 0) {
-        emailInput.focus();
+    if(username.length === 0) {
+        usernameInput.focus();
         return;
     }
 
     busy = true
+    client_secret = uuidv4()
 
     try {
-        let response = await request_invite(email)
+        let response = await request_password_reset({
+            username: username,
+            client_secret: client_secret
+        })
         if(response?.error) {
             bad_login = true
         } else {
@@ -71,8 +74,9 @@ async function process() {
 
         console.log('response', response)
 
-        if(response?.sent) {
-            success = true
+        if(response?.session) {
+            session = response.session
+            sent = true
         }
 
 
@@ -86,6 +90,68 @@ async function process() {
 
 
 let focused = $state(false);
+
+let codeInput: HTMLInputElement;
+let code = $state('');
+
+let bad_code = $state(false);
+
+async function verifyCode() {
+
+    if(code.length === 0) {
+        code.focus();
+        return;
+    }
+
+
+    busy = true
+
+    try {
+        let response = await verify_password_reset_code({
+            client_secret: client_secret,
+            session: session,
+            code: code
+        })
+
+        if(response?.error) {
+            console.log('error', response.error)
+            bad_code = true
+        }
+
+        if(response?.verified) {
+            console.log('verified', response)
+            verified = true
+        }
+
+
+    } catch (err){
+        console.log('error', err)
+    } finally {
+        busy = false
+        await tick()
+    }
+}
+
+function handleEnter(event) {
+
+    if(sent && codeInput) {
+        if(code.length === 0) {
+            return;
+        }
+        if(event.key === 'Enter') {
+            verifyCode();
+        }
+    } else if(emailInput) {
+
+        if(email.length === 0) {
+            return;
+        }
+        if(event.key === 'Enter') {
+            verify();
+        }
+    }
+
+}
 
 </script>
 
@@ -106,6 +172,10 @@ let focused = $state(false);
 
     </div>
 
+
+
+    {#if !sent && !verified}
+
     <div class="content flex-1 flex flex-col p-4 mt-2 mb-2">
         <div class="leading-6">
             Please enter your <strong>{PUBLIC_HOMESERVER_NAME}</strong> address. We'll send a verification code to the recovery email connected to your account.
@@ -114,18 +184,18 @@ let focused = $state(false);
         <div class="mt-4 relative">
             <input 
                 class="py-3 pl-3 pr-[164px]"
-                bind:this={emailInput} 
-                bind:value={email} 
+                bind:this={usernameInput} 
+                bind:value={username} 
                 type="text" 
                 disabled={busy}
                 onfocus={() => focused = true}
                 onblur={() => focused = false}
                 maxlength="30"
                 onkeydown={validate}
-                placeholder="user" />
+                placeholder="username" />
 
             <div class:focus={focused} 
-                onclick={() => emailInput.focus()}
+                onclick={() => usernameInput.focus()}
                 class="server pointer-events-none
     select-none flex items-center px-3 ml-[-1px] border-l border-bird-900">
                 @{PUBLIC_HOMESERVER_NAME}
@@ -142,7 +212,7 @@ let focused = $state(false);
 
         {#if bad_login}
             <div class="mt-6 text-red-600 text-center">
-                Invalid email or password
+                Invalid username or password
             </div>
         {/if}
 
@@ -156,16 +226,86 @@ let focused = $state(false);
         </div>
 
     </div>
+    {/if}
+
+    {#if sent && !verified}
+
+    <div class="content flex-1 flex flex-col p-4 mt-2 mb-2">
+        <div class="leading-6">
+            Enter the code we sent to your email address.
+        </div>
+
+        <div class="con mt-4 relative">
+            <input 
+                class="py-3 pl-3 pr-[164px]"
+                type="email" 
+                maxlength="30"
+                bind:this={codeInput} 
+                bind:value={code} 
+                onkeydown={handleEnter}
+                placeholder="verification code" />
+
+            {#if busy}
+                <div class="spinner-sm absolute right-4 top-4"></div>
+            {/if}
+
+        </div>
+
+        {#if bad_code}
+            <div class="mt-6 text-sm">
+                The code you entered is incorrect. 
+                <span onclick={reset} class="cursor-pointer underline">Start over?</span>
+            </div>
+        {/if}
+
+
+        <div class="mt-6">
+            <button 
+                onclick={verifyCode}
+                class="primary px-2 w-full py-3 text-base" >
+                    Verify Code
+            </button>
+        </div>
+
+    </div>
+    {/if}
+
+    {#if verified}
+
+    <div class="content flex-1 flex flex-col p-4 mt-2 mb-2">
+        <div class="leading-6">
+            Choose a new password for your account.
+        </div>
+
+        <div class="con mt-4 relative">
+            <input 
+                class="py-3 pl-3 pr-[164px]"
+                type="email" 
+                maxlength="30"
+                bind:this={codeInput} 
+                bind:value={code} 
+                onkeydown={handleEnter}
+                placeholder="verification code" />
+
+            {#if busy}
+                <div class="spinner-sm absolute right-4 top-4"></div>
+            {/if}
+
+        </div>
+
+        <div class="mt-6">
+            <button 
+                onclick={verifyCode}
+                class="primary px-2 w-full py-3 text-base" >
+                    Reset Password
+            </button>
+        </div>
+
+    </div>
+    {/if}
+
 </div>
 
-<div class="grid place-items-center w-full mt-6">
-    <div class="">
-        <span class="text-bird-700">Already have an account?</span>
-        <a href="/login" class="text-bird-900 underline">
-            Log in
-        </a>
-    </div>
-</div>
 
 <style>
 
