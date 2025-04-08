@@ -161,6 +161,26 @@ export const request_password_reset = async (body: object) => {
 
 }
 
+export const update_password = async (body: object) => {
+    const url = `${PUBLIC_APPSERVICE}/auth/password/update`;
+
+    let options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body)
+    }
+
+    try {
+        const response = await fetch(url, options)
+        return response.json();
+    } catch (error) {
+        throw error
+    }
+
+}
+
 export const query_code = async (code: string) => {
     const url = `${PUBLIC_APPSERVICE}/auth/code/validate/${code}`;
 

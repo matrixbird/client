@@ -4,19 +4,31 @@ import logo from '$lib/logo/logo'
 import { onMount, tick } from 'svelte';
 import { v4 as uuidv4 } from 'uuid';
 
+import { goto } from '$app/navigation';
+
 import { 
     request_password_reset,
     verify_password_reset_code,
+    update_password,
 } from '$lib/appservice/api';
 
 import { 
-    debounce
-} from '$lib/utils/utils';
+    showPassword,
+    hidePassword,
+} from '$lib/assets/icons';
 
 
-onMount(() => {
-    usernameInput.focus();
-});
+$effect(() => {
+    if(!sent && !verified && usernameInput) {
+        usernameInput.focus();
+    }
+    if(sent && codeInput) {
+        codeInput.focus();
+    }
+    if(verified && passwordInput) {
+        passwordInput.focus();
+    }
+})
 
 let usernameInput: HTMLInputElement;
 let username = $state('');
@@ -153,6 +165,64 @@ function handleEnter(event) {
 
 }
 
+let passwordInput: HTMLInputElement;
+let password = $state('');
+
+let passwordVisible = $state(false);
+
+async function togglePassword() {
+    passwordVisible = !passwordVisible;
+    if(passwordVisible) {
+        passwordInput.type = 'text';
+    } else {
+        passwordInput.type = 'password';
+    }
+
+    await tick();
+    passwordInput.focus();
+}
+
+async function updatePassword() {
+
+    if(passwordInput.length < 8) {
+        passwordInput.focus();
+        return;
+    }
+
+    busy = true
+
+    try {
+        let response = await update_password({
+            client_secret: client_secret,
+            session: session,
+            password: password
+        })
+
+        if(response?.error) {
+            console.log('error', response.error)
+        }
+
+        if(response?.updated) {
+            console.log('updated', response)
+            console.log("Password updated successfully")
+            goto('/login')
+        }
+
+
+    } catch (err){
+        console.log('error', err)
+    } finally {
+        busy = false
+        await tick()
+    }
+}
+
+function handlePasswordEnter(event) {
+    if(event.key === 'Enter') {
+        updatePassword();
+    }
+}
+
 </script>
 
 <div class="box w-full flex flex-col" 
@@ -280,22 +350,29 @@ function handleEnter(event) {
         <div class="con mt-4 relative">
             <input 
                 class="py-3 pl-3 pr-[164px]"
-                type="email" 
-                maxlength="30"
-                bind:this={codeInput} 
-                bind:value={code} 
-                onkeydown={handleEnter}
-                placeholder="verification code" />
+                type="password" 
+                minlength="8"
+                bind:this={passwordInput} 
+                bind:value={password} 
+                disabled={busy}
+                onkeydown={handlePasswordEnter}
+                placeholder="new password" />
 
-            {#if busy}
-                <div class="spinner-sm absolute right-4 top-4"></div>
-            {/if}
+            <div class="absolute right-[10px] top-[13px] cursor-pointer flex
+                place-items-center opacity-70 hover:opacity-100"
+                onclick={togglePassword}>
+                {#if passwordVisible}
+                    {@html hidePassword}
+                {:else}
+                    {@html showPassword}
+                {/if}
+            </div>
 
         </div>
 
         <div class="mt-6">
             <button 
-                onclick={verifyCode}
+                onclick={updatePassword}
                 class="primary px-2 w-full py-3 text-base" >
                     Reset Password
             </button>
