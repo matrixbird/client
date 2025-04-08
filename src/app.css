@@ -83,15 +83,15 @@
     --button-background: white;
     --button-text: hsla(0, 0%, 0%, 1);
     --button-hover: var(--bird-100);
-    --button-focus: white;
+    --button-focus: var(--bird-700);
     --button-active: var(--bird-200);
     --button-border: var(--bird-400);
     --button-box-shadow: var(--bird-100);
 
-    --button-primary-background: var(--bird-800);
+    --button-primary-background: var(--bird-900);
     --button-primary-text: hsla(0, 0%, 100%, 1);
-    --button-primary-hover: var(--bird-800);
-    --button-primary-focus: var(--bird-90);
+    --button-primary-hover: var(--bird-700);
+    --button-primary-focus: var(--bird-800);
     --button-primary-active: var(--bird-950);
     --button-primary-border: transparent;
     --button-primary-box-shadow: var(--bird-800);
