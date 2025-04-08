@@ -112,7 +112,7 @@ let code = $state('');
 
 let bad_code = $state(false);
 
-let success = $state(true);
+let success = $state(false);
 
 async function verifyCode() {
 
