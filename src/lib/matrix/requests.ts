@@ -1,4 +1,4 @@
-import { PUBLIC_HOMESERVER, PUBLIC_BASE_URL, PUBLIC_APP_NAME} from '$env/static/public';
+import { PUBLIC_HOMESERVER, PUBLIC_BASE_URL} from '$env/static/public';
 
 import type { ValidatedAuthMetadata } from 'matrix-js-sdk/src/oidc/validate'
 
