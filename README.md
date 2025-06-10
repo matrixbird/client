@@ -21,6 +21,22 @@ Refer to the [docs](https://svelte.dev/docs/kit/building-your-app) for more info
 
 The `.env.example` file contains the environment variables needed to run the project.
 
+#### Development
+
+To run the project locally:
+
+```bash
+npm run dev
+```
+
+If you want to emulate a prod environment and use a local dummy domain, copy the `.env.local.example` file to `.env.local` and set the appropriate values:
+
+```env
+VITE_LOCAL_ORIGIN=https://app.one.local
+VITE_ALLOWED_HOST=.one.local
+```
+
+See the docs on [local setup](https://github.com/matrixbird/matrixbird/blob/main/docs/local-synapse-setup.md) for more.
 
 ### Discuss
 
