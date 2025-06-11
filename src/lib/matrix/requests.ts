@@ -1,4 +1,4 @@
-import { PUBLIC_HOMESERVER, PUBLIC_BASE_URL} from '$env/static/public';
+import { PUBLIC_HOMESERVER } from '$env/static/public';
 
 import type { ValidatedAuthMetadata } from 'matrix-js-sdk/src/oidc/validate'
 
@@ -29,14 +29,16 @@ export const registerOauthClient = async (registration_endpoint: string) => {
         throw new Error('Missing token endpoint')
     }
 
+    let base = window.location.origin;
+
     let body = {
         application_type: "web",
         client_name: "Matrixbird",
-        client_uri: `${PUBLIC_BASE_URL}`,
+        client_uri: `${base}`,
         logo_uri: "https://static.matrixbird.com/logo.png",
         token_endpoint_auth_method: "none",
         redirect_uris: [
-            `${PUBLIC_BASE_URL}/oidc/callback`
+            `${base}/oidc/callback`
         ],
         response_types: [
             "code"
