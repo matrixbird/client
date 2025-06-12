@@ -50,12 +50,12 @@ if(browser) {
 
 function checkIfMobile() {
 
-    if(navigator.userAgentData.mobile) {
+    if(navigator?.userAgentData?.mobile) {
         ui_state.mobile = true
         return
     }
 
-    const userAgent = navigator.userAgent 
+    const userAgent = navigator?.userAgent 
     const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
 
     const isSmallScreen = window.innerWidth <= 768;
