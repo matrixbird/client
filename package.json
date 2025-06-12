@@ -52,6 +52,7 @@
 		"email-validator": "^2.0.4",
 		"emoji-picker-element": "^1.26.1",
 		"matrix-js-sdk": "github:matrix-org/matrix-js-sdk#develop",
+		"tldts": "^7.0.8",
 		"uuid": "^11.0.5"
 	}
 }

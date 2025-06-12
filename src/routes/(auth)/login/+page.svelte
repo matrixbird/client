@@ -16,6 +16,16 @@ import { updateSession } from '$lib/store/session.svelte'
 import { createMatrixStore } from '$lib/store/matrix.svelte'
 const store = createMatrixStore()
 
+let { 
+    data, 
+} = $props();
+
+$effect(() => {
+    if(data) {
+        console.log('data', data)
+    }
+})
+
 onMount(() => {
     usernameInput.focus();
 });

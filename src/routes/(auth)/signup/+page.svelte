@@ -5,7 +5,15 @@ import VerifyEmail from './verify-email.svelte';
 import CreateAccount from './create-account.svelte';
 
 
-let { data } = $props();
+let { 
+    data, 
+} = $props();
+
+$effect(() => {
+    if(data) {
+        console.log('data', data)
+    }
+})
 
 let disabled = $derived.by(() => {
     return !data?.registration_enabled
