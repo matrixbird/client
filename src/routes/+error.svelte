@@ -12,10 +12,10 @@ let message = $derived.by(() => {
 
 <div class="h-screen w-full grid place-items-center">
     <div class="flex flex-col text-center">
-        <div class="text-4xl font-bold mono">
+        <div class="text-6xl font-bold mono">
             🤖
         </div>
-        <div class="pt-3 text-xl ">
+        <div class="pt-5 text-xl ">
             {message}
         </div>
     </div>
