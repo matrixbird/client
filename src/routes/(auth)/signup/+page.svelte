@@ -10,9 +10,6 @@ let {
 } = $props();
 
 $effect(() => {
-    if(data) {
-        console.log('data', data)
-    }
 })
 
 let disabled = $derived.by(() => {
