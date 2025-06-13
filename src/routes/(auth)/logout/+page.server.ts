@@ -1,5 +1,5 @@
 import { redirect } from "@sveltejs/kit";
-import { PUBLIC_APPSERVICE } from '$env/static/public';
+import { PUBLIC_MATRIXBIRD_SERVER } from '$env/static/public';
 
 import type { Actions } from './$types';
 
@@ -12,7 +12,7 @@ export const actions = {
     cookies.delete('user_id', { path: '/' });
 
     try {
-      let url = `${PUBLIC_APPSERVICE}/auth/session/revoke`;
+      let url = `${PUBLIC_MATRIXBIRD_SERVER}/auth/session/revoke`;
       fetch(url, {
         headers: { 'Authorization': `Bearer ${session_id}` }
       });
@@ -32,7 +32,7 @@ export const load: PageServerLoad = async ({ cookies, fetch }) => {
     cookies.delete('user_id', { path: '/' });
 
     try {
-      let url = `${PUBLIC_APPSERVICE}/auth/session/revoke`;
+      let url = `${PUBLIC_MATRIXBIRD_SERVER}/auth/session/revoke`;
       fetch(url, {
         headers: { 'Authorization': `Bearer ${session_id}` }
       });

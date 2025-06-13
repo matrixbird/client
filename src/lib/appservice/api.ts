@@ -1,8 +1,8 @@
-import { PUBLIC_APPSERVICE } from '$env/static/public';
+import { PUBLIC_MATRIXBIRD_SERVER } from '$env/static/public';
 
 export const login = async (body: object) => {
     console.log(body)
-    const url = `${PUBLIC_APPSERVICE}/auth/login`;
+    const url = `${PUBLIC_MATRIXBIRD_SERVER}/auth/login`;
 
     let options = {
         headers: {
@@ -23,7 +23,7 @@ export const login = async (body: object) => {
 
 export const verify_email = async (body: object) => {
     console.log(body)
-    const url = `${PUBLIC_APPSERVICE}/auth/email/verify`;
+    const url = `${PUBLIC_MATRIXBIRD_SERVER}/auth/email/verify`;
 
     let options = {
         headers: {
@@ -44,7 +44,7 @@ export const verify_email = async (body: object) => {
 
 export const verify_code = async (body: object) => {
     console.log(body)
-    const url = `${PUBLIC_APPSERVICE}/auth/code/verify`;
+    const url = `${PUBLIC_MATRIXBIRD_SERVER}/auth/code/verify`;
 
     let options = {
         headers: {
@@ -65,7 +65,7 @@ export const verify_code = async (body: object) => {
 
 export const verify_password_reset_code = async (body: object) => {
     console.log(body)
-    const url = `${PUBLIC_APPSERVICE}/auth/password/code/verify`;
+    const url = `${PUBLIC_MATRIXBIRD_SERVER}/auth/password/code/verify`;
 
     let options = {
         headers: {
@@ -86,7 +86,7 @@ export const verify_password_reset_code = async (body: object) => {
 
 export const signup = async (body: object) => {
     console.log(body)
-    const url = `${PUBLIC_APPSERVICE}/auth/signup`;
+    const url = `${PUBLIC_MATRIXBIRD_SERVER}/auth/signup`;
 
     let options = {
         headers: {
@@ -106,7 +106,7 @@ export const signup = async (body: object) => {
 }
 
 export const usernameAvailable = async (username: string) => {
-    const url = `${PUBLIC_APPSERVICE}/auth/username/available/${username}`;
+    const url = `${PUBLIC_MATRIXBIRD_SERVER}/auth/username/available/${username}`;
 
     let options = {
         headers: {
@@ -124,7 +124,7 @@ export const usernameAvailable = async (username: string) => {
 }
 
 export const request_invite = async (email: string) => {
-    const url = `${PUBLIC_APPSERVICE}/auth/request/invite/${email}`;
+    const url = `${PUBLIC_MATRIXBIRD_SERVER}/auth/request/invite/${email}`;
 
     let options = {
         headers: {
@@ -142,7 +142,7 @@ export const request_invite = async (email: string) => {
 }
 
 export const request_password_reset = async (body: object) => {
-    const url = `${PUBLIC_APPSERVICE}/auth/password/reset`;
+    const url = `${PUBLIC_MATRIXBIRD_SERVER}/auth/password/reset`;
 
     let options = {
         method: 'POST',
@@ -162,7 +162,7 @@ export const request_password_reset = async (body: object) => {
 }
 
 export const update_password = async (body: object) => {
-    const url = `${PUBLIC_APPSERVICE}/auth/password/update`;
+    const url = `${PUBLIC_MATRIXBIRD_SERVER}/auth/password/update`;
 
     let options = {
         method: 'POST',
@@ -182,7 +182,7 @@ export const update_password = async (body: object) => {
 }
 
 export const query_code = async (code: string) => {
-    const url = `${PUBLIC_APPSERVICE}/auth/code/validate/${code}`;
+    const url = `${PUBLIC_MATRIXBIRD_SERVER}/auth/code/validate/${code}`;
 
     let options = {
         headers: {
@@ -200,7 +200,7 @@ export const query_code = async (code: string) => {
 }
 
 export const valid_domain = async (domain: string) => {
-    const url = `${PUBLIC_APPSERVICE}/domain/${domain}`;
+    const url = `${PUBLIC_MATRIXBIRD_SERVER}/domain/${domain}`;
 
     let options = {
         headers: {
@@ -218,7 +218,7 @@ export const valid_domain = async (domain: string) => {
 }
 
 export const valid_email = async (email: string) => {
-    const url = `${PUBLIC_APPSERVICE}/email/${email}`;
+    const url = `${PUBLIC_MATRIXBIRD_SERVER}/email/${email}`;
 
     let options = {
         headers: {
@@ -236,7 +236,7 @@ export const valid_email = async (email: string) => {
 }
 
 export const getFeatures = async () => {
-    const url = `${PUBLIC_APPSERVICE}/features`;
+    const url = `${PUBLIC_MATRIXBIRD_SERVER}/features`;
 
     let options = {
         headers: {

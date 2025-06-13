@@ -1,4 +1,4 @@
-//import { PUBLIC_APPSERVICE } from '$env/static/public';
+//import { PUBLIC_MATRIXBIRD_SERVER } from '$env/static/public';
 import { redirect } from "@sveltejs/kit";
 
 import type { LayoutServerLoad } from './$types';
@@ -29,7 +29,7 @@ export const load: LayoutServerLoad = async ({ cookies }) => {
   let reject = false;
 
   try {
-    let url = `${PUBLIC_APPSERVICE}/auth/session/validate`;
+    let url = `${PUBLIC_MATRIXBIRD_SERVER}/auth/session/validate`;
     const response = await fetch(url, {
       headers: { 'Authorization': `Bearer ${session_id}` }
     });
