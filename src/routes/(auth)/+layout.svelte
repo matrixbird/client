@@ -2,9 +2,18 @@
 import { onMount } from 'svelte';
 import '../../app.css';
 
-let { children } = $props();
+let { 
+    data, 
+    children 
+} = $props();
+
+
+import { setServerConfig } from '$lib/store/server.svelte';
 
 onMount(() => {
+    if(data?.["matrixbird.server"]) {
+        setServerConfig(data)
+    }
 })
 
 </script>

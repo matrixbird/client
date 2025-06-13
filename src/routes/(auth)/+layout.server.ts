@@ -1,5 +1,9 @@
 import { redirect } from "@sveltejs/kit";
+import { error } from '@sveltejs/kit';
+
+import { type } from 'arktype';
 import { parse } from 'tldts';
+import { ServerConfig } from '$lib/store/server.svelte';
 
 import type { LayoutServerLoad } from './$types';
 export const load: LayoutServerLoad = async ( { cookies, fetch, url } ) => {
@@ -20,17 +24,25 @@ export const load: LayoutServerLoad = async ( { cookies, fetch, url } ) => {
     try {
         const response = await fetch(endpoint);
         if (!response.ok) {
-            throw new Error(`Failed to fetch well-known client data: ${response.statusText}`);
+            throw new Error('Failed to fetch server configuration');
         }
-        const resp = await response.json();
-        if(resp?.["matrixbird.server"]?.url) {
-            data = resp
+
+        const raw = await response.json();
+
+        const validated = ServerConfig(raw);
+
+        if (validated instanceof type.errors) {
+            console.error('Server config validation failed:', validated.summary);
+            throw new Error('Invalid server configuration');
         }
-        console.log("Well-known data:", data);
 
+        data = raw
 
-    } catch (error) {
-        console.error("Error fetching well-known client data:", error);
+    } catch (err: any) {
+        console.error("Error:", err);
+        error(500, {
+            message: err?.message,
+        });
     }
 
     return data;
