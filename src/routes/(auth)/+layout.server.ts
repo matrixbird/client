@@ -23,18 +23,21 @@ export const load: LayoutServerLoad = async ( { params, cookies, fetch, url } ) 
     let data: {
         MATRIXBIRD_SERVER?: string;
         HOMESERVER?: string;
+        HOMESERVER_NAME?: string;
         RELATED_SERVERS?: string[];
     } = {};
 
 
     let MATRIXBIRD_SERVER = env.PUBLIC_MATRIXBIRD_SERVER;
     let HOMESERVER = env.PUBLIC_HOMESERVER;
+    let HOMESERVER_NAME = env.PUBLIC_HOMESERVER_NAME;
     let RELATED_SERVERS = env.PUBLIC_RELATED_SERVERS;
 
     // Skip server discovery if MATRIXBIRD_SERVER is set in env
-    if(MATRIXBIRD_SERVER && HOMESERVER) {
+    if(MATRIXBIRD_SERVER && HOMESERVER && HOMESERVER_NAME) {
         data["MATRIXBIRD_SERVER"] = MATRIXBIRD_SERVER;
         data["HOMESERVER"] = HOMESERVER;
+        data["HOMESERVER_NAME"] = HOMESERVER_NAME;
 
         if(RELATED_SERVERS) {
             data["RELATED_SERVERS"] = RELATED_SERVERS.split(",");
@@ -66,10 +69,13 @@ export const load: LayoutServerLoad = async ( { params, cookies, fetch, url } ) 
 
         data["MATRIXBIRD_SERVER"] = validated["matrixbird.server"].url
         data["HOMESERVER"] = validated["m.homeserver"].base_url
+        data["HOMESERVER_NAME"] = validated["m.homeserver"].server_name;
 
         if(validated["matrixbird.server"]?.related) {
             data["RELATED_SERVERS"] = validated["matrixbird.server"].related
         }
+
+        console.log("Returning server configuration from discovery:", data);
 
         return data;
 

@@ -6,7 +6,8 @@ export const MatrixbirdServer = type({
 });
 
 export const HomeServer = type({
-    base_url: "string"
+    base_url: "string",
+    server_name: "string?"
 });
 
 export const ServerConfig = type({
