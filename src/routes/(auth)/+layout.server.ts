@@ -7,12 +7,16 @@ import { parse } from 'tldts';
 import { ServerConfig } from '$lib/store/server.svelte';
 
 import type { LayoutServerLoad } from './$types';
-export const load: LayoutServerLoad = async ( { cookies, fetch, url } ) => {
+
+export const load: LayoutServerLoad = async ( { params, cookies, fetch, url } ) => {
+
+    let skip = url.pathname === '/logout' ||
+        url.pathname === '/signup/profile';
 
     // Check if the user is already authenticated
     let access_token = cookies.get("access_token");
-    // If the user is authenticated, redirect to inbox
-    if(access_token) {
+    // If the user is authenticated (and not trying to log out), redirect to inbox
+    if(access_token && !skip) {
         redirect(303, '/mail/inbox');
     }
 
