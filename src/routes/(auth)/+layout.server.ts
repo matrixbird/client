@@ -8,7 +8,9 @@ import { ServerConfig } from '$lib/store/server.svelte';
 import type { LayoutServerLoad } from './$types';
 export const load: LayoutServerLoad = async ( { cookies, fetch, url } ) => {
 
-    let data: any;
+    let data: {
+        MATRIXBIRD_SERVER?: string;
+    } = {};
 
     let access_token = cookies.get("access_token");
 
@@ -36,7 +38,9 @@ export const load: LayoutServerLoad = async ( { cookies, fetch, url } ) => {
             throw new Error('Invalid server configuration');
         }
 
-        data = raw
+        data["MATRIXBIRD_SERVER"] = validated["matrixbird.server"].url
+
+        return data;
 
     } catch (err: any) {
         console.error("Error:", err);
@@ -45,5 +49,4 @@ export const load: LayoutServerLoad = async ( { cookies, fetch, url } ) => {
         });
     }
 
-    return data;
 }

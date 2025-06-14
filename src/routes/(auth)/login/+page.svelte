@@ -24,9 +24,7 @@ let {
     data, 
 } = $props();
 
-let MATRIXBIRD_SERVER = $derived.by(() => {
-    return data?.['matrixbird.server']?.url;
-})
+let MATRIXBIRD_SERVER = $derived(data?.MATRIXBIRD_SERVER);
 
 $effect(() => {
     if(MATRIXBIRD_SERVER) {

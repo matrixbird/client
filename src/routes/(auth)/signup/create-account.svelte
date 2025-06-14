@@ -35,10 +35,7 @@ let {
     session 
 } = $props();
 
-let MATRIXBIRD_SERVER = $derived.by(() => {
-    return data?.['matrixbird.server']?.url;
-})
-
+let MATRIXBIRD_SERVER = $derived(data?.MATRIXBIRD_SERVER);
 
 let require_invite_code = $derived.by(() => {
     return data?.require_invite_code
