@@ -35,6 +35,11 @@ let {
     session 
 } = $props();
 
+let MATRIXBIRD_SERVER = $derived.by(() => {
+    return data?.['matrixbird.server']?.url;
+})
+
+
 let require_invite_code = $derived.by(() => {
     return data?.require_invite_code
 })
@@ -149,7 +154,7 @@ async function process() {
     busy = true
 
     try {
-        let response = await signup({
+        let response = await signup(MATRIXBIRD_SERVER, {
             username: username.toLowerCase(),
             password: password,
             session: session?.session || uuidv4(),
@@ -243,7 +248,7 @@ function checkUsername(e) {
 
 
         try {
-            let available = await usernameAvailable(username)
+            let available = await usernameAvailable(MATRIXBIRD_SERVER, username)
             if(available) {
                 username_available = true;
             } else {

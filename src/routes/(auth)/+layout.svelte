@@ -11,9 +11,7 @@ let {
 import { setServerConfig } from '$lib/store/server.svelte';
 
 onMount(() => {
-    if(data?.["matrixbird.server"]) {
-        setServerConfig(data)
-    }
+    //setServerConfig(data)
 })
 
 </script>

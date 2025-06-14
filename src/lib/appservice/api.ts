@@ -1,8 +1,12 @@
 import { PUBLIC_MATRIXBIRD_SERVER } from '$env/static/public';
 
-export const login = async (body: object) => {
-    console.log(body)
-    const url = `${PUBLIC_MATRIXBIRD_SERVER}/auth/login`;
+export const login = async (server: string, body: object) => {
+
+    if(!server || server === 'null' || server === 'undefined') {
+        throw new Error('Server URL is required');
+    }
+
+    const url = `${server}/auth/login`;
 
     let options = {
         headers: {
@@ -84,9 +88,13 @@ export const verify_password_reset_code = async (body: object) => {
 
 }
 
-export const signup = async (body: object) => {
-    console.log(body)
-    const url = `${PUBLIC_MATRIXBIRD_SERVER}/auth/signup`;
+export const signup = async (server: string, body: object) => {
+
+    if(!server || server === 'null' || server === 'undefined') {
+        throw new Error('Server URL is required');
+    }
+
+    const url = `${server}/auth/signup`;
 
     let options = {
         headers: {
@@ -105,8 +113,13 @@ export const signup = async (body: object) => {
 
 }
 
-export const usernameAvailable = async (username: string) => {
-    const url = `${PUBLIC_MATRIXBIRD_SERVER}/auth/username/available/${username}`;
+export const usernameAvailable = async (server: string, username: string) => {
+
+    if(!server || server === 'null' || server === 'undefined') {
+        throw new Error('Server URL is required');
+    }
+
+    const url = `${server}/auth/username/available/${username}`;
 
     let options = {
         headers: {

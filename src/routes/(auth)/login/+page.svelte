@@ -3,6 +3,10 @@ import { PUBLIC_HOMESERVER_NAME } from '$env/static/public';
 import logo from '$lib/logo/logo'
 import { onMount, tick } from 'svelte';
 
+import { serverConfig } from '$lib/store/server.svelte';
+
+//let MATRIXBIRD_SERVER = $derived(serverConfig?.["matrixbird.server"]?.url)
+
 import {
 	goto,
 } from '$app/navigation';
@@ -20,7 +24,14 @@ let {
     data, 
 } = $props();
 
+let MATRIXBIRD_SERVER = $derived.by(() => {
+    return data?.['matrixbird.server']?.url;
+})
+
 $effect(() => {
+    if(MATRIXBIRD_SERVER) {
+        console.log(MATRIXBIRD_SERVER)
+    }
 })
 
 onMount(() => {
@@ -77,7 +88,7 @@ async function login() {
     busy = true
 
     try {
-        let response = await appservice_login({
+        let response = await appservice_login(MATRIXBIRD_SERVER, {
             user: username,
             password: password
         })
@@ -140,6 +151,7 @@ let button_text = $derived.by(() => {
 let focused = $state(false);
 
 </script>
+
 
 <div class="box w-full flex flex-col" 
     class:bobble={busy}>

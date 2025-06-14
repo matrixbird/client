@@ -14,10 +14,27 @@ export const ServerConfig = type({
     "m.homeserver": HomeServer
 });
 
+export function createServerStore() {
+    return {
+        get server() {
+            return serverConfig;
+        },
+    };
+}
+
+
 
 export type ServerConfigType = typeof ServerConfig.infer;
 
-let serverConfig = $state<ServerConfigType | null>(null);
+export const serverConfig:ServerConfigType = $state({
+    "matrixbird.server": {
+        url: "",
+        "related?": []
+    },
+    "m.homeserver": {
+        base_url: ""
+    }
+});
 let configError = $state<string | null>(null);
 
 export function setServerConfig(rawData: unknown) {
@@ -26,9 +43,12 @@ export function setServerConfig(rawData: unknown) {
     if (result instanceof type.errors) {
         console.error('Validation failed:', result.summary);
         configError = result.summary;
-        serverConfig = null;
     } else {
-        serverConfig = result;
+        serverConfig["matrixbird.server"].url = result["matrixbird.server"].url;
+        if(result["matrixbird.server"]["related?"]) {
+            serverConfig["matrixbird.server"].related = result["matrixbird.server"]["related?"] || [];
+        }
+        serverConfig["m.homeserver"].base_url = result["m.homeserver"].base_url;
         configError = null;
     }
 
