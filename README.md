@@ -19,7 +19,7 @@ This is a sveltekit project and can be deployed in different ways.
 
 Refer to the [docs](https://svelte.dev/docs/kit/building-your-app) for more information.
 
-The `.env.example` file contains the environment variables needed to run the project.
+The `.env.example` file contains the environment variables needed to run the project. If you skip setting up env variables, the client will attempt to discover the matrixbird server using well-known discovery mechanism.
 
 #### Development
 
