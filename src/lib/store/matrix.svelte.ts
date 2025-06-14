@@ -207,7 +207,7 @@ export function createMatrixStore() {
 
 
         client =  sdk.createClient({
-            baseUrl: PUBLIC_HOMESERVER,
+            baseUrl: session.home_server,
             accessToken: session.access_token,
             userId: session.user_id,
             deviceId: session.device_id,

@@ -37,6 +37,8 @@ export const load: PageServerLoad = async ({ parent, cookies, fetch }) => {
     cookies.delete('session_id', { path: '/' });
     cookies.delete('access_token', { path: '/' });
     cookies.delete('device_id', { path: '/' });
+    cookies.delete('home_server', { path: '/' });
+    cookies.delete('server_name', { path: '/' });
     cookies.delete('user_id', { path: '/' });
 
     try {

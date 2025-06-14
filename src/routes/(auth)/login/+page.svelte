@@ -106,6 +106,8 @@ async function login() {
                     session_id: response.session_id,
                     access_token: response.access_token,
                     device_id: response.device_id,
+                    home_server: response.home_server,
+                    server_name: response.server_name,
                     user_id: response.user_id,
                 }),
             });
@@ -119,6 +121,8 @@ async function login() {
                 user_id: response.user_id,
                 access_token: response.access_token,
                 device_id: response.device_id,
+                home_server: response.home_server,
+                server_name: response.server_name,
             })
 
             store.createMatrixClient({
@@ -126,6 +130,8 @@ async function login() {
                 user_id: response.user_id,
                 access_token: response.access_token,
                 device_id: response.device_id,
+                home_server: response.home_server,
+                server_name: response.server_name,
             })
 
             goto('/mail/inbox')

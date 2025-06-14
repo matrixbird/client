@@ -3,13 +3,17 @@ export type Session = {
     user_id: string | undefined,
     access_token: string | undefined,
     device_id: string | undefined,
+    home_server: string | undefined,
+    server_name: string | undefined,
 }
 
 export const session: Session = $state({
     session_id: undefined,
     user_id: undefined,
     access_token: undefined,
-    device_id: undefined
+    device_id: undefined,
+    home_server: undefined,
+    server_name: undefined,
 });
 
 export function updateSession(data: Session) {
@@ -22,6 +26,8 @@ export function updateSession(data: Session) {
     session.user_id = data.user_id
     session.access_token = data.access_token
     session.device_id = data.device_id
+    session.home_server = data.home_server
+    session.server_name = data.server_name
     console.info('Session updated', $state.snapshot(session))
 }
 
@@ -34,6 +40,8 @@ export function clearSession() {
     session.user_id = undefined
     session.access_token = undefined
     session.device_id = undefined
+    session.home_server = undefined
+    session.server_name = undefined
     console.info('Session cleared', session)
 }
 
