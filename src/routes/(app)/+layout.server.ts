@@ -7,11 +7,15 @@ export const load: LayoutServerLoad = async ({ cookies }) => {
     let session_id = cookies.get("session_id");
     let access_token = cookies.get("access_token");
     let device_id = cookies.get("device_id");
+    let home_server = cookies.get("home_server");
+    let server_name = cookies.get("server_name");
     let user_id = cookies.get("user_id");
 
     console.log("session_id", session_id);
     console.log("access_token", access_token);
     console.log("device_id", device_id);
+    console.log("home_server", home_server);
+    console.log("server_name", server_name);
     console.log("user_id", user_id);
 
     if(!session_id || !access_token || !device_id || !user_id) {
@@ -22,11 +26,15 @@ export const load: LayoutServerLoad = async ({ cookies }) => {
         session_id: string | undefined;
         access_token: string | undefined;
         device_id: string | undefined;
+        home_server: string | undefined;
+        server_name: string | undefined;
         user_id: string | undefined;
     } = {
             session_id,
             access_token,
             device_id,
+            home_server,
+            server_name,
             user_id
         }
 
