@@ -9,8 +9,9 @@ import { ServerConfig } from '$lib/store/server.svelte';
 import type { LayoutServerLoad } from './$types';
 export const load: LayoutServerLoad = async ( { cookies, fetch, url } ) => {
 
+    // Check if the user is already authenticated
     let access_token = cookies.get("access_token");
-
+    // If the user is authenticated, redirect to inbox
     if(access_token) {
         redirect(303, '/mail/inbox');
     }
@@ -34,7 +35,7 @@ export const load: LayoutServerLoad = async ( { cookies, fetch, url } ) => {
         if(RELATED_SERVERS) {
             data["RELATED_SERVERS"] = RELATED_SERVERS.split(",");
         }
-
+        console.log("Using env variables for server configuration", data);
         return data;
     }
 
@@ -42,7 +43,6 @@ export const load: LayoutServerLoad = async ( { cookies, fetch, url } ) => {
     // Fallback to server discovery if env variables are not set
 
     let domain = parse(url.origin).domain;
-
     const endpoint = `https://${domain}/.well-known/matrixbird/client`;
 
     try {

@@ -59,7 +59,7 @@ let lock_code_input = $derived.by(() => {
 
 
 $effect(() => {
-    //console.log(code_in_url)
+    console.log(data)
 })
 
 onMount(() => {
