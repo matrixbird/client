@@ -1,3 +1,4 @@
+import { env } from '$env/dynamic/public';
 import { redirect } from "@sveltejs/kit";
 import { error } from '@sveltejs/kit';
 
@@ -8,18 +9,39 @@ import { ServerConfig } from '$lib/store/server.svelte';
 import type { LayoutServerLoad } from './$types';
 export const load: LayoutServerLoad = async ( { cookies, fetch, url } ) => {
 
-    let data: {
-        MATRIXBIRD_SERVER?: string;
-    } = {};
-
     let access_token = cookies.get("access_token");
 
     if(access_token) {
         redirect(303, '/mail/inbox');
     }
 
+    let data: {
+        MATRIXBIRD_SERVER?: string;
+        HOMESERVER?: string;
+        RELATED_SERVERS?: string[];
+    } = {};
+
+
+    let MATRIXBIRD_SERVER = env.PUBLIC_MATRIXBIRD_SERVER;
+    let HOMESERVER = env.PUBLIC_HOMESERVER;
+    let RELATED_SERVERS = env.PUBLIC_RELATED_SERVERS;
+
+    // Skip server discovery if MATRIXBIRD_SERVER is set in env
+    if(MATRIXBIRD_SERVER && HOMESERVER) {
+        data["MATRIXBIRD_SERVER"] = MATRIXBIRD_SERVER;
+        data["HOMESERVER"] = HOMESERVER;
+
+        if(RELATED_SERVERS) {
+            data["RELATED_SERVERS"] = RELATED_SERVERS.split(",");
+        }
+
+        return data;
+    }
+
+
+    // Fallback to server discovery if env variables are not set
+
     let domain = parse(url.origin).domain;
-    console.log("Domain:", domain);
 
     const endpoint = `https://${domain}/.well-known/matrixbird/client`;
 
@@ -39,6 +61,11 @@ export const load: LayoutServerLoad = async ( { cookies, fetch, url } ) => {
         }
 
         data["MATRIXBIRD_SERVER"] = validated["matrixbird.server"].url
+        data["HOMESERVER"] = validated["m.homeserver"].base_url
+
+        if(validated["matrixbird.server"]?.related) {
+            data["RELATED_SERVERS"] = validated["matrixbird.server"].related
+        }
 
         return data;
 
